@@ -1,3 +1,14 @@
 <resources>
+    <!--
+    <string> 요소
+    - 단일 문자열 리소스를 추가할 때 사용하는 요소
+    - 반드시 name 속성값을 지정해야 한다
+    - name속성값은 문자열의 이름이자 다른 곳에서 참조해야 할
+      시소스 id로 사용된다
+    -->
     <string name="app_name">Books</string>
+    <!--  앱제목  -->
+    <string name="app_title">Books</string>
+    <!--  서버주소 -->
+    <string name="server_url">Books</string>
 </resources>

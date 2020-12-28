@@ -1,11 +1,30 @@
+<!--
+<resource>~</resource>
+- xml 리소스 파일의 루트 요소
+-> 모든 리소스 정의는 <resource>의 하위요소로 정의해야 한다
+-->
 <resources>
-
+    <!--
+    <style>~<style>
+    - 스타일 리소스를 추가할 때 사용하는 요소
+    -> name속성값을 지정하여 다른 곳에서 해당 스타일 리소스를 참조할 수 있도록 한다
+    -->
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+        <!--
+         <item>~</item>
+         => 스타일을 지정하고자 하는 속성에 따라
+         문자열, 색상, 다른 리소스에 대한 참조 지정
+        -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!--  제목 텍스트뷰 : 가운데 정렬, 글자 크게   -->
+    <style name = "TITLE_STYLE">
+        <item name = "android:textSize">30sp</item>
+        <item name = "android:textColor">@color/colorPrimary</item>
+        <item name = "android:layout_gravity">center_horizontal</item>
+    </style>
 </resources>
