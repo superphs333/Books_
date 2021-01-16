@@ -57,6 +57,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
+        android:onClick="go_to_Signup_Page"
         android:text="회원가입" />
 
     <!-- 비밀번호 찾기 페이지로 이동 -->
