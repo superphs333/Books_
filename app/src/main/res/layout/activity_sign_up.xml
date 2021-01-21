@@ -65,7 +65,7 @@
                 android:id="@+id/PW"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="비밀번호"
+                android:text="비밀번호(대소문자 구분 숫자 특수문자  조합 9 ~ 12 자리)"
                 android:textStyle="bold" />
 
             <EditText
@@ -88,8 +88,15 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="비밀번호를 한  번 더 입력해주세요"
-                android:layout_marginBottom="20sp"
                 android:inputType="textPersonName" />
+
+            <TextView
+                android:id="@+id/txt_pw_double_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20sp"
+                android:text="비밀번호 일치 확인 문구" />
+
 
             <!-- 닉네임   -->
             <TextView
@@ -113,10 +120,11 @@
                     android:inputType="textPersonName" />
 
                 <Button
-                    android:id="@+id/button3"
+                    android:id="@+id/btn_nick_chk"
                     android:layout_width="0dp"
                     android:layout_weight="4"
                     android:layout_height="wrap_content"
+                    android:onClick="Check_Nick_Double"
                     android:text="중복확인" />
             </LinearLayout>
 

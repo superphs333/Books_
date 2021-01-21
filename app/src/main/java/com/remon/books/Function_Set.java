@@ -13,6 +13,7 @@ import com.android.volley.toolbox.Volley;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class Function_Set {
 
@@ -41,13 +42,14 @@ public class Function_Set {
     함수
      */
     // 이메일 중복확인
-    public void chk_double_email(final VolleyCallback callback){
+    public void chk_double(final VolleyCallback callback, final String sort){
 
         // 결과값 리턴 -> able or unable
         final String[] result = {"unable"};
 
         // 웹페이지 실행하기
-        String url = "https://my3my3my.tk/website/double_chk.php";
+        String url = context.getString(R.string.server_url)+"double_chk.php";
+
 
         // 요청생성
             // 제공된 url에서 문자열 response를 요청한다
@@ -91,8 +93,8 @@ public class Function_Set {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("sort", "email_double_chk"); // 분류
-                params.put("email", input); // 입력 된 이메일 전송
+                params.put("sort", sort); // 분류
+                params.put("input", input); // 입력 된 값 전송
                 return params;
             }
         };
@@ -103,8 +105,32 @@ public class Function_Set {
         request.setShouldCache(false);
         AppHelper.requestQueue = Volley.newRequestQueue(context);
         AppHelper.requestQueue.add(request);
-
-
-
     }
+
+    // 비밀번호 정규식 확인
+    public boolean validate_Pw(String pw){
+        // 대소문자 구분 숫자 특수문자  조합 9 ~ 12 자리
+
+        // 정규식
+        String pw_Pattern
+                = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&])[A-Za-z[0-9]$@$!%*#?&]{9,}$";
+
+        Boolean check = Pattern.matches(pw_Pattern,pw);
+        Log.d("실행","비밀번호 정규식 결과="+check);
+
+        // 결과값 반환
+        return check;
+    } // end validate_pw
+
+
+    // 비밀번호 = 비밀번호 확인 일치
+    public boolean check_pw_equal(String pw, String pw_double){
+        if(pw.equals(pw_double)){ // 일치
+            return true;
+        }else{ // 일치하지 않음
+            return false;
+        }
+    } // end check_pw_equal
+
+
 }
