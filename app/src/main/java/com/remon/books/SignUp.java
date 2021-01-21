@@ -1,5 +1,7 @@
 package com.remon.books;
 import android.content.Context;
+import android.os.AsyncTask;
+import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -22,6 +24,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.mail.MessagingException;
+import javax.mail.SendFailedException;
+
 public class SignUp extends AppCompatActivity {
 
     /*
@@ -36,10 +41,25 @@ public class SignUp extends AppCompatActivity {
     // 함수모음 객체
     Function_Set function_set;
 
+    // 이메일 보내는 객체
+    GMailSender gMailSender;
+
+    // 이메일 인증문자
+    String temp_email_string;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
+
+        /*
+        인터넷 사용을 위한 권한
+         */
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .permitDiskReads()
+                .permitDiskWrites()
+                .permitNetwork().build());
+
 
         /*
         뷰연결
@@ -61,6 +81,8 @@ public class SignUp extends AppCompatActivity {
 
         // 함수모음 (닉네임, 이메일 중복체크 위해서)
         function_set = new Function_Set();
+
+
 
 
 
@@ -92,7 +114,40 @@ public class SignUp extends AppCompatActivity {
         function_set.chk_double_email(new Function_Set.VolleyCallback() {
             @Override
             public void onSuccess(String result) {
-                 Log.d("실행", "밖에서 result="+result);
+
+                // 결과값이 unable인 경우 -> 함수 빠져나오기
+                if(result.equals("unable")){
+                    return;
+                }
+
+                /*
+                이메일 전송
+                 */
+                gMailSender = new GMailSender("lee333dan@gmail.com","hipulkxqivsomwou");
+                // 임시 문자 생성
+                temp_email_string = gMailSender.getEmailCode();
+                Log.d("실행", "생성 된 인증문자="+temp_email_string);
+                // 이메일 보내기
+                String email_title
+                        = getString(R.string.app_title)+"에서 온 인증문자입니다";
+                String email_content
+                        = "다음의 인증문자를 입력하세요 :"+temp_email_string;
+                try {
+                    gMailSender.sendMail(email_title, email_content, email);
+                } catch (SendFailedException e) {
+                    Toast
+                            .makeText(getApplicationContext(), "이메일 형식이 잘못되었습니다.", Toast.LENGTH_SHORT).show();
+                }catch (MessagingException e) {
+                    Toast.makeText(getApplicationContext(), "인터넷 연결을 확인해주십시오+", Toast.LENGTH_SHORT).show();
+                    Log.d("실행","MessagingException=왜안나와..");
+                    Log.d("실행","MessagingException=>"+e.getMessage());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(getApplicationContext(),"예상치 못한 문제가 발생하였습니다. 다시 한 번 시도해주세요", Toast.LENGTH_SHORT).show();
+                    Log.d("실행","Exception=>"+e.getMessage());
+                } // 이메일 전송 catch문 끝
+
+
             }
         });
 
@@ -114,6 +169,8 @@ public class SignUp extends AppCompatActivity {
         }
         return return_Value;
     } // end isEmail
+
+
 
 
 }
