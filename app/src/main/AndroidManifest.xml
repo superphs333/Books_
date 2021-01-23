@@ -6,6 +6,12 @@
 
     <!-- 인터넷 사용 권한   -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 카메라 사용 권한   -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- 외부 파일 읽기 사용 권한   -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- 외부 파일 쓰기 사용 권한   -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!-- 하드웨어 : 카메라 사용   -->
     <uses-feature

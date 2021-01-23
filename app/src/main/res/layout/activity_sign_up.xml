@@ -49,7 +49,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="send_email"
-                android:text="인증문자 보내기" />
+                android:text="중복체크 및 인증문자 전송" />
 
             <EditText
                 android:id="@+id/edit_email_chk"
@@ -161,6 +161,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
+                        android:onClick="camera_for_profile"
                         android:text="카메라" />
 
                     <Button
@@ -168,6 +169,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="1"
+                        android:onClick="gallery_for_profile"
                         android:text="갤러리" />
 
                     <Button

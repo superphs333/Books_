@@ -41,7 +41,7 @@ public class Function_Set {
     /*
     함수
      */
-    // 이메일 중복확인
+    // 이메일/닉네임 중복확인
     public void chk_double(final VolleyCallback callback, final String sort){
 
         // 결과값 리턴 -> able or unable
@@ -49,7 +49,6 @@ public class Function_Set {
 
         // 웹페이지 실행하기
         String url = context.getString(R.string.server_url)+"double_chk.php";
-
 
         // 요청생성
             // 제공된 url에서 문자열 response를 요청한다

@@ -38,4 +38,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.squareup.retrofit2:retrofit:2.6.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.6.0'
+
+    // 권한체크용 (ted)
+    implementation 'gun0912.ted:tedpermission:2.2.0'
+
 }
