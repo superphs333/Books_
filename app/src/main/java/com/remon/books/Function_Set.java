@@ -1,6 +1,7 @@
 package com.remon.books;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -130,6 +131,8 @@ public class Function_Set {
             return false;
         }
     } // end check_pw_equal
+
+
 
 
 }

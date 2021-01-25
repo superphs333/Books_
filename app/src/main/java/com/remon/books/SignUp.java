@@ -5,6 +5,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.StrictMode;
@@ -31,6 +34,7 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,6 +82,12 @@ public class SignUp extends AppCompatActivity {
 
     // 중복 없는 이메일 저장해둔 변수
     String double_no_email = "";
+
+    /*
+    이미지 관련 변수
+     */
+    Bitmap image_bitmap;
+    Uri image_Uri;
 
 
 
@@ -519,8 +529,47 @@ public class SignUp extends AppCompatActivity {
                  */
                 InputStream in
                         = getContentResolver().openInputStream(data.getData());
+                    /*
+                    Content Provider = 어플리케이션 사이에서 Data를 공유하는 통로 역할
+                    Content Resolver = 컨텐트 프로바이더가 안드로이드 시스템의 각종 설정값이나
+                    DB에 접근하게 해 준다면 -> 결과를 반환하는 브릿지 역할은 컨텐트 리졸버
+                    => 컨텐트 프로바이더의 주소를 통해 데이터에 접근하여 결과를 가져온다
+                     */
+                    /*
+                    InputStream openInputStream(Uri uri)
+                    : 콘텐츠 URI와 연결된 콘텐츠에 대한 스트림을 연다
+                    매개변수)
+                    uri => 콘텐츠, android.resource, 파일
+                    오류발생시)
+                    FileNotFoundException 에러 : 제공된 URI를 열 수 없는 경우
+                     */
 
                 // 비트맵
+                image_bitmap = BitmapFactory.decodeStream(in);
+                    /*
+                    BitmapFactory = 여러가지 이미지 포멧을 decode해서
+                    bitmap으로 변환하는 함수들로 되어 있음
+                     */
+                    /*
+                    BitmapFactory.decodeStream
+                    = 입력 스트림을 비트맵으로 디코딩함
+                     */
+
+                // 파일닫기
+                try{
+                    in.close();
+                }catch (IOException e){
+                    e.printStackTrace();
+                     Log.d("실행", "in.close오류 =>"+e.getMessage());
+                }
+
+                // 뷰연결 및 셋팅
+                img_profile.setImageBitmap(image_bitmap);
+
+                // Uri 리턴받기
+                    // 서버로 전송하기 위해
+                //image_Uri = SaveImage(image_bitmap);
+
 
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
