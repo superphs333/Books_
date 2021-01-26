@@ -1,23 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.remon.books"
-    >
-
-    <!-- 인터넷 사용 권한   -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- 카메라 사용 권한   -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <!-- 외부 파일 읽기 사용 권한   -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!-- 외부 파일 쓰기 사용 권한   -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <!-- 하드웨어 : 카메라 사용   -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.remon.books">
+    <!-- 인터넷 사용 권한 -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 카메라 사용 권한 -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- 외부 파일 읽기 사용 권한 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- 외부 파일 쓰기 사용 권한 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 하드웨어 : 카메라 사용 -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
-
 
     <application
         android:allowBackup="true"
@@ -26,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SignUp"></activity>
+        <activity android:name=".SignUp" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,6 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- 크롭용 액티비티 -->
+        <activity
+            android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
+            android:theme="@style/Base.Theme.AppCompat" />
     </application>
 
 </manifest>

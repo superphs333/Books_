@@ -32,6 +32,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -59,6 +60,7 @@ public class SignUp extends AppCompatActivity {
 
     // 함수모음 객체
     Function_Set function_set;
+    GetUri getUri;
 
     // 이메일 보내는 객체
     GMailSender gMailSender;
@@ -87,7 +89,7 @@ public class SignUp extends AppCompatActivity {
     이미지 관련 변수
      */
     Bitmap image_bitmap;
-    Uri image_Uri;
+    String image_Uri;
 
 
 
@@ -179,6 +181,9 @@ public class SignUp extends AppCompatActivity {
         // 함수모음 (닉네임, 이메일 중복체크 위해서)
         function_set = new Function_Set();
         function_set.context = context; // context셋팅
+
+        // 이미지 uri 받기위해
+        getUri = new GetUri();
 
 
         /*
@@ -566,14 +571,22 @@ public class SignUp extends AppCompatActivity {
                 // 뷰연결 및 셋팅
                 img_profile.setImageBitmap(image_bitmap);
 
-                // Uri 리턴받기
-                    // 서버로 전송하기 위해
-                //image_Uri = SaveImage(image_bitmap);
+                // uri값 셋팅
+                image_Uri = getUri.getPath(context,data.getData());
+                Log.d("실행", "uri="+image_Uri);
+
+                // 이미지 크롭후 리턴을 받아야함 -> 크롭후 저장 ?
+                CropImage.activity(Uri.parse(image_Uri)).start(activity);
 
 
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         } // end 갤러리에서 이미지 가져오기
+
+        // 이미지 크롭
+        if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+            Log.d("실행","requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE");
+        }
     } // end onAcitivtyResult
 }
