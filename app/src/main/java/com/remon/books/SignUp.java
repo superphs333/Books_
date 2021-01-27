@@ -5,12 +5,14 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -33,7 +35,9 @@ import com.android.volley.toolbox.StringRequest;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -527,66 +531,64 @@ public class SignUp extends AppCompatActivity {
          */
         if(requestCode==PICK_FROM_GALLERY && resultCode==RESULT_OK
         && data!=null && data.getData()!=null){
-            try {
-                /*
-                콘텐츠 제공자(Content Provider)에 접근하여, 필요한 데이터 얻어오기
-                + 컨텐츠 URI와 연관된 컨텐츠에 대한 스트림을 연다
-                 */
-                InputStream in
-                        = getContentResolver().openInputStream(data.getData());
-                    /*
-                    Content Provider = 어플리케이션 사이에서 Data를 공유하는 통로 역할
-                    Content Resolver = 컨텐트 프로바이더가 안드로이드 시스템의 각종 설정값이나
-                    DB에 접근하게 해 준다면 -> 결과를 반환하는 브릿지 역할은 컨텐트 리졸버
-                    => 컨텐트 프로바이더의 주소를 통해 데이터에 접근하여 결과를 가져온다
-                     */
-                    /*
-                    InputStream openInputStream(Uri uri)
-                    : 콘텐츠 URI와 연결된 콘텐츠에 대한 스트림을 연다
-                    매개변수)
-                    uri => 콘텐츠, android.resource, 파일
-                    오류발생시)
-                    FileNotFoundException 에러 : 제공된 URI를 열 수 없는 경우
-                     */
 
-                // 비트맵
-                image_bitmap = BitmapFactory.decodeStream(in);
-                    /*
-                    BitmapFactory = 여러가지 이미지 포멧을 decode해서
-                    bitmap으로 변환하는 함수들로 되어 있음
-                     */
-                    /*
-                    BitmapFactory.decodeStream
-                    = 입력 스트림을 비트맵으로 디코딩함
-                     */
+            Log.d("실행", "(갤러리)경로=>"+data.getData());
 
-                // 파일닫기
-                try{
-                    in.close();
-                }catch (IOException e){
-                    e.printStackTrace();
-                     Log.d("실행", "in.close오류 =>"+e.getMessage());
-                }
+            // 이미지 크롭
+            CropImage
+                    .activity(data.getData())
+                    .setGuidelines(CropImageView.Guidelines.ON)
+                    .start(activity);
 
-                // 뷰연결 및 셋팅
-                img_profile.setImageBitmap(image_bitmap);
-
-                // uri값 셋팅
-                image_Uri = getUri.getPath(context,data.getData());
-                Log.d("실행", "uri="+image_Uri);
-
-                // 이미지 크롭후 리턴을 받아야함 -> 크롭후 저장 ?
-                CropImage.activity(Uri.parse(image_Uri)).start(activity);
+            // 파일 절대 경로 얻어오기
+            image_Uri = getUri.getPath(context,data.getData());
+            Log.d("실행", "절대경로=>"+image_Uri);
 
 
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
         } // end 갤러리에서 이미지 가져오기
 
         // 이미지 크롭
         if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
             Log.d("실행","requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE");
-        }
+
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if(resultCode == RESULT_OK){
+                Uri resultUri = result.getUri();
+                Log.d("실행", "reseultUri="+resultUri);
+
+                // 이미지에 셋팅
+                img_profile.setImageURI(resultUri);
+
+                /*
+                크롭한 이미지 비트맵화 -> 이미지 저장하기
+                */
+                Bitmap image_bitmap;
+                try {
+                    // 콘텐츠 제공자(Contetn Provider)에 접근하여, 필요한 데이터 얻어오기 +
+                    // 컨텐츠 URI와 연관된 컨텐츠에 대한 스트림을 연다
+                    InputStream in = getContentResolver().openInputStream(data.getData());
+
+                    // 비트맵
+                    image_bitmap = BitmapFactory.decodeStream(in);
+
+                    /*
+                    BitmapFactory = 여러가지 이미지 포맷을 decode해서
+                    bitmap으로 변환 하는 함수드로 되어있다.
+                    inputStream으로부터 Bitmap을 만들어 준다.
+                     */
+                    // 파일 닫기
+                    try{in.close();}catch(IOException e){e.printStackTrace();}
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+
+
+
+            }else if(resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE){
+                Exception error = result.getError();
+                Log.d("실행", "이미지 크롭 에러=>"+error);
+            }
+        } // end 이미지 크롭
     } // end onAcitivtyResult
 }
