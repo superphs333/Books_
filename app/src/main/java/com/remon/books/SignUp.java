@@ -551,9 +551,12 @@ public class SignUp extends AppCompatActivity {
         if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
             Log.d("실행","requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE");
 
+            // 내부저장소는 그냥 보낼때 오류 안나나? FileInput~~~일때
+
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if(resultCode == RESULT_OK){
                 Uri resultUri = result.getUri();
+                    // 캐시파일임
                 Log.d("실행", "reseultUri="+resultUri);
 
                 // 이미지에 셋팅
