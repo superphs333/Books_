@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import android.os.Bundle;
 import android.view.View;
@@ -76,6 +77,7 @@ public class SignUp extends AppCompatActivity {
     startAcitivyForResult용 변수
      */
     int PICK_FROM_GALLERY = 123;
+    int REQUEST_IMAGE_CAPTURE = 456;
 
 
     /*
@@ -492,6 +494,47 @@ public class SignUp extends AppCompatActivity {
 
     // 카메라 버튼 클릭
     public void camera_for_profile(View view) {
+        // 카메라에서 이미지를 가져온다
+
+        Intent intent
+                = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            /*
+            MediaStore.ACTION_IMAGE_CAPTURE
+            = 카메라 응용 프로그램에서 이미지를 캡쳐하여 리턴해준다
+             */
+
+        /*
+        암시적 인텐트를 처리 할 수 있는 앱이 단말에 설치 되었는지 확인하기 위해
+        -> resolveAcitivty
+        , 만약 설치되어 있지 않았다면, startActivity를 호출하는 순간, 앱은 크래시 된다
+         */
+        if(intent.resolveActivity(getPackageManager())!=null){
+            // 설치가 되어 있는 경우에만
+
+            // 1. 임의 경로에 파일 만들기
+            File photo_File = null;
+            try {
+                photo_File = function_set.createImageFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d("실행", "createImageFile 오류=>"+e.getMessage());
+            }
+            Log.d("실행", "uri=>"+photo_File.getAbsolutePath());
+            image_Uri = photo_File.getAbsolutePath();
+
+
+            // 2. FileProvider를 통해서 파일의 uri값을 만든다
+                // 이런식으로 했을때 onAcitivty도달 가능능
+           if(photo_File !=null){
+                Uri photo_Uri = FileProvider.getUriForFile(context,getPackageName(),photo_File);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,photo_Uri);
+                startActivityForResult(intent,REQUEST_IMAGE_CAPTURE);
+            }
+
+        }else{
+            Toast.makeText(getApplicationContext()
+                    , "실행 할 수 있는 앱이 없습니다. 카메라 어플을 설치해주세요",Toast.LENGTH_SHORT).show();
+        }
     }
 
     // 갤러리 버튼 클릭
@@ -504,6 +547,15 @@ public class SignUp extends AppCompatActivity {
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(intent,PICK_FROM_GALLERY);
 
+    }
+
+    // 입력한 내용 서버로 전송
+    public void send_to_server(View view) {
+        // 서버로 보낼 데이터
+        String name = edit_email.getText().toString();
+
+        // 서버주소
+        String server_Url = "https://my3my3my.tk/website/signup_chk.php";
     }
 
     // 이메일 유효성 확인
@@ -547,46 +599,50 @@ public class SignUp extends AppCompatActivity {
 
         } // end 갤러리에서 이미지 가져오기
 
+        /*
+        카메라에서 이미지 가져오기 -> 이미지 회전 -> 크롭
+         */
+         if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
+             Log.d("실행", "카메라에서 사진 가져오기");
+
+             // 참고 : https://github.com/ArthurHub/Android-Image-Cropper/issues/466
+             Uri original_uri = Uri.parse(image_Uri);
+             Uri return_uri = null;
+             if(original_uri.getScheme()==null){
+                  Log.d("실행", "original_uri.getScheme()==null");
+                 return_uri = Uri.fromFile(new File(image_Uri));
+             }else{
+                 Log.d("실행", "original_uri.getScheme()!=null");
+                 return_uri = original_uri;
+             }
+             Log.d("실행", "return_uri="+return_uri);
+                // 앞에 file://이 붙어서 나온다
+
+             // 이미지 크롭하기
+             CropImage.activity(return_uri).setGuidelines(CropImageView.Guidelines.ON).start(activity);
+
+         }
+
         // 이미지 크롭
         if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
             Log.d("실행","requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE");
 
             // 내부저장소는 그냥 보낼때 오류 안나나? FileInput~~~일때
-
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if(resultCode == RESULT_OK){
-                Uri resultUri = result.getUri();
-                    // 캐시파일임
-                Log.d("실행", "reseultUri="+resultUri);
 
-                // 이미지에 셋팅
-                img_profile.setImageURI(resultUri);
+                image_Uri = CropImage.getActivityResult(data).getUri().getPath();
+                    // 참고 : https://sandn.tistory.com/3
+                    // 이런식으로 받아야지, 비트맵 생성 가능
+                    // 카메라, 갤러리에서 접근가능능
+               Log.d("실행", "image_Uri=>"+image_Uri);
 
-                /*
-                크롭한 이미지 비트맵화 -> 이미지 저장하기
-                */
-                Bitmap image_bitmap;
-                try {
-                    // 콘텐츠 제공자(Contetn Provider)에 접근하여, 필요한 데이터 얻어오기 +
-                    // 컨텐츠 URI와 연관된 컨텐츠에 대한 스트림을 연다
-                    InputStream in = getContentResolver().openInputStream(data.getData());
+                // 비트맵 방향변경
+                String temp = String.valueOf(image_Uri);
+                image_bitmap = function_set.rotate_from(temp);
 
-                    // 비트맵
-                    image_bitmap = BitmapFactory.decodeStream(in);
-
-                    /*
-                    BitmapFactory = 여러가지 이미지 포맷을 decode해서
-                    bitmap으로 변환 하는 함수드로 되어있다.
-                    inputStream으로부터 Bitmap을 만들어 준다.
-                     */
-                    // 파일 닫기
-                    try{in.close();}catch(IOException e){e.printStackTrace();}
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-
-
-
+                // 이미지 셋팅
+                img_profile.setImageBitmap(image_bitmap);
 
             }else if(resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE){
                 Exception error = result.getError();
@@ -594,4 +650,6 @@ public class SignUp extends AppCompatActivity {
             }
         } // end 이미지 크롭
     } // end onAcitivtyResult
+
+
 }
