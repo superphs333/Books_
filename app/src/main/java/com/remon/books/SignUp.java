@@ -38,18 +38,29 @@ import com.gun0912.tedpermission.TedPermission;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.mail.MessagingException;
 import javax.mail.SendFailedException;
+
+import retrofit2.http.Url;
 
 public class SignUp extends AppCompatActivity {
 
@@ -97,6 +108,11 @@ public class SignUp extends AppCompatActivity {
     Bitmap image_bitmap;
     String image_Uri;
 
+    /*
+    파일전송
+     */
+    // 서버에 전송할 파일
+    FileInputStream mFile_Input_Stream;
 
 
 
@@ -551,11 +567,18 @@ public class SignUp extends AppCompatActivity {
 
     // 입력한 내용 서버로 전송
     public void send_to_server(View view) {
-        // 서버로 보낼 데이터
-        String name = edit_email.getText().toString();
+        /*
+        서버로 보낼 데이터
+        : 이메일, 비밀번호, 닉네임, 프로필 사진
+        -> asynctastk에는 아이디, 비밀번호, 닉네임만 보내면 된다
+        (이미지는 따로)
+         */
+        String email = edit_email.getText().toString();
+        String pw = edit_pw.getText().toString();
+        String nickname = edit_nick.getText().toString();
 
-        // 서버주소
-        String server_Url = "https://my3my3my.tk/website/signup_chk.php";
+        InsertData task = new InsertData();
+        task.execute(email, pw, nickname);
     }
 
     // 이메일 유효성 확인
@@ -650,6 +673,253 @@ public class SignUp extends AppCompatActivity {
             }
         } // end 이미지 크롭
     } // end onAcitivtyResult
+
+    class InsertData extends AsyncTask<String, Void, String>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            // 서버주소
+            String server_Url = getString(R.string.server_url)+"signup_chk.php";
+
+            /*
+            입력값
+             */
+            String email = edit_email.getText().toString();
+            String pw = edit_pw.getText().toString();
+            String nickname = edit_nick.getText().toString();
+
+            /*
+            HttpURLConnection을 위한 변수들
+             */
+            String params = "";
+            String lineEnd = "\r\n";
+            String twoHyphens = "--";
+            String boundary = "*****";
+                // 넘겨지는 각 인자를 구분하기 위한 구분자
+
+            // 이미지 파일
+            String fileName = "";
+            Random generator = new Random();
+            int n = 1000000;
+            n = generator.nextInt(n);
+            fileName = "Image_Profile-"+n+".jpg";
+
+            // 프로필 사진이 있는 경우에만
+            if(image_Uri!=null){
+                try {
+                    mFile_Input_Stream = new FileInputStream(image_Uri);
+                    Log.d("실행","FileInputStream성공");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                    Log.d("실행","FileNotFoundException에러=>"+e.getMessage());
+                }
+            } // end if(image_Uri!=null)
+
+            /*
+            PHP파일을 실행시킬 수 있는 주소와 전송할 데이터를 준비한다
+            - POST방식으로 데이터 전달시에는 데이터가 주소에 직접 입력되지X
+                -> http메세지 본문에 포함되어 전송되기 때문에 따로 데이터를
+                준비해야 한다
+                - 전송 할 데이터는
+                    - 이름-값 형식
+                        -> 여기서 적어준 이름을 나중에 php를 사용하여
+                        값을 얻게 된다
+                    - 여러개를 보내야 하는 경우 -> 항목사이에 &를 추가
+             */
+
+            /*
+            HttpURLConnection클래스를 사용하여 POST방식으로 데이터를 전송한다
+             */
+            try {
+                URL connectUrl = new URL(server_Url);
+                Log.d("실행","URL 에러X");
+
+                try {
+                    // HttpURLConnection 생성하기
+                    HttpURLConnection httpURLConnection
+                            = (HttpURLConnection)connectUrl.openConnection();
+                    httpURLConnection.setReadTimeout(5000);
+                        // 5초 안에 응답이 오지 않으면, 예외 발생
+                    httpURLConnection.setConnectTimeout(5000);
+                        // 5초 안에 연결이 안되면 예외가 발생
+                    httpURLConnection.setRequestMethod("POST");
+                        // post방식
+                    httpURLConnection
+                            .setRequestProperty(
+                                    "Content-Type"
+                                    , "multipart/form-data;charset=utf-8;boundary=" + boundary);
+                        // Content-Type을 Multipart를 이용하면(Requestbody전달시) -> byte전송이 가능
+                            // 멀티미디어 파일을 서버로 전송 가능
+                        // 문자열로 boundary를 초기화(이때 사용되는 문자열은 어떤 것이든 상관x)
+                            // 이 문자열은 넘겨지는 각 인자를 구분하기 위한 구분자
+                    httpURLConnection.setRequestProperty("Connection", "Keep-Alive");
+                        // http특성상 한번 연결하고 끊고, 재연결시 새롭게 연결하는데
+                        // http1.1에서부터는 재연결시 재사용 할 수 있도록 한다
+                        // + 서버에서 Keep-Alive를 지원해야 이용이 가능하다
+                    httpURLConnection.setRequestProperty("Cache-Control", "no-cache");
+                        // 컨트롤 캐쉬 설정
+                    // allow input and output
+                    httpURLConnection.setDoInput(true);
+                        // 읽기모드 지정
+                    httpURLConnection.setDoOutput(true);
+                        // 쓰기 보드 지정
+                    httpURLConnection.setUseCaches(false);
+                        // 캐싱데이털르 받을지 안받을지
+
+                    /*
+                    데이터 쓰기
+                    : post의 경우, 스트림을 통해서 파라미터를 전송해야 하기 때문에
+                     URLConnection으로 부터 OutputStream을 구해야 한다
+                     => outputstream을 통해 데이터를 보낸다
+                     */
+                    DataOutputStream dos
+                            = new DataOutputStream(httpURLConnection.getOutputStream());
+
+                    // 텍스트값 : 이메일, pw, 닉네임
+                    StringBuffer pd = new StringBuffer();
+                    pd.append(lineEnd);
+                    pd.append(twoHyphens+boundary+lineEnd);
+                    pd.append("Content-Disposition: form-data; name=\"email\""+lineEnd);
+                    pd.append(lineEnd);
+                    pd.append(email+lineEnd);
+
+                    pd.append(twoHyphens + boundary + lineEnd);
+                    pd.append("Content-Disposition: form-data; name=\"pw\""+lineEnd);
+                    pd.append(lineEnd);
+                    pd.append(pw+lineEnd);
+
+                    pd.append(twoHyphens + boundary + lineEnd);
+                    pd.append("Content-Disposition: form-data; name=\"nickname\""+lineEnd);
+                    pd.append(lineEnd);
+                    pd.append(nickname+lineEnd);
+
+                    // 이미지
+                    pd.append(twoHyphens+boundary+lineEnd);
+                    pd.append("Content-Disposition: form-data; name=\"uploadedfile\"; filename=\""+fileName+"\"\r\n");
+                    pd.append(lineEnd);
+
+                    Log.d("실행", "DATA=>\r\n"+pd.toString());
+                    // 텍스트 쓰기
+                    dos.writeUTF(pd.toString());
+
+                    // 이미지가 있는 경우에만
+                    if(image_Uri!=null){
+                        // create a buffer of maximum size
+                        int byte_Available = mFile_Input_Stream.available();
+                            // 입력스트림으로 읽을 수 있는 데이터의 바이트 수를 반환
+                        Log.d("실행", "byte_Available="+byte_Available);
+                        int maxBufferSize = 1024;
+                        int bufferSize = Math.min(byte_Available,maxBufferSize);
+                            // Math.min() : 입력받은 두 개의 인자값 중 작은 값 리턴
+
+                        byte[] buffer = new byte[bufferSize];
+
+                        // read file and write it into form
+                        int bytesRead
+                                = mFile_Input_Stream.read(buffer,0,bufferSize);
+                            /* int read(byte[] b, int off, int len)
+                            : 지정한 개수만큼 데이터 바이트를 읽고
+                            , byte배열의 지정한 위치에서부터 데이터를 저장한다
+                             */
+                        // read image
+                        while(bytesRead>0){
+                            dos.write(buffer,0,bufferSize);
+                            byte_Available  = mFile_Input_Stream.available();
+                            bufferSize = Math.min(byte_Available , maxBufferSize);
+                            bytesRead = mFile_Input_Stream.read(buffer,0,bufferSize);
+                        } // end while
+
+                        // send multipart form data necessary after file data
+                        dos.writeBytes(lineEnd);
+                        dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+                        Log.e("실행" , "File is written");
+                        mFile_Input_Stream.close();
+                    } // end if(image_Uri!=null)
+
+                    // 전송마무리
+                    dos.flush();
+
+
+                    /*
+                    응답을 읽는다
+                     */
+                    int responseStatusCode
+                            = httpURLConnection.getResponseCode();
+                    Log.d("실행", "POST response code - " + responseStatusCode);
+
+                    // inputStream을 통해 데이터를 받아온다
+                    InputStream inputStream;
+                    if(responseStatusCode==HttpURLConnection.HTTP_OK){
+                        // 정상적인 응답 데이터 인 경우
+                        inputStream = httpURLConnection.getInputStream();
+                    }else{
+                        // 에러 발생
+                        inputStream = httpURLConnection.getErrorStream();
+                    }
+
+                    /*
+                    StringBuilder을 사용하여 수신되는 데이터를 저장한다
+                     */
+                    InputStreamReader inputStreamReader
+                            = new InputStreamReader(inputStream,"UTF-8");
+                        /* InputStreamReader(InputStream in, String charsetName)
+                        = charsetName을 명명하는 인코딩을 사용하는 객체를 생성
+                         */
+                    BufferedReader  bufferedReader
+                            = new BufferedReader (inputStreamReader);
+                        /* BufferedReader(Reader in)
+                        = 버퍼를 이용한 입력
+                        -> 버퍼를 사용하기 때문에 입출력의 효율이 좋아진다
+                        => 입력스트림에 대한 디폴트 크기의 내부 버퍼를 갖는
+                        객체 생성
+                         */
+
+                    StringBuilder sb = new StringBuilder();
+                    String line = null;
+                    while((line=bufferedReader.readLine())!=null){
+                        sb.append(line);
+                    }// end while
+                    bufferedReader.close();
+
+                    /*
+                    저장 된 데이터를 스트링으로 변환하여 리턴한다
+                     */
+                    return sb.toString();
+
+
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d("실행","HttpURLConnection 오류=>"+e.getMessage());
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                Log.d("실행","url 오류=>"+e.getMessage());
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+
+            super.onPostExecute(s);
+
+            Log.d("실행", "POST response  - " + s);
+
+
+        }
+    }
+
+
+
 
 
 }
