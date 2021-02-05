@@ -2,15 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.remon.books">
     <!-- 인터넷 사용 권한 -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <!-- 카메라 사용 권한 -->
-    <uses-permission android:name="android.permission.CAMERA" />
-    <!-- 외부 파일 읽기 사용 권한 -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!-- 외부 파일 쓰기 사용 권한 -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <!-- 하드웨어 : 카메라 사용 -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 카메라 사용 권한 -->
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- 외부 파일 읽기 사용 권한 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- 외부 파일 쓰기 사용 권한 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- 하드웨어 : 카메라 사용 -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
@@ -29,14 +24,10 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <!-- 크롭용 액티비티 -->
+        </activity> <!-- 크롭용 액티비티 -->
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat" />
-
-
-        <!-- 카메라 동작시 필요한 provider -->
+            android:theme="@style/Base.Theme.AppCompat" /> <!-- 카메라 동작시 필요한 provider -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.remon.books"
@@ -46,7 +37,6 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
-
     </application>
 
 </manifest>

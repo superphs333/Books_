@@ -84,6 +84,9 @@ public class SignUp extends AppCompatActivity {
     // 이메일 인증문자
     String temp_email_string;
 
+    // 중복 확인 체크한(중복이 아닌) 이메일
+    String temp_email_not_duplication;
+
     /*
     startAcitivyForResult용 변수
      */
@@ -99,8 +102,6 @@ public class SignUp extends AppCompatActivity {
     boolean pw_equal =false;
     boolean nick_no_double =false;
 
-    // 중복 없는 이메일 저장해둔 변수
-    String double_no_email = "";
 
     /*
     이미지 관련 변수
@@ -209,10 +210,9 @@ public class SignUp extends AppCompatActivity {
 
 
         /*
-        만약, 이메일 입력창이 변경되면+email_no_double이 true인 상태에서
-        => 경고창() : 이메일을 변경하면 인증문자를 다시 입력해야 합니다
-            => 예 : email_no_double=false, 인증문자 지워짐, 변수에 있는 인증문자 초기화
-            , 중복 확인 인증된 이메일 변수 초기화
+        이메일 중복 체크를 통과(email_no_double=true)
+        => 이메일 변경시 경고창(이메일 중복체크를 다시 해야 합니다)
+
          */
         edit_email.addTextChangedListener(new TextWatcher() {
             @Override
@@ -230,24 +230,21 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
 
-                if(email_no_double==true && double_no_email.equals(edit_email.getText().toString())){
+
+
+                if(email_no_double==true && !edit_email.getText().toString().equals(temp_email_not_duplication)){
                     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                     builder.setTitle("알림"); //AlertDialog의 제목 부분
-                    builder.setMessage("이메일을 변경하면 다시 이메일 인증문자를 전송해야 합니다." +
-                            "그래도 변경하시겠습니까?");
+                    builder.setMessage("중복체크가 완료된 이메일을 변경하시면 이메일 중복체크를 다시 해야합니다. 변경하시겠습니까?");
                     builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Log.d("실행","예 누름");
 
-                            // 이메일 중복 체크 확인 변수를 false로 변경
                             email_no_double = false;
-                            // 이메일 인증문자 변수 빈칸
-                            temp_email_string = "";
-                            // 인증문자 빈칸
-                            edit_email_chk.setText("");
-
-
+                            temp_email_not_duplication = null; // 중복되지 않은 이메일 초기화
+                            temp_email_string = null; // 인증문자 초기화
+                            edit_email.setText("");
                         }
                     });
                     builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
@@ -255,24 +252,19 @@ public class SignUp extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             Log.d("실행","아니요 누름");
 
-                            // 이메일 입력칸(edit_email)을 다시 원상태로 돌려놓는다
-                            edit_email.setText(double_no_email);
+                            // 이전값(중복체크가 완료된)으로 되돌리기
+                            edit_email.setText(temp_email_not_duplication);
+
+                            // 만약에 -> ()이면 -> edit Text 변경하기
 
 
                         }
                     });
-
-
-                    builder.setNeutralButton("취소", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Log.d("실행","취소 누름");
-                        }
-                    });
+                    builder.setNeutralButton("취소", null);
                     builder.create().show(); //보이기
 
-                }// end if
-            }
+                } // end if
+            } // end afterTextChanged
         });
 
         /*
@@ -282,19 +274,19 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 // 무언가 바뀐 시점 전에(글자 변화되기 전)
-                 Log.d("실행", "beforeTextChanged");
+                 //Log.d("실행", "beforeTextChanged");
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // 무언가 바뀐 시점(글자 변화되는 중)
-                Log.d("실행", "onTextChanged");
+                //Log.d("실행", "onTextChanged");
             }
 
             @Override
             public void afterTextChanged(Editable s) {
                 // 무언가 바뀐 이후(글자 변화된 후)
-                Log.d("실행", "afterTextChanged");
+                //Log.d("실행", "afterTextChanged");
 
                 // 입력값
                 String pw = edit_pw.getText().toString();
@@ -321,7 +313,6 @@ public class SignUp extends AppCompatActivity {
                 if(pw_equal==true){
                     txt_pw_double_info.setText("입력한 비밀번호를 확인해주세요");
                     pw_equal = false;
-
                 }
 
                 /*
@@ -448,8 +439,10 @@ public class SignUp extends AppCompatActivity {
                 /*
                 이메일 전송
                  */
+                // 이메일 double 체크 true
                 email_no_double = true;
-                double_no_email = email;
+                // 중복체크 확인한 이메일 임시 저장
+                temp_email_not_duplication = email;
                 gMailSender = new GMailSender("lee333dan@gmail.com","hipulkxqivsomwou");
                 // 임시 문자 생성
                 temp_email_string = gMailSender.getEmailCode();
@@ -488,6 +481,13 @@ public class SignUp extends AppCompatActivity {
     public void Check_Nick_Double(View view) {
         // 입력값
         String Nick = edit_nick.getText().toString();
+
+        // 닉네임 적합성 판단
+        if(!function_set.validate_Nick(Nick)){
+            Toast.makeText(getApplicationContext()
+                    , "닉네임이 적절하지 않습니다",Toast.LENGTH_LONG).show();
+            return;
+        }
 
         // 중복체크
         function_set.input = Nick;
@@ -565,8 +565,57 @@ public class SignUp extends AppCompatActivity {
 
     }
 
+    // 등록된 이미지 삭제
+    public void delete_profile_picture(View view) {
+        Log.d("실행", "delete_profile_picture");
+
+        // 이미지에 기본 이미지 셋팅
+        img_profile.setImageResource(R.drawable.basic_profile_img);
+
+        // uri에 셋팅되어 있는 값 초기화
+        image_Uri = null;
+
+    }
+
     // 입력한 내용 서버로 전송
     public void send_to_server(View view) {
+
+        /*
+        검사 : 이메일, 비밀번호, 닉네임
+         */
+        // 이메일 중복 확인
+        if(!email_no_double){
+            Toast.makeText(getApplicationContext()
+                    , "이메일 중복체크를 확인해주세요",Toast.LENGTH_LONG).show();
+            return;
+        }
+        // 이메일 인증 문자 확인
+        if(!edit_email_chk.getText().toString().equals(temp_email_string)){
+            Toast.makeText(getApplicationContext()
+                    , "이메일 인증 문자를 확인해주세요",Toast.LENGTH_LONG).show();
+            return;
+        }
+        // 비밀번호 적합성 확인
+        if(!regex_pw){
+            Toast.makeText(getApplicationContext()
+                    , "적합한 비밀번호인지 확인해주세요",Toast.LENGTH_LONG).show();
+            return;
+        }
+        // 비밀번호 = 비밀번호 일치 확인
+        if(!pw_equal){
+            Toast.makeText(getApplicationContext()
+                    , "비밀번호와 비밀번호 확인은 일치해야 합니다",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // 닉네임 중복 확인
+        if(!nick_no_double){
+            Toast.makeText(getApplicationContext()
+                    , "닉네임을 확인해주세요",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+
         /*
         서버로 보낼 데이터
         : 이메일, 비밀번호, 닉네임, 프로필 사진
@@ -674,6 +723,8 @@ public class SignUp extends AppCompatActivity {
         } // end 이미지 크롭
     } // end onAcitivtyResult
 
+
+
     class InsertData extends AsyncTask<String, Void, String>{
 
         @Override
@@ -703,15 +754,12 @@ public class SignUp extends AppCompatActivity {
             String boundary = "*****";
                 // 넘겨지는 각 인자를 구분하기 위한 구분자
 
-            // 이미지 파일
-            String fileName = "";
-            Random generator = new Random();
-            int n = 1000000;
-            n = generator.nextInt(n);
-            fileName = "Image_Profile-"+n+".jpg";
+
 
             // 프로필 사진이 있는 경우에만
             if(image_Uri!=null){
+                 Log.d("실행", "image_Uri!=null");
+
                 try {
                     mFile_Input_Stream = new FileInputStream(image_Uri);
                     Log.d("실행","FileInputStream성공");
@@ -799,17 +847,29 @@ public class SignUp extends AppCompatActivity {
                     pd.append(lineEnd);
                     pd.append(nickname+lineEnd);
 
-                    // 이미지
-                    pd.append(twoHyphens+boundary+lineEnd);
-                    pd.append("Content-Disposition: form-data; name=\"uploadedfile\"; filename=\""+fileName+"\"\r\n");
-                    pd.append(lineEnd);
 
-                    Log.d("실행", "DATA=>\r\n"+pd.toString());
+
+                    //Log.d("실행", "DATA=>\r\n"+pd.toString());
                     // 텍스트 쓰기
                     dos.writeUTF(pd.toString());
 
                     // 이미지가 있는 경우에만
                     if(image_Uri!=null){
+
+                        // 이미지 파일
+                        String fileName = "";
+                        Random generator = new Random();
+                        int n = 1000000;
+                        n = generator.nextInt(n);
+                        fileName = "Image_Profile-"+n+".jpg";
+
+                        // 이미지
+                        pd.append(twoHyphens+boundary+lineEnd);
+                        pd.append("Content-Disposition: form-data; name=\"uploadedfile\"; filename=\""+fileName+"\"\r\n");
+                        pd.append(lineEnd);
+                        dos.writeUTF(pd.toString());
+
+
                         // create a buffer of maximum size
                         int byte_Available = mFile_Input_Stream.available();
                             // 입력스트림으로 읽을 수 있는 데이터의 바이트 수를 반환
@@ -914,8 +974,24 @@ public class SignUp extends AppCompatActivity {
 
             Log.d("실행", "POST response  - " + s);
 
+            String[] string_array= s.split(getString(R.string.seperator));
+            String result = string_array[string_array.length-1];
+            Log.d("실행", "result = "+result);
 
-        }
+            if(result.equals("success")){
+                Toast.makeText(getApplicationContext()
+                        , "회원가입이 완료되었습니다",Toast.LENGTH_LONG).show();
+
+                // 로그인 페이지로 이동
+                Intent intent = new Intent(context,MainActivity.class);
+                startActivity(intent);
+                finish();
+            }else{
+                Toast.makeText(getApplicationContext()
+                        , "죄송합니다. 문제가 생겼습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
+            }
+
+        } // end onPostExecute
     }
 
 

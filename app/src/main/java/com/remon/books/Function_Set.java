@@ -128,7 +128,7 @@ public class Function_Set {
 
         // 정규식
         String pw_Pattern
-                = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&])[A-Za-z[0-9]$@$!%*#?&]{9,}$";
+                = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&])[A-Za-z[0-9]$@$!%*#?&]{9,12}$";
 
         Boolean check = Pattern.matches(pw_Pattern,pw);
         Log.d("실행","비밀번호 정규식 결과="+check);
@@ -146,6 +146,20 @@ public class Function_Set {
             return false;
         }
     } // end check_pw_equal
+
+    // 닉네임 정규식 확인
+    public boolean validate_Nick(String nickname){
+
+        Boolean check = false;
+
+        // 정규식
+            // 영문, 숫자, '_'로만 이루어진 4~12자 이하
+        String nick_Pattern
+                    = "^[a-zA-Z0-9]{1}[a-zA-Z0-9_]{3,11}$";
+        check = Pattern.matches(nick_Pattern,nickname);
+
+        return check;
+    }
 
 
     /*

@@ -11,4 +11,6 @@
     <string name="app_title">Books</string>
     <!--  서버주소 -->
     <string name="server_url">https://my3my3my.tk/website/</string>
+    <!--  구분자  -->
+    <string name="seperator">§▼▩</string>
 </resources>
