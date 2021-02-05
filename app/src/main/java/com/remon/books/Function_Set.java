@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Function_Set {
@@ -57,6 +58,21 @@ public class Function_Set {
     /*
     함수
      */
+    // 이메일 유효성 확인
+    public boolean is_Email(String email){
+        boolean return_Value = false;
+        String regex = "^[_a-zA-Z0-9-\\.]+@[\\.a-zA-Z0-9-]+\\.[a-zA-Z]+$";
+        Pattern p = Pattern.compile(regex);
+        // Pattern.compile(String regex)
+        // = 주어진 정규표현식으로부터 패턴을 만든다
+        // 패턴과 입력받은 값이 일치하는지 확인
+        Matcher m = p.matcher(email);
+        if(m.matches()){ // 일치하는 경우에만 true
+            return_Value = true;
+        }
+        return return_Value;
+    } // end isEmail
+
     // 이메일/닉네임 중복확인
     public void chk_double(final VolleyCallback callback, final String sort){
 

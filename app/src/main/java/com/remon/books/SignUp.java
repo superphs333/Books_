@@ -201,7 +201,7 @@ public class SignUp extends AppCompatActivity {
 
 
 
-        // 함수모음 (닉네임, 이메일 중복체크 위해서)
+        // 함수모음
         function_set = new Function_Set();
         function_set.context = context; // context셋팅
 
@@ -410,7 +410,7 @@ public class SignUp extends AppCompatActivity {
         final String email = edit_email.getText().toString();
 
         // 이메일 형식인지 확인한다
-        if(!is_Email(email)){ // 이메일 형식이 아닌 경우 토스트로 알림 -> 함수종료
+        if(!function_set.is_Email(email)){ // 이메일 형식이 아닌 경우 토스트로 알림 -> 함수종료
 
             Toast
                     .makeText
@@ -630,20 +630,6 @@ public class SignUp extends AppCompatActivity {
         task.execute(email, pw, nickname);
     }
 
-    // 이메일 유효성 확인
-    public boolean is_Email(String email){
-        boolean return_Value = false;
-        String regex = "^[_a-zA-Z0-9-\\.]+@[\\.a-zA-Z0-9-]+\\.[a-zA-Z]+$";
-        Pattern p = Pattern.compile(regex);
-            // Pattern.compile(String regex)
-                // = 주어진 정규표현식으로부터 패턴을 만든다
-        // 패턴과 입력받은 값이 일치하는지 확인
-        Matcher m = p.matcher(email);
-        if(m.matches()){ // 일치하는 경우에만 true
-            return_Value = true;
-        }
-        return return_Value;
-    } // end isEmail
 
 
     @Override
