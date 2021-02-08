@@ -386,11 +386,12 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 if(nick_no_double==true){ // 중복확인체크가 끝난경우
-                    txt_nick_info.setText("중복확인 문구");
+
 
                     // 만약 이전 닉네임과 같은 경우가 아니라면 nick_no_double = false
                     // + txt_nick_info 변경
                     if(!edit_nick.equals(before_nick)){
+                        txt_nick_info.setText("중복확인 문구");
                         nick_no_double = false;
                     }
 
