@@ -177,6 +177,9 @@ public class Function_Set {
         return check;
     }
 
+    // 회원 정보 가져오기 (by Retrofit)
+
+
 
     /*
     임시파일 반환하기

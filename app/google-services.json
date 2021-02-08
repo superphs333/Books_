@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "449317864971",
+    "project_id": "books-d9dcc",
+    "storage_bucket": "books-d9dcc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:449317864971:android:4f884e28c3a858d7b0a90e",
+        "android_client_info": {
+          "package_name": "com.remon.books"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "449317864971-rqu6i5m4rad0plcbuq5u4jfiomovt6r0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.remon.books",
+            "certificate_hash": "d6922784d6ddfcf72902ece2bc9a25eeaf9993f2"
+          }
+        },
+        {
+          "client_id": "449317864971-43q08ih4j8bvo4qko5et3nmgh4uuvai8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAijHN_zzpCYVlIzA9Epwn5WpidKHuO9Os"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "449317864971-43q08ih4j8bvo4qko5et3nmgh4uuvai8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

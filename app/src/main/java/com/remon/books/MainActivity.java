@@ -1,4 +1,6 @@
 package com.remon.books;
+
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.widget.Toast;
 
@@ -58,7 +60,15 @@ public class MainActivity extends AppCompatActivity {
     Function_Set function_set;
 
     /*
+    멤버저장
+     */
+    SharedPreferences pref;
+    SharedPreferences.Editor editor;
+
+
+    /*
     구글로그인
+    참고) https://dvlv.tistory.com/27
      */
     private SignInButton signInButton;
     private GoogleSignInClient mGoogleSignInClient;
@@ -90,6 +100,14 @@ public class MainActivity extends AppCompatActivity {
         // 함수모음
         function_set = new Function_Set();
         function_set.context = context; // context셋팅
+
+        /*
+        SharedPreference
+         */
+        pref = getSharedPreferences("member", Context.MODE_PRIVATE);
+        editor = pref.edit();
+
+
 
         /*
         버튼연결
@@ -145,8 +163,17 @@ public class MainActivity extends AppCompatActivity {
 
         if(currentUser != null){
             // User is signed in
+            Log.d("실행", "User is signed in");
+            String name = currentUser.getDisplayName();
+            String email = currentUser.getEmail();
+            Uri photoUrl = currentUser.getPhotoUrl();
+            String platform_id =  currentUser.getUid();
+            Log.d("실행", "name="+name+", email="+email+", photoUrl="+photoUrl+", platform_id="+platform_id);
+
         }else{
             // No user is signed in
+            Log.d("실행", "No user is signed in");
+
         }
     } // end onStart
 
@@ -260,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("실행", "txt_signup(회원가입) 클릭");
         Intent intent = new Intent(this,SignUp.class);
         startActivity(intent);
+        finish();
     }
 
 
@@ -301,8 +329,21 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(String response) {
                         Log.d("실행","response=>"+response);
 
+
                         if(response.equals("1")){ // 값존재 -> 로그인 성공
-                            Toast.makeText(getApplicationContext(), "로그인 되었습니다",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getApplicationContext()
+                                    , "로그인 되었습니다",Toast.LENGTH_LONG).show();
+
+                            /*
+                            회원정보 가져오기
+                             */
+
+
+                            /*
+                            Shared에 회원정보 저장(편의)
+                             */
+                            //editor.putString("Unique_Value",value);
+
 
                             // 페이지 이동
                             Intent intent = new Intent(context,Main.class);
