@@ -41,6 +41,7 @@
         android:id="@+id/chk_autologin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="20sp"
         android:text="자동로그인" />
 
     <!-- 로그인 버튼 -->
@@ -50,6 +51,14 @@
         android:layout_height="wrap_content"
         android:onClick="login"
         android:text="로그인" />
+
+    <!--구글 로그인 버튼-->
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+    />
 
     <!-- 회원가입 페이지로 이동 -->
     <TextView
