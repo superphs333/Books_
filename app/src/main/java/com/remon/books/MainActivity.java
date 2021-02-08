@@ -264,6 +264,13 @@ public class MainActivity extends AppCompatActivity {
 
                            } // end user!=null
 
+
+                            /*
+                            데이터베이스에 회원 등록(Database : members)
+                             */
+                            insert_member();
+
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w("실행", "signInWithCredential:failure", task.getException());
@@ -380,6 +387,12 @@ public class MainActivity extends AppCompatActivity {
         AppHelper.requestQueue.add(request);
 
     } // end login
+
+
+    // 회원등록
+    private boolean insert_member(){
+
+    }
 
 
 }
