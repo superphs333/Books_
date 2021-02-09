@@ -20,6 +20,8 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.remon.books.Function.Function_Set;
+import com.remon.books.Function.Function_SharedPreference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +35,7 @@ public class Set_nickname extends AppCompatActivity {
     Button btn_nick_chk;
 
     Function_Set function_set;
+    Function_SharedPreference fs;
 
     // 닉네임 중복체크
     boolean nick_no_double = false;
@@ -57,6 +60,8 @@ public class Set_nickname extends AppCompatActivity {
         // 함수 모음 객체
         function_set = new Function_Set();
         function_set.context = context; // context셋팅
+        fs = new Function_SharedPreference(context);
+
 
         /*
         Intent로 부터 값 받아오기(login_value, profile_url)
@@ -156,7 +161,8 @@ public class Set_nickname extends AppCompatActivity {
                                     , "회원가입이 완료되었습니다",Toast.LENGTH_LONG).show();
 
                             // Shared에 회원 Unique_Value 저장
-                            function_set.save_member_info(login_value);
+                            fs.PREFERENCE = "member";
+                            fs.setPreference("Unique_Value",login_value);
 
                             // 페이지 이동
                             Intent intent = new Intent(context,Main.class);

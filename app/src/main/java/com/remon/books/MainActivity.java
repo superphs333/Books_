@@ -38,6 +38,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.remon.books.Function.Function_Set;
+import com.remon.books.Function.Function_SharedPreference;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,12 +60,8 @@ public class MainActivity extends AppCompatActivity {
 
     // 함수모음 객체
     Function_Set function_set;
+    Function_SharedPreference function_sharedPreference;
 
-    /*
-    멤버저장
-     */
-    SharedPreferences pref;
-    SharedPreferences.Editor editor;
 
 
     /*
@@ -100,12 +98,7 @@ public class MainActivity extends AppCompatActivity {
         // 함수모음
         function_set = new Function_Set();
         function_set.context = context; // context셋팅
-
-        /*
-        SharedPreference
-         */
-        pref = getSharedPreferences("member", Context.MODE_PRIVATE);
-        editor = pref.edit();
+        function_sharedPreference = new Function_SharedPreference(context);
 
 
 
@@ -354,7 +347,8 @@ public class MainActivity extends AppCompatActivity {
                             /*
                             Shared에 회원 Unique_Value 저장(편의)
                              */
-                            function_set.save_member_info(email);
+                            function_sharedPreference.PREFERENCE = "member";
+                            function_sharedPreference.setPreference("Unique_Value",email);
 
 
                             // 페이지 이동

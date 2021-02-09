@@ -1,4 +1,4 @@
-package com.remon.books;
+package com.remon.books.Function;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -19,6 +19,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.remon.books.AppHelper;
+import com.remon.books.R;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,8 +42,8 @@ public class Function_Set {
     /*
     변수
      */
-    String input;
-    Context context;
+    public String input;
+    public Context context;
 
     /*
     생성자1
@@ -302,30 +304,7 @@ public class Function_Set {
                                 true);
     }
 
-    // SharedPreference에 해당 member의 Unique_Value저장하기
-    public void save_member_info(String unique){
-        SharedPreferences pref = context.getSharedPreferences("member", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putString("Unique_Value",unique);
-        editor.commit();
-        //pref.getString("Unique_Value",)
-    } // end save_member_info
 
-
-    /*
-    SharedPreference
-     */
-    public void save_in_SharedPreference(String SharedPreference_name, String key, String datatype){
-        SharedPreferences pref = context.getSharedPreferences(SharedPreference_name, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-
-        if(datatype.equals("int")){
-
-        }else if(){
-
-        }
-
-    } // end save_in_SharedPreference
 
 
 
