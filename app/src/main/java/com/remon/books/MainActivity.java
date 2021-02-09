@@ -170,6 +170,10 @@ public class MainActivity extends AppCompatActivity {
             String platform_id =  currentUser.getUid();
             Log.d("실행", "name="+name+", email="+email+", photoUrl="+photoUrl+", platform_id="+platform_id);
 
+            // 페이지 이동
+            Intent intent = new Intent(context,Main.class);
+            startActivity(intent);
+
         }else{
             // No user is signed in
             Log.d("실행", "No user is signed in");
@@ -222,6 +226,8 @@ public class MainActivity extends AppCompatActivity {
         //showProgressDialog();
         // [END_EXCLUDE]
 
+
+
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -251,9 +257,9 @@ public class MainActivity extends AppCompatActivity {
                            : name, email address, profile photo url
                             */
                            if(user != null){
-                               Uri profile_url = user.getPhotoUrl();
+                               String profile_url = String.valueOf(user.getPhotoUrl());
                                String login_value =  user.getUid();
-
+                               //Log.d("실행", "profile_url="+profile_url);
 
                                // Check if user's email is verified
                                boolean emailVerified = user.isEmailVerified();
@@ -346,14 +352,9 @@ public class MainActivity extends AppCompatActivity {
                                     , "로그인 되었습니다",Toast.LENGTH_LONG).show();
 
                             /*
-                            회원정보 가져오기
+                            Shared에 회원 Unique_Value 저장(편의)
                              */
-
-
-                            /*
-                            Shared에 회원정보 저장(편의)
-                             */
-                            //editor.putString("Unique_Value",value);
+                            function_set.save_member_info(email);
 
 
                             // 페이지 이동
@@ -392,50 +393,10 @@ public class MainActivity extends AppCompatActivity {
 
     } // end login
 
-
-    // 회원등록
-    private boolean insert_member(){
-        // 웹페이지 실행하기
-        String url = getString(R.string.server_url)+"login.php";
-
-        StringRequest request = new StringRequest(
-                Request.Method.POST,
-                url,
-                new com.android.volley.Response.Listener<String>() { // 정상 응답
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d("실행","response=>"+response);
-
-                    }
-                },
-                new com.android.volley.Response.ErrorListener() { // 에러 발생
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("실행","error=>"+error.getMessage());
-                    }
-                }
-
-        ){ // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
-            // 만약 헤더를 한 줄 추가하고 싶다면 getHeaders() override
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("google_login","google_login");
-                params.put("", "post로 넣을 값");
-                return params;
-            }
-        };
-
-        // 요청 객체를 만들었으니 이제 requestQueue 객체에 추가하면 됨.
-        // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
-        // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
-        request.setShouldCache(false);
-        AppHelper.requestQueue = Volley.newRequestQueue(context);
-        AppHelper.requestQueue.add(request);
-
-        return false;
-
-    }
+    // 구글 로그인 탈퇴(임시코드)
+    public void google_unlink(View view) {
+        mAuth.getCurrentUser().delete();
+    } // end google_unlink
 
 
 }

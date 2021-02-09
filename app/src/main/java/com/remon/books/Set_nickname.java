@@ -4,14 +4,25 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Set_nickname extends AppCompatActivity {
 
@@ -26,7 +37,8 @@ public class Set_nickname extends AppCompatActivity {
     // 닉네임 중복체크
     boolean nick_no_double = false;
 
-    // login
+    // login 정보
+    String login_value,profile_url;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +61,9 @@ public class Set_nickname extends AppCompatActivity {
         /*
         Intent로 부터 값 받아오기(login_value, profile_url)
          */
-        String login_va;
+        login_value = getIntent().getStringExtra("login_value");
+        profile_url = getIntent().getStringExtra("profile_url");
+
 
         /*
         중복확인 후에,
@@ -71,6 +85,7 @@ public class Set_nickname extends AppCompatActivity {
              @Override
              public void afterTextChanged(Editable s) {
                  if(nick_no_double==true){
+                     txt_nick_info.setText("중복확인 문구");
                      nick_no_double = false;
                  } // end if
              } // end afterTextChanged
@@ -111,7 +126,76 @@ public class Set_nickname extends AppCompatActivity {
 
     } // end Check_Nick_Double
 
+    // 회원가입
     public void sign_up(View view) {
 
-    }
+        // 만약, nick_no_double = false인 경우 toast하고 함수 빠져나오기)
+        if(nick_no_double==false){
+            Toast.makeText(getApplicationContext()
+                    , "닉네임을 확인해 주세요",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // 닉네임
+       final String nickname = edit_nick.getText().toString();
+
+        // 웹페이지 실행하기
+        String url = getString(R.string.server_url)+"signup_google_chk.php";
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                url,
+                new com.android.volley.Response.Listener<String>() { // 정상 응답
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("실행","response=>"+response);
+
+                        // 성공인경우
+                        if(response.equals("success")){
+                            Toast.makeText(getApplicationContext()
+                                    , "회원가입이 완료되었습니다",Toast.LENGTH_LONG).show();
+
+                            // Shared에 회원 Unique_Value 저장
+                            function_set.save_member_info(login_value);
+
+                            // 페이지 이동
+                            Intent intent = new Intent(context,Main.class);
+                            startActivity(intent);
+
+                        }else{
+                            Toast.makeText(getApplicationContext()
+                                    , "죄송합니다. 오류가 발생하였습니다. 다시 시도해 주세요",Toast.LENGTH_LONG).show();
+                        }
+
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() { // 에러 발생
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("실행","error=>"+error.getMessage());
+                    }
+                }
+
+        ){ // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
+            // 만약 헤더를 한 줄 추가하고 싶다면 getHeaders() override
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("login_value", login_value);
+                params.put("profile_url", profile_url);
+                params.put("nickname", nickname);
+
+
+                return params;
+            }
+        };
+
+        // 요청 객체를 만들었으니 이제 requestQueue 객체에 추가하면 됨.
+        // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
+        // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
+        request.setShouldCache(false);
+        AppHelper.requestQueue = Volley.newRequestQueue(context);
+        AppHelper.requestQueue.add(request);
+
+    } // end sign_up
 }

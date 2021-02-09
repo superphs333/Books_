@@ -1,6 +1,7 @@
 package com.remon.books;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -31,6 +32,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import retrofit2.Retrofit;
 
 public class Function_Set {
 
@@ -298,6 +301,31 @@ public class Function_Set {
                                 matrix,
                                 true);
     }
+
+    // SharedPreference에 해당 member의 Unique_Value저장하기
+    public void save_member_info(String unique){
+        SharedPreferences pref = context.getSharedPreferences("member", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString("Unique_Value",unique);
+        editor.commit();
+        //pref.getString("Unique_Value",)
+    } // end save_member_info
+
+
+    /*
+    SharedPreference
+     */
+    public void save_in_SharedPreference(String SharedPreference_name, String key, String datatype){
+        SharedPreferences pref = context.getSharedPreferences(SharedPreference_name, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+
+        if(datatype.equals("int")){
+
+        }else if(){
+
+        }
+
+    } // end save_in_SharedPreference
 
 
 
