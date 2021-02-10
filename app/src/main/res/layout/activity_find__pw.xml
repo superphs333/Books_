@@ -30,6 +30,7 @@
         android:id="@+id/btn_send"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="send_email"
         android:text="인증코드 전송" />
 
     <LinearLayout
@@ -47,10 +48,11 @@
             android:inputType="textPersonName" />
 
         <Button
-            android:id="@+id/btn"
+            android:id="@+id/btn_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="validate_string_confirm"
             android:text="확인" />
     </LinearLayout>
 
