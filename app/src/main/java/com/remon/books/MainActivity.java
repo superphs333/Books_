@@ -64,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
     /*
     구글로그인
     참고) https://dvlv.tistory.com/27
@@ -99,6 +101,9 @@ public class MainActivity extends AppCompatActivity {
         function_set = new Function_Set();
         function_set.context = context; // context셋팅
         function_sharedPreference = new Function_SharedPreference(context);
+
+
+
 
 
 
@@ -465,5 +470,6 @@ public class MainActivity extends AppCompatActivity {
     // 비밀번호 찾기
     public void find_pw(View view) {
         Intent intent = new Intent(context,Find_Pw.class);
-    }
+        startActivity(intent);
+    } // end find_pw
 }
