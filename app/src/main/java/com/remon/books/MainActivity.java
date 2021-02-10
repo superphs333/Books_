@@ -109,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.d("실행", "구글 로그인 버튼");
+
+                // 구글 로그인이 이미 되어 있는 경우에는,
                 /*
                 사용자에게 로그인할 Google계정을 선택하라는 메세지 표시
                 + profile, email, openid 이외의 범위를 요청한 경우
@@ -163,9 +165,10 @@ public class MainActivity extends AppCompatActivity {
             String platform_id =  currentUser.getUid();
             Log.d("실행", "name="+name+", email="+email+", photoUrl="+photoUrl+", platform_id="+platform_id);
 
+
             // 페이지 이동
-            Intent intent = new Intent(context,Main.class);
-            startActivity(intent);
+            //Intent intent = new Intent(context,Main.class);
+            //startActivity(intent);
 
         }else{
             // No user is signed in
@@ -258,13 +261,12 @@ public class MainActivity extends AppCompatActivity {
                                boolean emailVerified = user.isEmailVerified();
                                Log.d("실행", "emailVerified="+emailVerified);
 
-                                /*
-                                닉네임 설정 액티비티로 이동
-                                 */
-                               Intent intent = new Intent(context,Set_nickname.class);
-                               intent.putExtra("profile_url",profile_url);
-                               intent.putExtra("login_value",login_value);
-                               startActivity(intent);
+                               /*
+                               신규회원인지 이미 회원가입한 회원인지를 분기한다
+                                */
+                               validate_new(user.getUid(),profile_url);
+
+
 
 
                            } // end user!=null
@@ -353,6 +355,7 @@ public class MainActivity extends AppCompatActivity {
 
                             // 페이지 이동
                             Intent intent = new Intent(context,Main.class);
+                            finish();
                             startActivity(intent);
                         }else{ // 값없음 -> 로그인 실패
                             Toast.makeText(getApplicationContext()
@@ -387,10 +390,80 @@ public class MainActivity extends AppCompatActivity {
 
     } // end login
 
+    // 신규회원인지, 기존회원인지 분류
+    private void validate_new(final String login_value, final String profile_url){
+        /// 웹페이지 실행하기
+        String url = getString(R.string.server_url)+"google_login_validate_new.php";
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                url,
+                new com.android.volley.Response.Listener<String>() { // 정상 응답
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("실행","response=>"+response);
+
+                        if(response.equals("1")){
+                            // 존재하는 회원(구글-로그하웃 했다가, 다시 로그인하는 경우)
+
+                            // Shared - member 에 저장
+                            function_sharedPreference.PREFERENCE = "member";
+                            function_sharedPreference.setPreference("Unique_Value",login_value);
+
+                            // Main페이지로 이동
+                            Intent intent = new Intent(context,Main.class);
+                            intent.putExtra("login_value",login_value);
+                            startActivity(intent);
+                            finish();
+
+                        }else if(response.equals("0")){ // 존재하지 않는 신규회원
+                            // 닉네임 설정 액티비티로 이동
+                            Intent intent = new Intent(context,Set_nickname.class);
+                            intent.putExtra("profile_url",profile_url);
+                            intent.putExtra("login_value",login_value);
+                            startActivity(intent);
+                            finish();
+                        }else{
+                            Toast.makeText(getApplicationContext()
+                                    , "문제가 발생하였습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
+                        }
+
+                    }// end onResponse
+                },
+                new com.android.volley.Response.ErrorListener() { // 에러 발생
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("실행","error=>"+error.getMessage());
+                    }
+                }
+
+        ){ // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
+            // 만약 헤더를 한 줄 추가하고 싶다면 getHeaders() override
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("login_value", login_value);
+                return params;
+            }
+        };
+
+        // 요청 객체를 만들었으니 이제 requestQueue 객체에 추가하면 됨.
+        // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
+        // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
+        request.setShouldCache(false);
+        AppHelper.requestQueue = Volley.newRequestQueue(context);
+        AppHelper.requestQueue.add(request);
+
+    }
+
     // 구글 로그인 탈퇴(임시코드)
     public void google_unlink(View view) {
         mAuth.getCurrentUser().delete();
     } // end google_unlink
 
 
+    // 비밀번호 찾기
+    public void find_pw(View view) {
+        Intent intent = new Intent(context,Find_Pw.class);
+    }
 }

@@ -166,7 +166,9 @@ public class Set_nickname extends AppCompatActivity {
 
                             // 페이지 이동
                             Intent intent = new Intent(context,Main.class);
+                            finish();
                             startActivity(intent);
+
 
                         }else{
                             Toast.makeText(getApplicationContext()
