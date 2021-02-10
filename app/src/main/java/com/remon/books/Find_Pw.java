@@ -1,4 +1,5 @@
 package com.remon.books;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -139,6 +140,7 @@ public class Find_Pw extends AppCompatActivity {
                             return;
                         } // 이메일 전송 catch문 끝
 
+                        // 인증된 이메일 셋팅
                         validate_email = email;
 
 
@@ -177,11 +179,30 @@ public class Find_Pw extends AppCompatActivity {
     } // end send_email
 
     // 확인(btn_confirm) 클릭
+        // 인증문자가 "" 이 아닌지 확인
         // 입력된 인증문자가 맞는지 확인한다
             // 맞다면 -> 비밀번호 변경 액티비티(Change_PW)로 이동
             // 틀리다면 -> TOAST
     public void validate_string_confirm(View view) {
-    }
+
+        // 인증문자 빈값인지 확인
+        if(temp_string.equals("")){ // 빈 값인 경우
+            Toast.makeText(getApplicationContext(), "전송된 인증코드가 없습니다",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        String temp = edit_chk_char.getText().toString();
+
+        if(!temp_string.equals(temp)){ // 임시문자가 같지 않으면
+            Toast.makeText(getApplicationContext(), "인증문자를 잘못 입력하셨습니다",Toast.LENGTH_LONG).show();
+            return;
+        } // end if
+
+        // 페이지 이동
+        Intent intent = new Intent(context,Change_Pw.class);
+        intent.putExtra("email",validate_email);
+        startActivity(intent);
+    } // end validate_string_confirm
 
 
 }

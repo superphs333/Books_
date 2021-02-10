@@ -973,7 +973,6 @@ public class SignUp extends AppCompatActivity {
                 // 로그인 페이지로 이동
                 Intent intent = new Intent(context,MainActivity.class);
                 startActivity(intent);
-                finish();
             }else{
                 Toast.makeText(getApplicationContext()
                         , "죄송합니다. 문제가 생겼습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
