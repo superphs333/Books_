@@ -1,6 +1,8 @@
 package com.remon.books.Function;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,6 +22,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.remon.books.AppHelper;
+import com.remon.books.Change_Pw;
+import com.remon.books.MainActivity;
 import com.remon.books.R;
 
 import java.io.File;
@@ -44,6 +48,7 @@ public class Function_Set {
      */
     public String input;
     public Context context;
+    public Activity activity;
 
     /*
     생성자1
@@ -302,6 +307,76 @@ public class Function_Set {
                                 bitmap.getHeight(),
                                 matrix,
                                 true);
+    }
+
+    /*
+    비밀번호 or 닉네임을 변경한다
+    - 매개변수 : sort, change, login_value
+        - sort : nickname / pw
+        - change : 변경값
+        - login_value : 누구를 바꿀지
+    - 기능
+        - 서버(member_info_change.php)로 이동
+        - 값여부/sort에 따라 페이지 이동
+     */
+    public void Change_Member_Info(final String sort, final String change, final String login_value){
+        // 웹페이지 실행하기
+        String url = context.getString(R.string.server_url)+"member_info_change.php";
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                url,
+                new com.android.volley.Response.Listener<String>() { // 정상 응답
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("실행","response=>"+response);
+
+                        /* 성공시
+                        - sort = pw
+                            -> toast(비밀번호 변경이 되었습니다), MainActivity로 페이지로 이동
+                        - sort = nickname
+                         */
+                        if(!response.equals("success")){
+                            Toast.makeText(context, "죄송합니다. 문제가 생겼습니다. 다시 시도해주세요"
+                                    ,Toast.LENGTH_LONG).show();
+                            return;
+                        } // end if
+
+                        // pw인 경우 nickname인 경우 분기
+                        if(sort.equals("pw")){ // pw인 경우 -> MainActivity이동
+                            Intent intent = new Intent(context, MainActivity.class);
+                            context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                            activity.finish();
+                        }else if(sort.equals("nickname")){ // nickname인 경우
+
+                        }
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() { // 에러 발생
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("실행","error=>"+error.getMessage());
+                    }
+                }
+
+        ){ // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
+            // 만약 헤더를 한 줄 추가하고 싶다면 getHeaders() override
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("sort", sort);
+                params.put("change",change);
+                params.put("login_value", login_value);
+                return params;
+            }
+        };
+
+        // 요청 객체를 만들었으니 이제 requestQueue 객체에 추가하면 됨.
+        // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
+        // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
+        request.setShouldCache(false);
+        AppHelper.requestQueue = Volley.newRequestQueue(context);
+        AppHelper.requestQueue.add(request);
     }
 
 

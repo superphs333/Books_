@@ -1,4 +1,6 @@
 package com.remon.books;
+import android.os.StrictMode;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,11 +9,20 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.remon.books.Function.Function_Set;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Change_Pw extends AppCompatActivity {
 
@@ -29,7 +40,8 @@ public class Change_Pw extends AppCompatActivity {
     String email;
 
     // 비밀번호 체크용
-    boolean pw_equal;
+    boolean pw_regex_ok; // 비밀번호가 정규식 만족하는지 확인
+    boolean pw_equal; // 비밀번호=비밀번호 확인
 
     // 체크 문구
     String pw_ok = "사용가능한 비밀번호 입니다";
@@ -44,6 +56,8 @@ public class Change_Pw extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change__pw);
 
+
+
         /*
         뷰연결
          */
@@ -57,6 +71,7 @@ public class Change_Pw extends AppCompatActivity {
         // 함수객체
         fs = new Function_Set();
         fs.context = context;
+        fs.activity = Change_Pw.this;
 
 
         // 비밀번호 찾기 액티비티에서 온 경우
@@ -84,23 +99,34 @@ public class Change_Pw extends AppCompatActivity {
 
                 /*
                 비밀번호 정규식에 일치하는지 확인하기
+                => 일치여부에 따라 txt_pw_info 텍스트 변경+pw_regex_ok(정규식 일치여부) 변경
                  */
                 Boolean check = fs.validate_Pw(pw);
                 if(check==true){// 적합할때
                     txt_pw_info.setText(pw_ok);
+                    pw_regex_ok = true;
                 }else{// 적합하지 않을 때
                     txt_pw_info.setText(pw_no);
+                    pw_regex_ok = false;
                 }
 
 
                 /*
                 비밀번호=비밀번호 확인 일치 여부
                  */
-                String pw_chk = edit_pw_chk.getText().toString();
-                boolean check2 = fs.check_pw_equal(pw,pw_chk);
+                String pw_chk = edit_pw_chk.getText().toString(); // 비밀번호 확인 입력값
+                boolean check2 = fs.check_pw_equal(pw,pw_chk); // 비밀번호 일치 여부
+                if(check2==true){ //일치
+                    txt_chk_info.setText(pw_chk_ok);
+                    pw_equal = true;
+                }else{ // 일치하지 않음
+                    txt_chk_info.setText(pw_chk_no);
+                    pw_equal = false;
+                }
 
 
             } // end afterTextChanged
+
         }); // end edit_pw.addTextChangedListener
 
         /*
@@ -140,4 +166,33 @@ public class Change_Pw extends AppCompatActivity {
 
 
     } // end onCreate
+
+    /* 변경버튼(btn_chk) 클릭
+    : pw_regex_ok = true && pw_equal=true 확인
+    -> false라면 각 상황에 맞춰서 안내문
+    -> 모두 true라면 비밀번호 변경(by volley) + 페이지 이동(MainAcitivty)
+     */
+    public void Pw_Change(View view) {
+        // 비밀번호
+        final String pw = edit_pw.getText().toString();
+
+        // 정규식 일치 확인 : false라면 -> toast+return
+        if(pw_regex_ok==false){
+            Toast.makeText(getApplicationContext()
+                    , pw_no,Toast.LENGTH_LONG).show();
+            return;
+        } // end if
+
+        // 비밀번호 = 비밀번호 확인 일치 여부
+        if(pw_equal==false){
+            Toast.makeText(getApplicationContext()
+                    , pw_chk_no,Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // 모두 일치하므로, 비밀번호 변경
+        fs.Change_Member_Info("pw",edit_pw.getText().toString(),email);
+
+
+    } // end Pw_Change
 }

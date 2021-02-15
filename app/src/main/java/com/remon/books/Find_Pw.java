@@ -1,5 +1,6 @@
 package com.remon.books;
 import android.content.Intent;
+import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -41,7 +42,7 @@ public class Find_Pw extends AppCompatActivity {
     GMailSender gMailSender;
 
     // 임시문자(이메일로 전송할)
-    String temp_string;
+    String temp_string="";
 
     // 인증된 이메일(인증코드를 전송할때의 이메일)
         // 이 이메일에 대한 회원의 비밀번호를 변경한다
@@ -51,6 +52,11 @@ public class Find_Pw extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find__pw);
+
+        StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                .permitDiskReads()
+                .permitDiskWrites()
+                .permitNetwork().build());
 
         /*
         뷰연결
