@@ -17,7 +17,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Change_Pw"></activity>
+        <activity android:name=".Activity_Setting"></activity>
+        <activity android:name=".Change_Pw" />
         <activity android:name=".Find_Pw" />
         <activity android:name=".Set_nickname" />
         <activity android:name=".Main" />

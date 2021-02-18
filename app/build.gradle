@@ -74,5 +74,11 @@ dependencies {
     //crop
     api 'com.theartofdev.edmodo:android-image-cropper:2.8.+'
 
+    // glide : 이미지 서버에서 가져오기
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+
+    // 이미지 원형
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
 
 }

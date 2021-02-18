@@ -10,11 +10,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.remon.books.Function.Function_Set;
 import com.remon.books.Function.Function_SharedPreference;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main extends AppCompatActivity {
 
-    Function_SharedPreference fs;
+    // 함수
+    Function_SharedPreference fshared;
+    Function_Set fs;
 
     /*
     뷰변수
@@ -66,12 +77,27 @@ public class Main extends AppCompatActivity {
             // replace() = 이전 프래그먼트를 제거한 후에 새로운 프래그먼트를 추가한다
 
 
-
-
         /*
         함수셋팅
          */
-        fs = new Function_SharedPreference(context);
+        fshared = new Function_SharedPreference(context);
+        fs = new Function_Set();
+        fs.context = context;
+
+        /*
+        프로필, 닉네임 SharedPreference에 저장한다
+        by login_value값
+         */
+        // 프로필, 닉네임 불러오기
+        fshared.PREFERENCE = "member";
+        String login_value = fshared.getPreferenceString("login_value");
+        Log.d("실행", "login_value="+login_value);
+        fs.bring_nick_profile(login_value,"nickname"); // 닉네임
+        fs.bring_nick_profile(login_value,"profile_url"); // 프로필 이미지
+
+
+
+
 
 
 

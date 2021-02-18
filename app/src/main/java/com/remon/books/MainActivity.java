@@ -355,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
                             Shared에 회원 Unique_Value 저장(편의)
                              */
                             function_sharedPreference.PREFERENCE = "member";
-                            function_sharedPreference.setPreference("Unique_Value",email);
+                            function_sharedPreference.setPreference("login_value",email);
 
 
                             // 페이지 이동
@@ -413,7 +413,7 @@ public class MainActivity extends AppCompatActivity {
 
                             // Shared - member 에 저장
                             function_sharedPreference.PREFERENCE = "member";
-                            function_sharedPreference.setPreference("Unique_Value",login_value);
+                            function_sharedPreference.setPreference("login_value",login_value);
 
                             // Main페이지로 이동
                             Intent intent = new Intent(context,Main.class);

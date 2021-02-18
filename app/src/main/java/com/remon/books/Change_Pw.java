@@ -20,6 +20,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.remon.books.Function.Function_Set;
+import com.remon.books.Function.Function_SharedPreference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,7 @@ public class Change_Pw extends AppCompatActivity {
 
     // 함수모음객체
     Function_Set fs;
+    Function_SharedPreference fshared;
 
     String email;
 
@@ -55,6 +57,7 @@ public class Change_Pw extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change__pw);
+        Log.d("실행", "");
 
 
 
@@ -72,11 +75,19 @@ public class Change_Pw extends AppCompatActivity {
         fs = new Function_Set();
         fs.context = context;
         fs.activity = Change_Pw.this;
+        fshared = new Function_SharedPreference(context);
+        fshared.PREFERENCE="member";
 
 
         // 비밀번호 찾기 액티비티에서 온 경우
+        // 어디에서 왔는지 -> 비밀번호 찾기 액티비티 or 설정(Activity_Setting)
         email = getIntent().getStringExtra("email");
-        Log.d("실행", "email="+email);
+        if(email==null){
+            Log.d("실행", "설정 액티비티에서 온 경우");
+            email = fshared.getPreferenceString("login_value");
+        }
+        fs.log("email="+email);
+
 
         /*
         비밀번호를 입력 할 때마다 비밀번호 정규식 체크
