@@ -89,8 +89,7 @@ public class Main extends AppCompatActivity {
         by login_value값
          */
         // 프로필, 닉네임 불러오기
-        fshared.PREFERENCE = "member";
-        String login_value = fshared.getPreferenceString("login_value");
+        String login_value = fshared.getPreferenceString("member","login_value");
         Log.d("실행", "login_value="+login_value);
         fs.bring_nick_profile(login_value,"nickname"); // 닉네임
         fs.bring_nick_profile(login_value,"profile_url"); // 프로필 이미지

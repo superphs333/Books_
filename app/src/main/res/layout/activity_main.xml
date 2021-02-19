@@ -79,12 +79,5 @@
         android:onClick="find_pw"
         android:text="비밀번호 찾기" />
 
-    <Button
-        android:id="@+id/btn_google_unlink"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="google_unlink"
-        android:text="회원탈퇴 " />
-
 
 </LinearLayout>

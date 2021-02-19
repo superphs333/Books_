@@ -63,9 +63,6 @@ public class MainActivity extends AppCompatActivity {
     Function_SharedPreference function_sharedPreference;
 
 
-
-
-
     /*
     구글로그인
     참고) https://dvlv.tistory.com/27
@@ -154,6 +151,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        // 일반로그인 -> 자동로그인에 표시되어 있다면, 페이지 이동
+        /*
+        자동로그인 여부
+         */
+        if(function_sharedPreference.getPreferenceBoolean("auto_login","auto_login")){
+            Log.d("실행", "자동로그인 o");
+
+            // 자동로그인이 true상태이면 -> 페이지 이동
+            Intent intent = new Intent(context,Main.class);
+            startActivity(intent);
+            finish();
+        }
+
+
         // Check if user is signed in (non-null) and update UI accordingly.
         /* 구글 로그인
         : onStart에서 사용자가 이미 Google로 앱에 로그인했는지 확인
@@ -170,10 +181,13 @@ public class MainActivity extends AppCompatActivity {
             String platform_id =  currentUser.getUid();
             Log.d("실행", "name="+name+", email="+email+", photoUrl="+photoUrl+", platform_id="+platform_id);
 
+            // shared에 google로 로그인 했다는 것 저장
+            function_sharedPreference.setPreference("member","platform_type","google");
+
 
             // 페이지 이동
-            //Intent intent = new Intent(context,Main.class);
-            //startActivity(intent);
+            Intent intent = new Intent(context,Main.class);
+            startActivity(intent);
 
         }else{
             // No user is signed in
@@ -227,8 +241,6 @@ public class MainActivity extends AppCompatActivity {
         //showProgressDialog();
         // [END_EXCLUDE]
 
-
-
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -271,9 +283,6 @@ public class MainActivity extends AppCompatActivity {
                                 */
                                validate_new(user.getUid(),profile_url);
 
-
-
-
                            } // end user!=null
 
 
@@ -304,7 +313,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("실행", "txt_signup(회원가입) 클릭");
         Intent intent = new Intent(this,SignUp.class);
         startActivity(intent);
-        finish();
     }
 
 
@@ -354,8 +362,20 @@ public class MainActivity extends AppCompatActivity {
                             /*
                             Shared에 회원 Unique_Value 저장(편의)
                              */
-                            function_sharedPreference.PREFERENCE = "member";
-                            function_sharedPreference.setPreference("login_value",email);
+                            function_sharedPreference.setPreference("member","login_value",email);
+
+                            // Shared - member - platform_type = "normal"
+                            function_sharedPreference.setPreference("member","platform_type","normal");
+
+                            /*
+                            자동로그인 여부
+                             */
+                            if(chk_autologin.isChecked()){ // 체크 o
+                                function_sharedPreference.setPreference("auto_login","auto_login",true);
+                            }else{ // 체크 x
+                                function_sharedPreference.setPreference("auto_login","auto_login",false);
+                            }
+
 
 
                             // 페이지 이동
@@ -412,8 +432,7 @@ public class MainActivity extends AppCompatActivity {
                             // 존재하는 회원(구글-로그하웃 했다가, 다시 로그인하는 경우)
 
                             // Shared - member 에 저장
-                            function_sharedPreference.PREFERENCE = "member";
-                            function_sharedPreference.setPreference("login_value",login_value);
+                            function_sharedPreference.setPreference("member","login_value",login_value);
 
                             // Main페이지로 이동
                             Intent intent = new Intent(context,Main.class);

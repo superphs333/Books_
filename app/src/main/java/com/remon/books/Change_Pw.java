@@ -76,7 +76,6 @@ public class Change_Pw extends AppCompatActivity {
         fs.context = context;
         fs.activity = Change_Pw.this;
         fshared = new Function_SharedPreference(context);
-        fshared.PREFERENCE="member";
 
 
         // 비밀번호 찾기 액티비티에서 온 경우
@@ -84,7 +83,7 @@ public class Change_Pw extends AppCompatActivity {
         email = getIntent().getStringExtra("email");
         if(email==null){
             Log.d("실행", "설정 액티비티에서 온 경우");
-            email = fshared.getPreferenceString("login_value");
+            email = fshared.getPreferenceString("member","login_value");
         }
         fs.log("email="+email);
 

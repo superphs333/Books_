@@ -8,7 +8,6 @@ import static android.content.Context.MODE_PRIVATE;
 public class Function_SharedPreference {
 
     public Context context;
-    public String PREFERENCE;
     public static final String DEFAULT_VALUE_STRING = "";
     public static final boolean DEFAULT_VALUE_BOOLEAN = false;
     public static final int DEFAULT_VALUE_INT = -1;
@@ -22,32 +21,32 @@ public class Function_SharedPreference {
 
 
     // 데이터 저장 함수
-    public void setPreference(String key, boolean value){
+    public void setPreference(String PREFERENCE,String key, boolean value){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putBoolean(key, value);
         editor.commit();
     }
-    public void setPreference(String key, String value){
+    public void setPreference(String PREFERENCE,String key, String value){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putString(key, value);
         editor.commit();
     }
-    public void setPreference(String key, int value){
+    public void setPreference(String PREFERENCE,String key, int value){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putInt(key, value);
         editor.commit();
     }
-    public void setPreference(String key, float value){
+    public void setPreference(String PREFERENCE,String key, float value){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putFloat(key, value);
         editor.commit();
     }
 
-    public void setPreference(String key, long value){
+    public void setPreference(String PREFERENCE,String key, long value){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.putLong(key, value);
@@ -56,29 +55,29 @@ public class Function_SharedPreference {
 
 
     // 데이터 불러오기 함수
-    public boolean getPreferenceBoolean(String key){
+    public boolean getPreferenceBoolean(String PREFERENCE,String key){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         return pref.getBoolean(key, false);
     }
-    public String getPreferenceString(String key){
+    public String getPreferenceString(String PREFERENCE,String key){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         return pref.getString(key, "");
     }
-    public int getPreferenceInt(String key){
+    public int getPreferenceInt(String PREFERENCE,String key){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         return pref.getInt(key, 0);
     }
-    public float getPreferenceFloat(String key){
+    public float getPreferenceFloat(String PREFERENCE,String key){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         return pref.getFloat(key, 0f);
     }
-    public long getPreferenceLong(String key){
+    public long getPreferenceLong(String PREFERENCE,String key){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         return pref.getLong(key, 0l);
     }
 
     // 데이터 한개씩 삭제하는 함수
-    public void setPreferenceRemove(String key){
+    public void setPreferenceRemove(String PREFERENCE,String key){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.remove(key);
@@ -86,7 +85,7 @@ public class Function_SharedPreference {
     }
 
     // 모든 데이터 삭제
-    public void setPreferenceClear(){
+    public void setPreferenceClear(String PREFERENCE){
         SharedPreferences pref = context.getSharedPreferences(PREFERENCE, MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
         editor.clear();

@@ -161,8 +161,10 @@ public class Set_nickname extends AppCompatActivity {
                                     , "회원가입이 완료되었습니다",Toast.LENGTH_LONG).show();
 
                             // Shared에 회원 Unique_Value 저장
-                            fs.PREFERENCE = "member";
-                            fs.setPreference("Unique_Value",login_value);
+                            fs.setPreference("member","login_value",login_value);
+
+                            // shared에 google로 로그인 했다는 것 저장
+                            fs.setPreference("member","platform_type","google");
 
                             // 페이지 이동
                             Intent intent = new Intent(context,Main.class);

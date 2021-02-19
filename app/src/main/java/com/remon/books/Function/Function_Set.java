@@ -399,7 +399,6 @@ public class Function_Set {
 
         // 함수셋팅
         fshared = new Function_SharedPreference(context);
-        fshared.PREFERENCE="member";
 
         // 웹페이지 실행하기
         String url = context.getString(R.string.server_url)+"get_member_info.php";
@@ -412,7 +411,7 @@ public class Function_Set {
                     public void onResponse(String response) {
                         Log.d("실행","response=>"+response);
 
-                        fshared.setPreference(sort,response);
+                        fshared.setPreference("member",sort,response);
 
                     }
                 },

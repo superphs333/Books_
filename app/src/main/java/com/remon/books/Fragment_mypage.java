@@ -50,16 +50,16 @@ public class Fragment_mypage extends Fragment {
 
         // 함수셋팅
         fshared = new Function_SharedPreference(context);
-        fshared.PREFERENCE = "member";
+
 
         /*
         프로필, 닉네임 셋팅 (서버에서 가져온다)
         by member에 저장된(sharedpreference)
          */
-        Log.d("실행", "nickname="+fshared.getPreferenceString("nickname"));
-        Log.d("실행", "profile_url="+fshared.getPreferenceString("profile_url"));
-        Glide.with(context).load(fshared.getPreferenceString("profile_url")).into(img_profile);
-        txt_nickname.setText(fshared.getPreferenceString("nickname"));
+        Log.d("실행", "nickname="+fshared.getPreferenceString("member","nickname"));
+        Log.d("실행", "profile_url="+fshared.getPreferenceString("member","profile_url"));
+        Glide.with(context).load(fshared.getPreferenceString("member","profile_url")).into(img_profile);
+        txt_nickname.setText(fshared.getPreferenceString("member","nickname"));
 
         // 세팅 버튼 => Acitvity_Setting으로 이동
         img_setting.setOnClickListener(new View.OnClickListener() {
