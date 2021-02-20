@@ -70,6 +70,23 @@ public class Fragment_mypage extends Fragment {
             }
         });
 
+        // img_profile(이미지) => 프로필 사진 변경
+        img_profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        // txt_nickname(닉네임) => 닉네임 변경
+        txt_nickname.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context,Set_nickname.class);
+                startActivity(intent);
+            }
+        });
+
 
 
 

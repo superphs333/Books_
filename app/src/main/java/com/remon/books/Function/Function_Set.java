@@ -188,9 +188,10 @@ public class Function_Set {
         Boolean check = false;
 
         // 정규식
-            // 영문, 숫자, '_'로만 이루어진 4~12자 이하
-        String nick_Pattern
-                    = "^[a-zA-Z0-9]{1}[a-zA-Z0-9_]{3,11}$";
+            // 영문, 숫자,한글, '_'로만 이루어진 4~12자 이하
+//        String nick_Pattern
+//                    = "^[a-zA-Z0-9]{1}[a-zA-Z0-9_]{3,11}$";
+        String nick_Pattern = "^[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣|0-9]{1}[a-z|A-Z|ㄱ-ㅎ|ㅏ-ㅣ|가-힣|0-9_]{3,11}$";
         check = Pattern.matches(nick_Pattern,nickname);
 
         return check;

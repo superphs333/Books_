@@ -1,6 +1,7 @@
 package com.remon.books;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
@@ -20,6 +21,8 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.remon.books.Function.Function_SharedPreference;
@@ -153,16 +156,7 @@ public class Activity_Setting extends AppCompatActivity {
            FirebaseAuth.getInstance().signOut();
        }
 
-       // shared - auto_login-auto_login - false
-        fshared.setPreference("auto_login","auto_login",false);
-
-        // shared에 저장되어 있는 정보 삭제
-        fshared.setPreferenceClear("member");
-
-        // MainAcitvity 페이지로 이동
-        Intent intent = new Intent(context,MainActivity.class);
-        ActivityCompat.finishAffinity(this);
-        startActivity(intent);
+        delete_and_intent();
     }
 
     /*
@@ -208,22 +202,35 @@ public class Activity_Setting extends AppCompatActivity {
                         Log.d("실행","response=>"+response);
 
                         if(response.equals("success")){
+                            // 회원정보 삭제 성공
+
                             // 구글 or 일반 로그인 분기
                             if(fshared.getPreferenceString("member","platform_type").equals("google")){
                                 // 구글로 로그인 한 경우
                                 Log.d("실행", "구글로그인");
-                                FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                                mAuth.getCurrentUser().delete();
+
+                                // 계정 삭제
+                                FirebaseUser user
+                                        = FirebaseAuth.getInstance().getCurrentUser();
+                                user.delete()
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                Log.d("실행","User account deleted");
+
+                                                delete_and_intent();
+
+                                            }
+                                        });
+
+                            }else{
+                                // 일반로그인
+                                delete_and_intent();
                             }
 
-                            // shared에 저장되어 있는 정보 삭제
-                            fshared.setPreferenceClear("member");
 
-                            // MainAcitvity 페이지로 이동
-                            Intent intent = new Intent(context,MainActivity.class);
-                            ActivityCompat.finishAffinity(activity);
-                            startActivity(intent);
                         }else{
+                            // 회원정보 삭제 실패
                             Toast.makeText(getApplicationContext(), "문제가 생겼습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
                         }
                     }
@@ -253,4 +260,18 @@ public class Activity_Setting extends AppCompatActivity {
         AppHelper.requestQueue.add(request);
 
     } // end withdrawal()
+
+
+    private void delete_and_intent(){
+        // shared - auto_login-auto_login - false
+        fshared.setPreference("auto_login","auto_login",false);
+
+        // shared에 저장되어 있는 정보 삭제
+        fshared.setPreferenceClear("member");
+
+        // MainAcitvity 페이지로 이동
+        Intent intent = new Intent(context,MainActivity.class);
+        ActivityCompat.finishAffinity(this);
+        startActivity(intent);
+    }
 }

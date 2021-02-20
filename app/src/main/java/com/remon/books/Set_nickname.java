@@ -69,6 +69,9 @@ public class Set_nickname extends AppCompatActivity {
         login_value = getIntent().getStringExtra("login_value");
         profile_url = getIntent().getStringExtra("profile_url");
 
+        /*
+        어디로부터 왔는지 확인 -> 마이페이지 or 로그인
+         */
 
         /*
         중복확인 후에,
