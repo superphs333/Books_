@@ -1,7 +1,5 @@
 package com.remon.books;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +13,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
@@ -27,8 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
-public class Set_nickname extends AppCompatActivity {
+public class Change_nickname extends AppCompatActivity {
 
     Context context;
     Activity activity;
@@ -43,12 +42,12 @@ public class Set_nickname extends AppCompatActivity {
     boolean nick_no_double = false;
 
     // login 정보
-    String login_value,profile_url;
+    String login_value,nickname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_set_nickname);
+        setContentView(R.layout.activity_change_nickname);
 
         /*
         뷰연결
@@ -66,10 +65,15 @@ public class Set_nickname extends AppCompatActivity {
 
 
         /*
-        Intent로 부터 값 받아오기(login_value, profile_url)
+        nickname, login_value 셋팅
          */
-        login_value = getIntent().getStringExtra("login_value");
-        profile_url = getIntent().getStringExtra("profile_url");
+        login_value = fs.getPreferenceString("member","login_value");
+        nickname = fs.getPreferenceString("member","nickname");
+        Log.d("실행", "login_value="+login_value+", nickname="+nickname);
+
+        // 기존 닉네임 셋팅
+        edit_nick.setText(nickname);
+
 
 
 
@@ -93,9 +97,15 @@ public class Set_nickname extends AppCompatActivity {
              @Override
              public void afterTextChanged(Editable s) {
                  if(nick_no_double==true){
-                     txt_nick_info.setText("중복확인 문구");
+                     if(edit_nick.getText().toString().equals(nickname)){
+                         txt_nick_info.setText("현재 닉네임과 동일한 닉네임");
+                     }else{
+                         txt_nick_info.setText("중복확인 문구");
+                     }
                      nick_no_double = false;
                  } // end if
+
+
              } // end afterTextChanged
          }); // end edit_nick.addTextChangedListener
 
@@ -111,6 +121,13 @@ public class Set_nickname extends AppCompatActivity {
         if(!function_set.validate_Nick(Nick)){
             Toast.makeText(getApplicationContext()
                     , "닉네임이 적절하지 않습니다",Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // 이전 닉네임과 같을때
+        if(Nick.equals(nickname)){
+            Toast.makeText(getApplicationContext(), "현재 닉네임과 같은 닉네임입니다",Toast.LENGTH_LONG).show();
+            txt_nick_info.setText("현재 닉네임과 동일한 닉네임");
             return;
         }
 
@@ -135,7 +152,9 @@ public class Set_nickname extends AppCompatActivity {
     } // end Check_Nick_Double
 
     // 회원가입
-    public void sign_up(View view) {
+    public void change(View view) {
+
+
 
         // 만약, nick_no_double = false인 경우 toast하고 함수 빠져나오기)
         if(nick_no_double==false){
@@ -144,11 +163,13 @@ public class Set_nickname extends AppCompatActivity {
             return;
         }
 
+
+
         // 닉네임
-       final String nickname = edit_nick.getText().toString();
+       final String change_nickname = edit_nick.getText().toString();
 
         // 웹페이지 실행하기
-        String url = getString(R.string.server_url)+"signup_google_chk.php";
+        String url = getString(R.string.server_url)+"change_nickname.php";
 
         StringRequest request = new StringRequest(
                 Request.Method.POST,
@@ -161,18 +182,16 @@ public class Set_nickname extends AppCompatActivity {
                         // 성공인경우
                         if(response.equals("success")){
                             Toast.makeText(getApplicationContext()
-                                    , "회원가입이 완료되었습니다",Toast.LENGTH_LONG).show();
-
-                            // Shared에 회원 Unique_Value 저장
-                            fs.setPreference("member","login_value",login_value);
+                                    , "닉네임 변경이 완료되었습니다",Toast.LENGTH_LONG).show();
 
                             // shared에 google로 로그인 했다는 것 저장
                             fs.setPreference("member","platform_type","google");
 
-                            // 페이지 이동
-                            Intent intent = new Intent(context,Main.class);
+                            // shared에 변경된 닉네임 저장
+                            fs.setPreference("member","nickname",change_nickname);
+
+                            // 액티비티 종료
                             finish();
-                            startActivity(intent);
 
 
                         }else{
@@ -195,9 +214,7 @@ public class Set_nickname extends AppCompatActivity {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("login_value", login_value);
-                params.put("profile_url", profile_url);
-                params.put("nickname", nickname);
-
+                params.put("change_nickname", change_nickname);
 
                 return params;
             }
