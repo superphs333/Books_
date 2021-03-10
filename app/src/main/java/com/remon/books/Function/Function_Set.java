@@ -10,7 +10,9 @@ import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
@@ -40,6 +42,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import retrofit2.Retrofit;
+
+import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
 public class Function_Set {
 
@@ -198,6 +202,62 @@ public class Function_Set {
     }
 
     // 회원 정보 가져오기 (by Retrofit)
+
+    /*
+    갤러리에서 이미지 1장 가져오기
+     */
+    public void gallery_for_profile(int PICK_FROM_GALLERY){
+        // 매개변수 : startAcitivtyForResult에 넣을 변수
+
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        // 이미지르 열 수 있는 앱을 호출
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        activity.startActivityForResult(intent,PICK_FROM_GALLERY);
+    }// end gallery_for_profile
+
+    /*
+    카메라에서 이미지 1장 가져오기
+     */
+    public String camera_for_profile(int REQUEST_IMAGE_CAPTURE){
+        // 이 함수를 쓰는 경우, image_Uri라는 변수(string)을 만들어 두는 것이 좋다
+
+        Intent intent
+                = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        if(intent.resolveActivity(context.getPackageManager())!=null){
+            // 설치가 되어 있는 경우
+
+            // 1. 임의의 경로에 파일 만들기
+            File photo_File = null;
+            try{
+                photo_File = createImageFile();
+            }catch (IOException e) {
+                e.printStackTrace();
+                Log.d("실행", "createImageFile 오류=>"+e.getMessage());
+            }
+            Log.d("실행", "uri=>"+photo_File.getAbsolutePath());
+
+
+            // 2. FileProvider를 통해서 파일의 uri값을 만든다
+                // 이런식으로 했을 때 onActivity도달 가능
+            if(photo_File!=null){
+                Uri photo_Uri = FileProvider.getUriForFile(context,context.getPackageName(),photo_File);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,photo_Uri);
+                activity.startActivityForResult(intent,REQUEST_IMAGE_CAPTURE);
+
+                return photo_File.getAbsolutePath();
+            }
+        }else{
+            // 설치가 되어 있지 않은 경우
+            Toast.makeText(context
+                    , "실행 할 수 있는 앱이 없습니다. 카메라 어플을 설치해주세요",Toast.LENGTH_SHORT).show();
+        }
+
+        return null;
+    } // end camera_for_profile
+
+
 
 
 

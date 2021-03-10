@@ -123,39 +123,42 @@ public class Fragment_mypage extends Fragment {
             }
         });
 
-        // img_profile(이미지) => 프로필 사진 변경
+        // img_profile(이미지) => 프로필 사진 변경 액티비티(Activity_Change_Profile)
         img_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                // 카메라 or 갤러리 선택
-                AlertDialog.Builder builder
-                        = new AlertDialog.Builder(activity);
-                final String str[] = {"카메라","갤러리"};
-                builder.setTitle("선택하세요")
-                        .setNegativeButton("취소",null)
-                        .setItems(str,// 리스트 목록에 사용할 배열
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Log.d("실행","선택된것="+str[which]);
+                Intent intent = new Intent(context,Activity_Change_Profile.class);
+                startActivity(intent);
 
-                                        // 분기 -> 카메라, 갤러리
-                                        if(str[which].equals("카메라")){
-
-                                        }else if(str[which].equals("갤러리")){
-                                            Intent intent = new Intent();
-                                            intent.setType("image/*");
-                                            // 이미지르 열 수 있는 앱을 호출
-                                            intent.setAction(Intent.ACTION_GET_CONTENT);
-                                            startActivityForResult(intent,PICK_FROM_GALLERY);
-                                        }
-
-                                    } // end onClick
-                                }
-                        );
-                AlertDialog dialog = builder.create();
-                dialog.show();
+//                // 카메라 or 갤러리 선택
+//                AlertDialog.Builder builder
+//                        = new AlertDialog.Builder(activity);
+//                final String str[] = {"카메라","갤러리"};
+//                builder.setTitle("선택하세요")
+//                        .setNegativeButton("취소",null)
+//                        .setItems(str,// 리스트 목록에 사용할 배열
+//                                new DialogInterface.OnClickListener() {
+//                                    @Override
+//                                    public void onClick(DialogInterface dialog, int which) {
+//                                        Log.d("실행","선택된것="+str[which]);
+//
+//                                        // 분기 -> 카메라, 갤러리
+//                                        if(str[which].equals("카메라")){
+//
+//                                        }else if(str[which].equals("갤러리")){
+//                                            Intent intent = new Intent();
+//                                            intent.setType("image/*");
+//                                            // 이미지르 열 수 있는 앱을 호출
+//                                            intent.setAction(Intent.ACTION_GET_CONTENT);
+//                                            startActivityForResult(intent,PICK_FROM_GALLERY);
+//                                        }
+//
+//                                    } // end onClick
+//                                }
+//                        );
+//                AlertDialog dialog = builder.create();
+//                dialog.show();
 
 
 
@@ -203,6 +206,7 @@ public class Fragment_mypage extends Fragment {
         갤러리 이미지 가져오기
          */
         if(requestCode==PICK_FROM_GALLERY&&resultCode==RESULT_OK && data!=null && data.getData()!=null){
+            fs.log("onAcitivtyResult - 갤러리에서 이미지 가져오기");
             // 이미지 크롭
             CropImage
                     .activity(data.getData())
@@ -215,6 +219,8 @@ public class Fragment_mypage extends Fragment {
         이미지 크롭
          */
         if(requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE){
+            fs.log("onAcitivtyResult -  이미지 크롭");
+
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
 
             if(resultCode == RESULT_OK){
@@ -230,9 +236,12 @@ public class Fragment_mypage extends Fragment {
                 image_bitmap = fs.rotate_from(temp);
 
 
-            }else{
-
             }
-        } // end requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE
+        }else if(resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE){
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+
+            Exception error = result.getError();
+            Log.d("실행", "이미지 크롭 에러=>"+error);
+        }
     } // end onActivityResult
 }
