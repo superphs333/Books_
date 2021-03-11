@@ -15,8 +15,12 @@ import android.view.View;
 import android.widget.Button;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.remon.books.Function.Function_Set;
@@ -25,6 +29,7 @@ import com.remon.books.Function.Function_SharedPreference;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -112,6 +117,7 @@ public class Main extends AppCompatActivity {
 
 
     }
+
 
     @Override
     protected void onResume() {

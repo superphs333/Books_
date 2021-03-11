@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="read_status">
+        <item>읽고싶은</item>
+        <item>읽는중</item>
+        <item>읽음</item>
+    </string-array>
+</resources>

@@ -1,5 +1,7 @@
 package com.remon.books;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -10,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -20,11 +24,14 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
     뷰변수
      */
     View v;
+    Context context;
+    Spinner category_read_status;
 
     //FAB
     Animation fab_open, fab_close;
     Boolean openFlag = false;
     FloatingActionButton floating,floating_self,floating_search;
+
 
 
     @Override
@@ -36,9 +43,11 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
          */
         LayoutInflater inflater1 = inflater;
         v = inflater.inflate(R.layout.fragment__books,container,false);
+        context = v.getContext();
         floating = v.findViewById(R.id.floating);
         floating_self = v.findViewById(R.id.floating_self);
         floating_search = v.findViewById(R.id.floating_search);
+        category_read_status = v.findViewById(R.id.category_read_status);
 
         /*
         floating버튼 설정
@@ -56,6 +65,14 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
         floating.setOnClickListener(this);
         floating_self.setOnClickListener(this);
         floating_search.setOnClickListener(this);
+
+        /*
+        카테고리 값 셋팅
+         */
+        final String[] data = v.getResources().getStringArray(R.array.read_status);
+        ArrayAdapter<String> adapter
+                = new ArrayAdapter<String>(v.getContext(),android.R.layout.simple_dropdown_item_1line,data);
+        category_read_status.setAdapter(adapter);
 
 
 
@@ -75,10 +92,14 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
             case R.id.floating_search:
                 anim();
                 Log.d("실행", "찾기");
+                Intent intent = new Intent(context,Activity_Book_Search.class);
+                startActivity(intent);
                 break;
             case R.id.floating_self:
                 anim();
                 Log.d("실행", "직접추가");
+                Intent intent2 = new Intent(context,Activity_Book_Add.class);
+                startActivity(intent2);
                 break;
         }
     } // end onClick
