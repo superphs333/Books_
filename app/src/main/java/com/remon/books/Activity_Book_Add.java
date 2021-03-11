@@ -203,6 +203,7 @@ public class Activity_Book_Add extends AppCompatActivity {
                     pd.append(lineEnd);
                     pd.append(strings[5]+lineEnd);
 
+
                     dos.writeUTF(pd.toString());
 
                     // 책 이미지가 있는 경우에만
