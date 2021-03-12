@@ -1,5 +1,8 @@
 package com.remon.books;
 import android.os.AsyncTask;
+import android.widget.ArrayAdapter;
+import android.widget.RatingBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -16,6 +19,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.remon.books.Function.Function_Set;
+import com.remon.books.Function.Function_SharedPreference;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
@@ -37,12 +41,15 @@ public class Activity_Book_Add extends AppCompatActivity {
     함수
      */
     Function_Set fs;
+    Function_SharedPreference fshared;
 
     /*
     뷰변수
      */
     Context context;
     EditText edit_title, edit_authors, edit_publisher, edit_isbn, edit_content;
+    Spinner category_read_status;
+    RatingBar rating;
     Button btn_add;
     ImageView img_book;
 
@@ -70,6 +77,9 @@ public class Activity_Book_Add extends AppCompatActivity {
         edit_content = findViewById(R.id.edit_content);
         btn_add = findViewById(R.id.btn_add);
         img_book = findViewById(R.id.img_book);
+        category_read_status = findViewById(R.id.category_read_status);
+        rating = findViewById(R.id.rating);
+
 
         /*
         함수연결
@@ -77,6 +87,15 @@ public class Activity_Book_Add extends AppCompatActivity {
         fs = new Function_Set();
         fs.context =context;
         fs.activity = Activity_Book_Add.this;
+        fshared = new Function_SharedPreference(context);
+
+        /*
+        spinner셋팅
+         */
+        final String[] data = getResources().getStringArray(R.array.read_status);
+        ArrayAdapter<String> adapter
+                = new ArrayAdapter<String>(context,android.R.layout.simple_dropdown_item_1line,data);
+        category_read_status.setAdapter(adapter);
 
 
     }
@@ -104,13 +123,35 @@ public class Activity_Book_Add extends AppCompatActivity {
             return;
         }
 
+        // isbn
+        if(edit_isbn.getText().toString().equals("")){
+            Toast.makeText(getApplicationContext(), "isbn를 입력해주세요",Toast.LENGTH_LONG).show();
+            return;
+        }
 
+
+        // status -> 읽고싶은:0, 읽는중:1, 읽음:2
+        int status;
+        if(category_read_status.getSelectedItem().toString().equals(getString(R.string.read_bucket))){
+            // 읽고싶은
+            status = 0;
+        }else if(category_read_status.getSelectedItem().toString().equals(getString(R.string.read_reading))){
+            // 읽는중
+            status = 1;
+        }else{
+            // 읽음
+            status = 2;
+        }
 
         InsertData task = new InsertData();
         task.execute(edit_title.getText().toString(), edit_authors.getText().toString()
         , edit_publisher.getText().toString(), edit_isbn.getText().toString()
-                ,"0", edit_content.getText().toString());
-                // 타이틀, 작가, 출판사, isbn, 페이지수, 요약정보
+                ,"0", edit_content.getText().toString()
+                , fshared.getPreferenceString("member","login_value")
+                ,rating.getRating()+""
+                ,status+""
+        );
+                // 타이틀, 작가, 출판사, isbn, 페이지수, 요약정보, 회원, rating, status
     }
 
     class InsertData extends AsyncTask<String, Void, String>{
@@ -170,7 +211,7 @@ public class Activity_Book_Add extends AppCompatActivity {
                     DataOutputStream dos
                             = new DataOutputStream(httpURLConnection.getOutputStream());
 
-                    // 텍스트값 : 제목, 지은이, 출판사, isbn, 페이지수, 요약정보
+                    // 텍스트값 : 제목, 지은이, 출판사, isbn, 페이지수, 요약정보, 로그인 정보
                     StringBuffer pd = new StringBuffer();
                     pd.append(lineEnd);
                     pd.append(twoHyphens+boundary+lineEnd);
@@ -202,6 +243,21 @@ public class Activity_Book_Add extends AppCompatActivity {
                     pd.append("Content-Disposition: form-data; name=\"contents\""+lineEnd);
                     pd.append(lineEnd);
                     pd.append(strings[5]+lineEnd);
+
+                    pd.append(twoHyphens+boundary+lineEnd);
+                    pd.append("Content-Disposition: form-data; name=\"login_value\""+lineEnd);
+                    pd.append(lineEnd);
+                    pd.append(strings[6]+lineEnd);
+
+                    pd.append(twoHyphens+boundary+lineEnd);
+                    pd.append("Content-Disposition: form-data; name=\"rating\""+lineEnd);
+                    pd.append(lineEnd);
+                    pd.append(strings[7]+lineEnd);
+
+                    pd.append(twoHyphens+boundary+lineEnd);
+                    pd.append("Content-Disposition: form-data; name=\"status\""+lineEnd);
+                    pd.append(lineEnd);
+                    pd.append(strings[8]+lineEnd);
 
 
                     dos.writeUTF(pd.toString());
@@ -316,6 +372,21 @@ public class Activity_Book_Add extends AppCompatActivity {
             super.onPostExecute(s);
 
             Log.d("실행", "POST response  - " + s);
+
+            String[] string_array= s.split(getString(R.string.seperator));
+            String result = string_array[string_array.length-1];
+            Log.d("실행", "result = "+result);
+
+            if(result.equals("success")){
+                Toast.makeText(getApplicationContext()
+                        , "책등록을 마쳤습니다",Toast.LENGTH_LONG).show();
+
+                // 로그인 페이지로 이동
+                finish();
+            }else{
+                Toast.makeText(getApplicationContext()
+                        , "죄송합니다. 문제가 생겼습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
+            }
         }
     } // InsertData
 
