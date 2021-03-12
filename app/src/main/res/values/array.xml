@@ -5,4 +5,11 @@
         <item>읽는중</item>
         <item>읽음</item>
     </string-array>
+
+    <string-array name="read_status_books">
+        <item>전체</item>
+        <item>읽고싶은</item>
+        <item>읽는중</item>
+        <item>읽음</item>
+    </string-array>
 </resources>

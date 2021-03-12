@@ -25,6 +25,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.remon.books.AppHelper;
 import com.remon.books.Change_Pw;
+import com.remon.books.JsonPlaceHolderApi;
 import com.remon.books.MainActivity;
 import com.remon.books.R;
 
@@ -33,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +44,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.firebase.ui.auth.AuthUI.getApplicationContext;
 
@@ -77,6 +80,7 @@ public class Function_Set {
     /*
     함수
      */
+
     // log
     public void log(String input){
         Log.d("실행", input);
