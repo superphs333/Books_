@@ -199,6 +199,9 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
                     arrayList = response.body();
                     mainAdapter = new Adater_My_Book(arrayList,context);
                     rv_my_books.setAdapter(mainAdapter);
+                    linearLayoutManager = new LinearLayoutManager(context);
+                    linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                    rv_my_books.setLayoutManager(linearLayoutManager);
 
                 }else{
                     Log.d("실행","서버에 연결은 되었으나 오류발생");
