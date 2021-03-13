@@ -16,66 +16,75 @@
         android:text="서재"
     />
 
-    <!--  필요한 정보 검색/카테고리  -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <!-- 카테고리 : 읽고싶은 / 읽는중 / 읽음       -->
-        <Spinner
-            android:id="@+id/category_read_status"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3" />
-
-        <EditText
-            android:id="@+id/edit_search"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="6"
-            android:ems="10"
-            android:inputType="textPersonName" />
-
-        <ImageView
-            android:id="@+id/imageView"
-            android:layout_width="0dp"
+        android:background="#FFFDFD"
+        android:orientation="vertical">
+        <!--  필요한 정보 검색/카테고리  -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@android:drawable/ic_menu_search" />
+            android:orientation="horizontal">
+
+            <!-- 카테고리 : 읽고싶은 / 읽는중 / 읽음       -->
+            <Spinner
+                android:id="@+id/category_read_status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3" />
+
+            <EditText
+                android:id="@+id/edit_search"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="6"
+                android:ems="10"
+                android:inputType="textPersonName" />
+
+            <ImageView
+                android:id="@+id/img_search"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@android:drawable/ic_menu_search" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_my_books"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="9" >
+
+
+
+        </androidx.recyclerview.widget.RecyclerView>
+
     </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_my_books"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="9" />
-
-    <View
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floating_search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:clickable="true"
-        android:layout_marginBottom="5sp"
-        android:src="@android:drawable/ic_menu_search"
-         />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating_self"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
+        android:layout_marginBottom="2sp"
         android:clickable="true"
-        android:layout_marginBottom="5sp"
-        android:src="@android:drawable/ic_menu_edit" />
+        android:src="@android:drawable/ic_menu_edit"
+        tools:visibility="invisible" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floating_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_marginBottom="2sp"
+        android:clickable="true"
+        android:src="@android:drawable/ic_menu_search"
+
+        tools:visibility="invisible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating"
@@ -84,5 +93,8 @@
         android:layout_gravity="right"
         android:clickable="true"
         android:src="@android:drawable/ic_input_add" />
+
+
+
 
 </LinearLayout>

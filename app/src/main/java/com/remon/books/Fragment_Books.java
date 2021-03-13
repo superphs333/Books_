@@ -14,8 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -43,6 +45,7 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
     Spinner category_read_status;
     EditText edit_search;
     RecyclerView rv_my_books;
+    ImageView img_search;
 
     //FAB
     Animation fab_open, fab_close;
@@ -79,6 +82,7 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
         category_read_status = v.findViewById(R.id.category_read_status);
         edit_search = v.findViewById(R.id.edit_search);
         rv_my_books = v.findViewById(R.id.rv_my_books);
+        img_search = v.findViewById(R.id.img_search);
 
 
         /*
@@ -111,9 +115,29 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
                 = new ArrayAdapter<String>(v.getContext(),android.R.layout.simple_dropdown_item_1line,data);
         category_read_status.setAdapter(adapter);
 
-
-
+        // 데이터 불러오기
         Get_My_Books();
+
+        // 카테고리 변경시 -> 적절한 데이터 불러오기
+        category_read_status.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Get_My_Books();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        // 돋보기 버튼(img_search) -> 적절한 데이터 불러오기
+        img_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Get_My_Books();
+            }
+        });
 
         // Inflate the layout for this fragment
         return v;
@@ -166,7 +190,7 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
         // 보낼값
         String login_value = fshared.getPreferenceString("member","login_value");
         String temp_status = category_read_status.getSelectedItem().toString();
-        int status=0;
+        int status=4;
         if(temp_status.equals(getString(R.string.read_bucket))){
             status = 0;
         }else if(temp_status.equals(getString(R.string.read_reading))){
@@ -175,6 +199,9 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
             status = 2;
         }
         String search = edit_search.getText().toString();
+
+        Log.d("실행", "status="+status+", search="+search);
+
 
         RetrofitConnection retrofitConnection
                 = new RetrofitConnection();
