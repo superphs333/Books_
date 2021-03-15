@@ -1,17 +1,15 @@
 package com.remon.books.Data;
 
-public class Data_My_Book {
-    String unique_book_value, title, authors, publisher,thumbnail, contents, from_ ,isbn;
-    int status;
-    float rating;
+public class Data_Search_Book {
+    String unique_book_value, title, authors, publisher,thumbnail, contents, from_,isbn;
+
 
     // 생성자
-    public Data_My_Book(){}
+    public Data_Search_Book(){}
 
     // 생성자
-    public Data_My_Book(String unique_book_value, String title, String authors
-            , String publisher, String thumbnail, String contents
-            , String from_, String isbn, int status, float rating)
+    public Data_Search_Book(String unique_book_value, String title, String authors
+            , String publisher, String thumbnail, String contents, String isbn)
     {
         this.unique_book_value = unique_book_value;
         this.title = title;
@@ -19,10 +17,7 @@ public class Data_My_Book {
         this.publisher = publisher;
         this.thumbnail = thumbnail;
         this.contents = contents;
-        this.from_ = from_;
         this.isbn = isbn;
-        this.status = status;
-        this.rating = rating;
     }
 
     public String getUnique_book_value() {
@@ -87,21 +82,5 @@ public class Data_My_Book {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public float getRating() {
-        return rating;
-    }
-
-    public void setRating(float rating) {
-        this.rating = rating;
     }
 }

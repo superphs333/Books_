@@ -1,10 +1,18 @@
 package com.remon.books;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
+import android.graphics.Movie;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Adapter;
+import android.widget.EditText;
+import android.widget.ImageView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -16,11 +24,35 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.remon.books.Adapter.Adater_My_Book;
+import com.remon.books.Adapter.Adater_Search_Book;
+import com.remon.books.Data.Data_My_Book;
+import com.remon.books.Data.Data_Search_Book;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Activity_Book_Search extends AppCompatActivity {
+
+    ArrayList<Data_Search_Book> arrayList;
+
+    /*
+    뷰변수
+     */
+    Context context;
+    EditText edit_search;
+    RecyclerView rv_books;
+    ImageView img_search;
+
+    // 리싸이클러뷰용 변수
+    private Adater_Search_Book mainAdapter;
+    private LinearLayoutManager linearLayoutManager;
 
 
 
@@ -30,8 +62,26 @@ public class Activity_Book_Search extends AppCompatActivity {
         setContentView(R.layout.activity__book__search);
 
 
+        // arrayList 초기화
+        arrayList = new ArrayList<>();
+        context = getApplicationContext();
+        edit_search = findViewById(R.id.edit_search);
+        img_search = findViewById(R.id.img_search);
+        rv_books = findViewById(R.id.rv_books);
 
-        String url="https://dapi.kakao.com"+"/v3/search/book?query="+"9788996991342"+"&page="+1+"&size="+1+"&target=isbn";
+
+
+
+
+
+
+    }
+
+
+    // 책을 검색하여 보여줌
+    public void search_book(View view) {
+        String url="https://dapi.kakao.com"+"/v3/search/book?query="+edit_search.getText().toString();
+
         StringRequest request = new StringRequest(
                 Request.Method.GET, // GET 방식으로 요청
                 url,
@@ -41,13 +91,73 @@ public class Activity_Book_Search extends AppCompatActivity {
                     public void onResponse(String response) {
                         Log.i("실행","응답 ->" + response);
 
+                        try {
+                            JSONObject jsonObject = new JSONObject(response.toString());
+                            JSONArray TEMP = jsonObject.getJSONArray("documents");
+
+                            for(int i=0; i<TEMP.length(); i++){
+                                JSONObject temp_object = TEMP.getJSONObject(i);
+                                Data_Search_Book dmy = new Data_Search_Book();
+
+                                /*
+                                작가
+                                - 배열 -> 객체
+                                 */
+//                                JSONArray temp = new JSONArray(temp_object.getString("authors"));
+//                                String authors = "";
+//                                for(int j=0; j<temp.length(); j++){
+//                                    authors+=temp.get(j).toString();
+//
+//                                    if(j!=0){
+//                                        authors+=",";
+//                                    }
+//                                }
+//                                dmy.setAuthors(authors);
+//                                JSONObject jo = new JSONObject(temp_object.getString("authors"));
+//                                JSONArray js = jo.getJSONObject()
+
+                                dmy.setAuthors(temp_object.getString("authors"));
+
+                                String regex = "\[";
+                                String temp = temp_object.getString("authors").replaceAll("\"","");
+                                Log.d("실행", "authors="+temp);
+
+
+                                dmy.setContents(temp_object.getString("contents"));
+
+                                // isbn -> 분기
+                                String[] string_array= temp_object.getString("isbn").split(" ");
+                                dmy.setIsbn(string_array[0]);
+
+                                dmy.setPublisher(temp_object.getString("publisher"));
+                                dmy.setThumbnail(temp_object.getString("thumbnail"));
+                                dmy.setTitle(temp_object.getString("title"));
+                                arrayList.add(dmy);
+                            }
+
+                            // 리싸이클러뷰에 셋팅
+                            mainAdapter = new Adater_Search_Book(arrayList,context);
+                            rv_books.setAdapter(mainAdapter);
+                            linearLayoutManager = new LinearLayoutManager(context);
+                            linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                            rv_books.setLayoutManager(linearLayoutManager);
+
+
+
+
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         //TODO 에러응답을 받았을 때
-                         Log.d("실행", "error=>"+error.getMessage());
+                        Log.d("실행", "error=>"+error.getMessage());
 
                     }
                 }
@@ -62,9 +172,5 @@ public class Activity_Book_Search extends AppCompatActivity {
 
         request.setShouldCache(false);
         AppHelper.requestQueue.add(request);
-
     }
-
-
-
 }
