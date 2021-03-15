@@ -19,8 +19,10 @@ import com.bumptech.glide.Glide;
 import com.remon.books.Activity_Book_URL;
 import com.remon.books.Data.Data_My_Book;
 import com.remon.books.Data.Data_Search_Book;
+import com.remon.books.PopUp_in_Search_Book;
 import com.remon.books.R;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Adater_Search_Book
@@ -76,7 +78,7 @@ public class Adater_Search_Book
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CustomViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final CustomViewHolder holder, int position) {
         // 이미지 셋팅
         Glide.with(holder.itemView.getContext()).load(arrayList.get(holder.getAdapterPosition()).getThumbnail()).into(holder.img_thumbnail);
         // 타이틀
@@ -104,9 +106,17 @@ public class Adater_Search_Book
 
                                         if(str[which].equals("자세히 보기")){
                                             // 자세히 보기 클릭
+
+                                            // 해당 url페이지를 웹뷰로 보여주는 액티비티로 이동
                                             Intent intent = new Intent(activity, Activity_Book_URL.class);
+                                            intent.putExtra("url",arrayList.get(holder.getAdapterPosition()).getUrl());
+                                            activity.startActivity(intent);
                                         }else{
                                             // 책 저장하기 클릭
+                                            Intent intent = new Intent(activity, PopUp_in_Search_Book.class);
+                                            intent.putExtra("title",arrayList.get(holder.getAdapterPosition()).getTitle());
+                                            intent.putExtra("book", (Serializable) arrayList.get(holder.getAdapterPosition()));
+                                            activity.startActivity(intent);
                                         }
                                     }
                                 }

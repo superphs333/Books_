@@ -1,6 +1,8 @@
 package com.remon.books.Data;
 
-public class Data_Search_Book {
+import java.io.Serializable;
+
+public class Data_Search_Book implements Serializable {
     String unique_book_value, title, authors, publisher,thumbnail, contents, from_,isbn,url;
 
 
