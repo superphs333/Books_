@@ -37,13 +37,16 @@
                 android:id="@+id/txt_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="책제목" />
+                android:text="책제목"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/txt_authors"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="작가" />
+                android:text="작가"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/txt_contents"

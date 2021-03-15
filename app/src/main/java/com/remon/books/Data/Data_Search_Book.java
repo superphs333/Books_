@@ -1,7 +1,7 @@
 package com.remon.books.Data;
 
 public class Data_Search_Book {
-    String unique_book_value, title, authors, publisher,thumbnail, contents, from_,isbn;
+    String unique_book_value, title, authors, publisher,thumbnail, contents, from_,isbn,url;
 
 
     // 생성자
@@ -9,7 +9,7 @@ public class Data_Search_Book {
 
     // 생성자
     public Data_Search_Book(String unique_book_value, String title, String authors
-            , String publisher, String thumbnail, String contents, String isbn)
+            , String publisher, String thumbnail, String contents, String isbn,String url)
     {
         this.unique_book_value = unique_book_value;
         this.title = title;
@@ -18,6 +18,7 @@ public class Data_Search_Book {
         this.thumbnail = thumbnail;
         this.contents = contents;
         this.isbn = isbn;
+        this.url = url;
     }
 
     public String getUnique_book_value() {
@@ -82,5 +83,13 @@ public class Data_Search_Book {
 
     public void setIsbn(String isbn) {
         this.isbn = isbn;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

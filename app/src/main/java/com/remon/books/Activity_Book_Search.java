@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Movie;
 import android.net.Uri;
@@ -37,6 +38,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class Activity_Book_Search extends AppCompatActivity {
 
@@ -46,6 +48,7 @@ public class Activity_Book_Search extends AppCompatActivity {
     뷰변수
      */
     Context context;
+    Activity activity;
     EditText edit_search;
     RecyclerView rv_books;
     ImageView img_search;
@@ -64,6 +67,7 @@ public class Activity_Book_Search extends AppCompatActivity {
 
         // arrayList 초기화
         arrayList = new ArrayList<>();
+        activity = Activity_Book_Search.this;
         context = getApplicationContext();
         edit_search = findViewById(R.id.edit_search);
         img_search = findViewById(R.id.img_search);
@@ -80,6 +84,10 @@ public class Activity_Book_Search extends AppCompatActivity {
 
     // 책을 검색하여 보여줌
     public void search_book(View view) {
+
+        // arraylist 초기화
+        arrayList.clear();
+
         String url="https://dapi.kakao.com"+"/v3/search/book?query="+edit_search.getText().toString();
 
         StringRequest request = new StringRequest(
@@ -99,29 +107,10 @@ public class Activity_Book_Search extends AppCompatActivity {
                                 JSONObject temp_object = TEMP.getJSONObject(i);
                                 Data_Search_Book dmy = new Data_Search_Book();
 
-                                /*
-                                작가
-                                - 배열 -> 객체
-                                 */
-//                                JSONArray temp = new JSONArray(temp_object.getString("authors"));
-//                                String authors = "";
-//                                for(int j=0; j<temp.length(); j++){
-//                                    authors+=temp.get(j).toString();
-//
-//                                    if(j!=0){
-//                                        authors+=",";
-//                                    }
-//                                }
-//                                dmy.setAuthors(authors);
-//                                JSONObject jo = new JSONObject(temp_object.getString("authors"));
-//                                JSONArray js = jo.getJSONObject()
 
-                                dmy.setAuthors(temp_object.getString("authors"));
-
-                                String regex = "\[";
-                                String temp = temp_object.getString("authors").replaceAll("\"","");
-                                Log.d("실행", "authors="+temp);
-
+                                // 작가
+                                String temp = temp_object.getString("authors").replaceAll("\\[","").replaceAll("\\]","").replaceAll("\"","");
+                                dmy.setAuthors(temp);
 
                                 dmy.setContents(temp_object.getString("contents"));
 
@@ -132,15 +121,18 @@ public class Activity_Book_Search extends AppCompatActivity {
                                 dmy.setPublisher(temp_object.getString("publisher"));
                                 dmy.setThumbnail(temp_object.getString("thumbnail"));
                                 dmy.setTitle(temp_object.getString("title"));
+                                dmy.setUrl(temp_object.getString("url"));
                                 arrayList.add(dmy);
                             }
 
                             // 리싸이클러뷰에 셋팅
-                            mainAdapter = new Adater_Search_Book(arrayList,context);
+                            mainAdapter = new Adater_Search_Book(arrayList,context,activity);
                             rv_books.setAdapter(mainAdapter);
                             linearLayoutManager = new LinearLayoutManager(context);
                             linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
                             rv_books.setLayoutManager(linearLayoutManager);
+
+
 
 
 
