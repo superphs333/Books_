@@ -90,6 +90,8 @@ public class Activity_Book_Search extends AppCompatActivity {
 
         String url="https://dapi.kakao.com"+"/v3/search/book?query="+edit_search.getText().toString();
 
+
+
         StringRequest request = new StringRequest(
                 Request.Method.GET, // GET 방식으로 요청
                 url,
@@ -107,11 +109,12 @@ public class Activity_Book_Search extends AppCompatActivity {
                                 JSONObject temp_object = TEMP.getJSONObject(i);
                                 Data_Search_Book dmy = new Data_Search_Book();
 
-
                                 // 작가
                                 String temp = temp_object.getString("authors").replaceAll("\\[","").replaceAll("\\]","").replaceAll("\"","");
                                 dmy.setAuthors(temp);
 
+                                // contents
+//                                String contents = temp_object.getString("contents").
                                 dmy.setContents(temp_object.getString("contents"));
 
                                 // isbn -> 분기
@@ -123,6 +126,8 @@ public class Activity_Book_Search extends AppCompatActivity {
                                 dmy.setTitle(temp_object.getString("title"));
                                 dmy.setUrl(temp_object.getString("url"));
                                 arrayList.add(dmy);
+
+
                             }
 
                             // 리싸이클러뷰에 셋팅
@@ -131,6 +136,8 @@ public class Activity_Book_Search extends AppCompatActivity {
                             linearLayoutManager = new LinearLayoutManager(context);
                             linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
                             rv_books.setLayoutManager(linearLayoutManager);
+
+
 
 
 
