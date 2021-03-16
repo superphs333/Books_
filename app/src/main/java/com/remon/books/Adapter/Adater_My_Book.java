@@ -1,4 +1,5 @@
 package com.remon.books.Adapter;
+import android.widget.Toast;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.remon.books.Activity_Detail_My_Book;
 import com.remon.books.Data.Data_My_Book;
+import com.remon.books.Function.Function_Set;
 import com.remon.books.R;
 
 import java.util.ArrayList;
@@ -30,6 +32,9 @@ public class Adater_My_Book
 
     // 데이터 셋팅
     private ArrayList<Data_My_Book> arrayList;
+
+    // 함수
+    public Function_Set fs;
 
     // 생성자
     public Adater_My_Book(ArrayList<Data_My_Book> arrayList, Context context){
@@ -73,7 +78,7 @@ public class Adater_My_Book
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final CustomViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final CustomViewHolder holder, final int position) {
         // 이미지 셋팅
         Glide.with(holder.itemView.getContext()).load(arrayList.get(holder.getAdapterPosition()).getThumbnail()).into(holder.img_thumbnail);
         // 타이틀
@@ -115,8 +120,13 @@ public class Adater_My_Book
                         = new AlertDialog.Builder(context);
 
                 // 만약 from_=search라면 => 수정이 보이지 않아야 함
-                if(arrayList.get(holder.getAdapterPosition()).getFrom_().equals(""))
-                final String str[] = {"A","B"};
+                final String str[];
+                if(arrayList.get(holder.getAdapterPosition()).getFrom_().equals("search")){
+                    str = new String[]{context.getString(R.string.delete)};
+                }else{
+                    str = new String[]{context.getString(R.string.delete),context.getString(R.string.update)};
+                }
+
                 builder.setTitle("선택하세요")
                         .setNegativeButton("취소",null)
                         .setItems(str,// 리스트 목록에 사용할 배열
@@ -125,8 +135,63 @@ public class Adater_My_Book
                                     public void onClick(DialogInterface dialog, int which) {
                                         Log.d("실행","선택된것="+str[which]);
 
+                                        if(str[which].equals(context.getString(R.string.delete))){ // 삭제
+
+
+                                            // 정말로 삭제하시겠습니까?(다시묻기)
+                                            AlertDialog.Builder builder2 = new AlertDialog.Builder(context);
+                                            builder2.setTitle("알림"); //AlertDialog의 제목 부분
+                                            builder2.setMessage("정말로 삭제하시겠습니까?"); //AlertDialog의 내용 부분
+                                            builder2.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+
+
+                                                    Log.d("실행","예 누름");
+                                                    // login_value, unique_book_value 전송
+                                                    // My_Book_Delete.php
+                                                    // echo => success, 그외
+                                                    // success -> 해당 리스트 없애기
+                                                    // 그외 -> toast 메세지
+                                                    fs = new Function_Set(context);
+                                                    fs.context = context;
+                                                    fs.My_Book_Delete(arrayList.get(holder.getAdapterPosition()).getUnique_book_value(), new Function_Set.VolleyCallback() {
+                                                        @Override
+                                                        public void onSuccess(String result) {
+
+                                                            // 성공시에만 해당 아이템 삭제
+                                                            if(result.equals(context.getString(R.string.success))){
+                                                                arrayList.remove(holder.getAdapterPosition());
+                                                                notifyItemRemoved(holder.getAdapterPosition());
+                                                            }else{ // 오류
+                                                                Toast
+                                                                        .makeText
+                                                                                (context
+                                                                                        , "문제가 발생했습니다. 다시 시도해주세요",Toast.LENGTH_LONG
+                                                                                )
+                                                                        .show();
+                                                            }
+                                                        }
+                                                    });
+
+                                                }
+                                            });
+                                            builder2.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    Log.d("실행","아니요 누름");
+                                                }
+                                            });
+                                            builder2.setNeutralButton("취소", null);
+                                            builder2.create().show(); //보이기
+
+
+                                        }else if(str[which].equals(context.getString(R.string.update))){ // 수정
+                                            // Activity_Book_Edit으로 이동
+                                            Intent intent = new Intent(context,)
+                                        }
                                     }
-                                }
+                               }
                         );
                 AlertDialog dialog = builder.create();
                 dialog.show();

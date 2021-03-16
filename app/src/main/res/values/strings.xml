@@ -13,6 +13,13 @@
     <string name="server_url">https://my3my3my.tk/website/</string>
     <!--  구분자  -->
     <string name="seperator">§▼▩</string>
+    <!-- 수정   -->
+    <string name="update">수정</string>
+    <!-- 삭제   -->
+    <string name="delete">삭제</string>
+    <!-- 성공   -->
+    <string name="success">success</string>
+
 
     <!--
     read표시
