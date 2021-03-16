@@ -56,6 +56,7 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
     함수
      */
     Function_SharedPreference fshared;
+    Function_Set fs;
 
     // 데이터
     ArrayList<Data_My_Book> arrayList;

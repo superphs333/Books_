@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.remon.books.Activity_Book_Edit;
 import com.remon.books.Activity_Detail_My_Book;
 import com.remon.books.Data.Data_My_Book;
 import com.remon.books.Function.Function_Set;
@@ -188,7 +189,9 @@ public class Adater_My_Book
 
                                         }else if(str[which].equals(context.getString(R.string.update))){ // 수정
                                             // Activity_Book_Edit으로 이동
-                                            Intent intent = new Intent(context,)
+                                            Intent intent = new Intent(context, Activity_Book_Edit.class);
+                                            intent.putExtra("unique_book_value",arrayList.get(holder.getAdapterPosition()).getUnique_book_value());
+                                            context.startActivity(intent);
                                         }
                                     }
                                }

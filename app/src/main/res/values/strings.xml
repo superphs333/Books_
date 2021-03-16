@@ -19,6 +19,8 @@
     <string name="delete">삭제</string>
     <!-- 성공   -->
     <string name="success">success</string>
+    <!-- 성공   -->
+    <string name="check_delete">정말로 삭제하시겠습니까?</string>
 
 
     <!--

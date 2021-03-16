@@ -1,4 +1,6 @@
 package com.remon.books;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 import android.widget.RatingBar;
@@ -96,6 +98,39 @@ public class Activity_Book_Add extends AppCompatActivity {
         ArrayAdapter<String> adapter
                 = new ArrayAdapter<String>(context,android.R.layout.simple_dropdown_item_1line,data);
         category_read_status.setAdapter(adapter);
+
+        // 이미지 길게 누르면 -> 이미지 삭제(기본이미지로 변경 + 이미지 변수=null)
+        img_book.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(Activity_Book_Add.this);
+                builder.setTitle("알림"); //AlertDialog의 제목 부분
+                builder.setMessage(getString(R.string.check_delete)); //AlertDialog의 내용 부분
+                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d("실행","예 누름");
+
+                        // 이미지 기본 이미지로 변경
+                        img_book.setImageResource(R.drawable.basic_book_cover);
+                        // 이미지 변수 null
+                        image_bitmap = null;
+                        image_Uri = "";
+                    }
+                });
+                builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d("실행","아니요 누름");
+                    }
+                });
+                builder.setNeutralButton("취소", null);
+                builder.create().show(); //보이기
+
+                return false;
+            }
+        });
 
 
     }

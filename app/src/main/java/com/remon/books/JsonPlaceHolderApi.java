@@ -25,4 +25,11 @@ public interface JsonPlaceHolderApi {
     @FormUrlEncoded
     @POST("Data/Get_My_Books.php")
     Call<ArrayList<Data_My_Book>> Get_My_Books(@Field("login_value") String login_value, @Field("status") int status, @Field("search") String search);
+
+    /*
+    My_Books 데이터 1개 가져오기
+     */
+    @FormUrlEncoded
+    @POST("Data/Get_My_Book.php")
+    Call<ArrayList<Data_My_Book>> Get_My_Book(@Field("unique_book_value") String unique_book_value);
 }
