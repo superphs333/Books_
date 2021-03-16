@@ -60,8 +60,7 @@ public class Set_nickname extends AppCompatActivity {
         btn_nick_chk = findViewById(R.id.btn_nick_chk);
 
         // 함수 모음 객체
-        function_set = new Function_Set();
-        function_set.context = context; // context셋팅
+        function_set = new Function_Set(context);
         fs = new Function_SharedPreference(context);
 
 

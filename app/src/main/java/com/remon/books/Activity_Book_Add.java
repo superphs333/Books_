@@ -84,7 +84,7 @@ public class Activity_Book_Add extends AppCompatActivity {
         /*
         함수연결
          */
-        fs = new Function_Set();
+        fs = new Function_Set(context,Activity_Book_Add.this);
         fs.context =context;
         fs.activity = Activity_Book_Add.this;
         fshared = new Function_SharedPreference(context);

@@ -108,8 +108,7 @@ public class Fragment_mypage extends Fragment {
 
         // 함수셋팅
         fshared = new Function_SharedPreference(context);
-        fs = new Function_Set();
-        fs.context = context;
+        fs = new Function_Set(context,activity);
 
 
 

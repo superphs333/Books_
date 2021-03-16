@@ -95,8 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // 함수모음
-        function_set = new Function_Set();
-        function_set.context = context; // context셋팅
+        function_set = new Function_Set(context);
         function_sharedPreference = new Function_SharedPreference(context);
 
 

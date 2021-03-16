@@ -203,8 +203,8 @@ public class SignUp extends AppCompatActivity {
 
 
         // 함수모음
-        function_set = new Function_Set();
-        function_set.context = context; // context셋팅
+        function_set = new Function_Set(context);
+
 
         // 이미지 uri 받기위해
         getUri = new GetUri();

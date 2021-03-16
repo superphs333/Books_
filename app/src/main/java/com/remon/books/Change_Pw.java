@@ -72,7 +72,7 @@ public class Change_Pw extends AppCompatActivity {
         btn_chk = findViewById(R.id.btn_chk);
 
         // 함수객체
-        fs = new Function_Set();
+        fs = new Function_Set(context,Change_Pw.this);
         fs.context = context;
         fs.activity = Change_Pw.this;
         fshared = new Function_SharedPreference(context);

@@ -119,7 +119,12 @@ public class Activity_Book_Search extends AppCompatActivity {
 
                                 // isbn -> 분기
                                 String[] string_array= temp_object.getString("isbn").split(" ");
-                                dmy.setIsbn(string_array[0]);
+                                // 만약, 10자리 isbn이 없다면 13자리 isbn사용
+                                if(string_array[0].equals("")){
+                                    dmy.setIsbn(string_array[1]);
+                                }else{
+                                    dmy.setIsbn(string_array[0]);
+                                }
 
                                 dmy.setPublisher(temp_object.getString("publisher"));
                                 dmy.setThumbnail(temp_object.getString("thumbnail"));

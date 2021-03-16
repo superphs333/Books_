@@ -71,6 +71,14 @@ public class Main extends AppCompatActivity {
         btn_record = findViewById(R.id.btn_record);
         btn_mypage = findViewById(R.id.btn_mypage);
 
+        /*
+        함수셋팅
+         */
+        fshared = new Function_SharedPreference(context);
+        fs = new Function_Set(context);
+        fs.context = context;
+
+
 
         /*
         프래그 먼트
@@ -91,12 +99,6 @@ public class Main extends AppCompatActivity {
             // replace() = 이전 프래그먼트를 제거한 후에 새로운 프래그먼트를 추가한다
 
 
-        /*
-        함수셋팅
-         */
-        fshared = new Function_SharedPreference(context);
-        fs = new Function_Set();
-        fs.context = context;
 
         /*
         프로필, 닉네임 SharedPreference에 저장한다

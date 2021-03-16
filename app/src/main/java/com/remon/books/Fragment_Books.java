@@ -115,8 +115,7 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
                 = new ArrayAdapter<String>(v.getContext(),android.R.layout.simple_dropdown_item_1line,data);
         category_read_status.setAdapter(adapter);
 
-        // 데이터 불러오기
-        Get_My_Books();
+
 
         // 카테고리 변경시 -> 적절한 데이터 불러오기
         category_read_status.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -141,6 +140,14 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
 
         // Inflate the layout for this fragment
         return v;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // 데이터 불러오기
+        Get_My_Books();
     }
 
     @Override

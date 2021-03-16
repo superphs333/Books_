@@ -76,6 +76,9 @@ public class Adater_My_Book
         holder.txt_authors.setText(arrayList.get(holder.getAdapterPosition()).getAuthors());
         // 내용
         holder.txt_contents.setText(arrayList.get(holder.getAdapterPosition()).getContents());
+        if(arrayList.get(holder.getAdapterPosition()).getContents().equals("")){
+            holder.txt_contents.setVisibility(View.GONE);
+        }
         // 별점
         holder.txt_rating.setText(arrayList.get(holder.getAdapterPosition()).getRating()+"");
         // 읽음상태

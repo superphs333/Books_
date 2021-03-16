@@ -68,7 +68,7 @@ public class Find_Pw extends AppCompatActivity {
         btn_confirm = findViewById(R.id.btn_confirm);
 
         // 함수
-        fs = new Function_Set();
+        fs = new Function_Set(context,Find_Pw.this);
         fs.context = context;
 
         // 이메일 객체

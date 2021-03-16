@@ -71,7 +71,7 @@ public class Activity_Change_Profile extends AppCompatActivity {
         img_profile = findViewById(R.id.img_profile);
 
         // 함수셋팅
-        fs = new Function_Set();
+        fs = new Function_Set(context,activity);
         fs.activity = activity;
         fs.context = context;
         fshared = new Function_SharedPreference(context);

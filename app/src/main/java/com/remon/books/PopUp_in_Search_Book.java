@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -109,12 +110,29 @@ public class PopUp_in_Search_Book extends AppCompatActivity {
                     public void onResponse(String response) {
                         Log.d("실행","response=>"+response);
 
+                        String[] string_array= response.split(getString(R.string.seperator));
+                        String result = string_array[string_array.length-1];
+                        result = result.trim();
+                        Log.d("실행", "result="+result);
+
+                        if(result.equals("success")){
+                            Toast.makeText(getApplicationContext()
+                                    , "책등록을 마쳤습니다",Toast.LENGTH_LONG).show();
+
+                            finish();
+                        }else{
+                            Toast.makeText(getApplicationContext()
+                                    , "죄송합니다. 문제가 생겼습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
+                        }
+
                     }
                 },
                 new com.android.volley.Response.ErrorListener() { // 에러 발생
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.d("실행","error=>"+error.getMessage());
+                        Toast.makeText(getApplicationContext()
+                                , "죄송합니다. 문제가 생겼습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
                     }
                 }
 

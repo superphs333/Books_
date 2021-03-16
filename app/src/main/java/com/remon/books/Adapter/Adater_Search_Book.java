@@ -1,4 +1,5 @@
 package com.remon.books.Adapter;
+import android.widget.Toast;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,15 +16,24 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.remon.books.Activity_Book_URL;
+import com.remon.books.AppHelper;
 import com.remon.books.Data.Data_My_Book;
 import com.remon.books.Data.Data_Search_Book;
+import com.remon.books.Function.Function_Set;
+import com.remon.books.Function.Function_SharedPreference;
 import com.remon.books.PopUp_in_Search_Book;
 import com.remon.books.R;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Adater_Search_Book
     extends RecyclerView.Adapter<Adater_Search_Book.CustomViewHolder>
@@ -36,11 +46,17 @@ public class Adater_Search_Book
     // 데이터 셋팅
     private ArrayList<Data_Search_Book> arrayList;
 
+    // 함수
+    Function_Set fs;
+
+
     // 생성자
     public Adater_Search_Book(ArrayList<Data_Search_Book> arrayList, Context context,Activity activity){
         this.arrayList = arrayList;
         this.context = context;
         this.activity = activity;
+        fs = new Function_Set(context);
+        fs.context = context;
     }
 
     // 뷰홀더
@@ -112,11 +128,27 @@ public class Adater_Search_Book
                                             intent.putExtra("url",arrayList.get(holder.getAdapterPosition()).getUrl());
                                             activity.startActivity(intent);
                                         }else{
-                                            // 책 저장하기 클릭
-                                            Intent intent = new Intent(activity, PopUp_in_Search_Book.class);
-                                            intent.putExtra("title",arrayList.get(holder.getAdapterPosition()).getTitle());
-                                            intent.putExtra("book", (Serializable) arrayList.get(holder.getAdapterPosition()));
-                                            activity.startActivity(intent);
+
+                                            // 책 중복 확인 -> 중복되지 않았다면, 책 저장하기
+                                            fs.Check_in_mybook(arrayList.get(holder.getAdapterPosition()).getIsbn(),new Function_Set.VolleyCallback() {
+                                                @Override
+                                                public void onSuccess(String result) {
+
+                                                    // result = duplicate_no인 경우에만 책 추가
+                                                    if(result.equals("duplicate_no")){
+                                                        Intent intent = new Intent(activity, PopUp_in_Search_Book.class);
+                                                        intent.putExtra("title",arrayList.get(holder.getAdapterPosition()).getTitle());
+                                                        intent.putExtra("book", (Serializable) arrayList.get(holder.getAdapterPosition()));
+                                                        activity.startActivity(intent);
+                                                    }else if(result.equals("duplicate")){ // 이미 존재하는 경우
+                                                        Toast.makeText(context, "이미 등록되어 있는 도서입니다.",Toast.LENGTH_LONG).show();
+                                                    }else{ // 에러
+                                                        Toast.makeText(context, "문제가 생겼습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
+                                                    }
+                                                }
+                                            });
+
+
                                         }
                                     }
                                 }
@@ -134,6 +166,7 @@ public class Adater_Search_Book
     public int getItemCount() {
         return (null !=  arrayList ?  arrayList.size() : 0);
     }
+
 
 
 }
