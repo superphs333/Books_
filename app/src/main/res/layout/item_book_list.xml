@@ -68,6 +68,13 @@
                 android:layout_height="wrap_content"
                 android:text="0.0" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/txt_function"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="⋮" />
     </LinearLayout>
 
 </LinearLayout>
