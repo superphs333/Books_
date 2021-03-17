@@ -150,7 +150,7 @@ public class Activity_Book_Edit extends AppCompatActivity {
                     Glide.with(context).load(dmb.getThumbnail()).into(img_book);
 
                 }else{
-                    Log.d("실행","서버에 연결은 되었으나 오류발생");
+                    Log.d("실행","서버에 연결은 되었으나 오류발생 ");
                 }
             }
 
