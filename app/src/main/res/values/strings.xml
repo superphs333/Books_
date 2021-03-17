@@ -34,4 +34,20 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
+    <!--
+    SharedPreference관련
+    -->
+    <string name="member">member</string>
+    <string name="login_value">login_value</string>
+
+
+    <!--
+    자주쓰는
+    -->
+    <string name="unique_book_value">unique_book_value</string>
+
+
+
+
+
 </resources>

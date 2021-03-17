@@ -119,6 +119,8 @@
             android:id="@+id/txt_review"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:text="서평..." />
 
     </LinearLayout>
