@@ -38,7 +38,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <!--    -->
+    <!-- Rating Bar 크기 작게   -->
+    <style name="RatingBar_style_small" parent="@android:style/Widget.RatingBar">
+        <item name="android:minHeight">30dp</item>
+        <item name="android:maxHeight">30dp</item>
+        <item name="android:height">25dp</item>
+        <item name="android:width">25dp</item>
+    </style>
 
 
 </resources>

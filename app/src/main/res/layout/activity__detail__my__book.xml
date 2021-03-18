@@ -78,7 +78,7 @@
             android:layout_weight="4" />
 
         <RatingBar
-            android:id="@+id/rating"
+            android:id="@+id/rating_bar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="6"

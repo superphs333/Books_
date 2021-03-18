@@ -1,4 +1,6 @@
 package com.remon.books.Adapter;
+import android.provider.Telephony;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
 import android.app.AlertDialog;
@@ -48,7 +50,8 @@ public class Adater_My_Book
 
         // 위젯정의
         protected ImageView img_thumbnail;
-        protected TextView txt_title, txt_authors, txt_contents,txt_rating,txt_status,txt_function;
+        protected TextView txt_title, txt_authors, txt_contents,txt_status,txt_function;
+        protected RatingBar rating_bar;
 
 
         public CustomViewHolder(@NonNull View itemView) {
@@ -58,7 +61,7 @@ public class Adater_My_Book
             this.txt_title = (TextView) itemView.findViewById(R.id.txt_title);
             this.txt_authors = (TextView)itemView.findViewById(R.id.txt_authors);
             this.txt_contents = (TextView)itemView.findViewById(R.id.txt_contents);
-            this.txt_rating = (TextView)itemView.findViewById(R.id.txt_rating);
+            this.rating_bar = (RatingBar) itemView.findViewById(R.id.rating_bar);
             this.txt_status = (TextView)itemView.findViewById(R.id.txt_status);
             this.txt_function = (TextView)itemView.findViewById(R.id.txt_function);
 
@@ -92,7 +95,7 @@ public class Adater_My_Book
             holder.txt_contents.setVisibility(View.GONE);
         }
         // 별점
-        holder.txt_rating.setText(arrayList.get(holder.getAdapterPosition()).getRating()+"");
+        holder.rating_bar.setRating(arrayList.get(holder.getAdapterPosition()).getRating());
         // 읽음상태
         if(arrayList.get(holder.getAdapterPosition()).getStatus()==0){ // 읽고싶은
             holder.txt_status.setText(context.getString(R.string.read_bucket));

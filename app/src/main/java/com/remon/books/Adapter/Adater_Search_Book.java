@@ -74,7 +74,7 @@ public class Adater_Search_Book
             this.txt_title = (TextView) itemView.findViewById(R.id.txt_title);
             this.txt_authors = (TextView)itemView.findViewById(R.id.txt_authors);
             this.txt_contents = (TextView)itemView.findViewById(R.id.txt_contents);
-            this.txt_rating = (TextView)itemView.findViewById(R.id.txt_rating);
+//            this.txt_rating = (TextView)itemView.findViewById(R.id.txt_rating);
             this.txt_status = (TextView)itemView.findViewById(R.id.txt_status);
 
         }
