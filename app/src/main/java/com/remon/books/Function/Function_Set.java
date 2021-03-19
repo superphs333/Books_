@@ -261,7 +261,6 @@ public class Function_Set {
                 Uri photo_Uri = FileProvider.getUriForFile(context,context.getPackageName(),photo_File);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT,photo_Uri);
                 activity.startActivityForResult(intent,REQUEST_IMAGE_CAPTURE);
-
                 return photo_File.getAbsolutePath();
             }
         }else{
@@ -272,6 +271,19 @@ public class Function_Set {
 
         return null;
     } // end camera_for_profile
+
+
+    /*
+    갤러리에서 여러 이미지 가져오기
+     */
+    public void pick_from_gallery_imgs(int PICK_FROM_GALLERY_MULTI){
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
+        intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
+        intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        activity.startActivityForResult(intent,PICK_FROM_GALLERY_MULTI);
+    } // end pick_from_gallery_imgs
 
 
 

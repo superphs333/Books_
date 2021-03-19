@@ -1,4 +1,5 @@
 package com.remon.books;
+import android.app.Activity;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,7 +43,8 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
     뷰변수
      */
     Context context;
-    ImageView img_book,img_review_write;
+    Activity activity;
+    ImageView img_book,img_review_write,img_add_memo;
     TextView txt_title, txt_authors, txt_publisher, txt_contents,txt_review;
     Spinner category_read_status;
     RatingBar rating_bar;
@@ -76,6 +78,8 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
         rv_book_memos = findViewById(R.id.rv_book_memos);
         txt_review = findViewById(R.id.txt_review);
         img_review_write = findViewById(R.id.img_review_write);
+        img_add_memo = findViewById(R.id.img_add_memo);
+
 
         // 함수
         fs = new Function_Set(context);
@@ -213,6 +217,14 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
         Intent intent = new Intent(context,Activity_Review_Write.class);
         intent.putExtra(getString(R.string.unique_book_value),unique_book_value);
         intent.putExtra("review",txt_review.getText().toString());
+        startActivity(intent);
+    }
+
+    // Activity_Add_Memo로 이동
+    public void go_to_Activity_Add_Memo(View view) {
+        Intent intent = new Intent(context,Activity_Add_Memo.class);
+        intent.putExtra(getString(R.string.unique_book_value),unique_book_value);
+        intent.putExtra("title",dmb.getTitle());
         startActivity(intent);
     }
 
