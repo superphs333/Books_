@@ -90,5 +90,8 @@ dependencies {
     // 이미지 슬라이드
     implementation 'com.github.smarteist:autoimageslider:1.4.0'
 
+    // 동그라미 이미지
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
 
 }
