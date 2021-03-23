@@ -121,7 +121,7 @@ public class Activity_Add_Memo extends AppCompatActivity {
         리사이클러뷰 셋팅
          */
         arrayList = new ArrayList<>();
-        mainAdapter = new Adapter_Img_Memo(arrayList,context);
+        mainAdapter = new Adapter_Img_Memo(arrayList,context,activity);
         rv_memo_img.setAdapter(mainAdapter);
         linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);

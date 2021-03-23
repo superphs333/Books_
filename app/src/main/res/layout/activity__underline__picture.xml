@@ -8,4 +8,53 @@
     android:layout_height="match_parent"
     tools:context=".Activity_Underline_Picture">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/fui_bgFacebook"
+        android:padding="10sp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/image_back"
+            android:onClick="Back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/ic_menu_revert" />
+    </LinearLayout>
+
+    <com.remon.books.MyCanvas
+        android:id="@+id/my_canvas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="10sp"
+        android:layout_weight="1"
+        android:background="#C8BDBD" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btn_pen"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="펜" />
+
+        <Button
+            android:id="@+id/btn_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="초기화" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_ok"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="확인" />
 </LinearLayout>

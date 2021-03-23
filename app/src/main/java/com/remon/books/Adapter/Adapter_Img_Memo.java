@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.remon.books.Activity_Add_Memo;
 import com.remon.books.Activity_Underline_Picture;
 import com.remon.books.Data.Data_Img_Memo;
 import com.remon.books.ItemTouchHelperListener;
@@ -28,15 +29,17 @@ public class Adapter_Img_Memo
 {
     // Context
     Context context;
+    Activity activity;
 
     // 데이터 셋팅
     private ArrayList<Data_Img_Memo> arrayList;
 
 
     // 생성자
-    public Adapter_Img_Memo(ArrayList<Data_Img_Memo> arrayList, Context context){
+    public Adapter_Img_Memo(ArrayList<Data_Img_Memo> arrayList, Context context,Activity activity){
         this.arrayList = arrayList;
         this.context = context;
+        this.activity = activity;
     }
 
 
@@ -87,7 +90,7 @@ public class Adapter_Img_Memo
             public void onClick(View v) {
                 Intent intent = new Intent(context, Activity_Underline_Picture.class);
                 intent.putExtra("img_url",arrayList.get(position).getImg());
-                ((Activity) context).startActivityForResult(intent,999);
+                activity.startActivityForResult(intent,999);
             }
         });
     }
