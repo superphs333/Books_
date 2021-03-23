@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -19,9 +20,17 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 
+import com.remon.books.Function.Function_Set;
+
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class MyCanvas extends View {
 
@@ -41,6 +50,8 @@ public class MyCanvas extends View {
     Path path = new Path();
     public String m_filename;
         // 셋팅할 이미지 파일 주소
+    public String send_filepath;
+        // 보낼 파일 주소
 
 
     public MyCanvas(Context context) {
@@ -184,20 +195,130 @@ public class MyCanvas extends View {
     // 해당 이미지를 저장하고 이전엑티비티로 전송
     public String Save_Send(){
 
-        ContentValues contentValues = new ContentValues(3);
-        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, "Draw On Me");
-        Uri imageFileUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,contentValues);
-        try {
-            OutputStream imageFileOS = context.getContentResolver().openOutputStream(imageFileUri);
-            image_Bitmap.compress(Bitmap.CompressFormat.JPEG,90,imageFileOS);
+        // 다른방법으로 이미지를 저장해야 하나?
 
+        // 임의 경로에 파일 만들기
+//        File photoFile = null;
+//        try {
+//            photoFile = createImgageFile();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            Log.d("실행", "photoFile에러=>"+e.getMessage());
+//        }
+//
+//        // FileProvider를 통해서 파일의 uri값을 만든다
+//        if(photoFile !=null){
+//            send_filepath = String.valueOf(FileProvider.getUriForFile(context,context.getPackageName(),photoFile));
+//                // 주어진 파일에 대한 uri반환
+//            Log.d("실행","send_filepath="+send_filepath);
+//            image_Bitmap.compress(Bitmap.CompressFormat.JPEG,90,out)
+//        }else{
+//            Log.d("실행", "photoFile=null");
+//        }
+//
+//        // 이미지 저장하기
+//        String root = context.getExternalCacheDir().toString();
+
+//        try {
+////
+////            File file = new File(String.valueOf(createImgageFile()));
+////            OutputStream os = null;
+////
+////            file.createNewFile();
+////            os = new FileOutputStream(file);
+////
+////            image_Bitmap.compress(Bitmap.CompressFormat.PNG,100,os);
+////            os.close();
+////
+////        } catch (IOException e) {
+////            e.printStackTrace();
+////        }
+
+//        ContentValues contentValues = new ContentValues(3);
+//        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, "Draw_On_Me");
+//        Uri imageFileUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,contentValues);
+//
+//        try {
+//            OutputStream imageFileOS = context.getContentResolver().openOutputStream(imageFileUri);
+//            image_Bitmap.compress(Bitmap.CompressFormat.JPEG,90,imageFileOS);
+//
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//            Log.d("실행","FileNotFoundException:"+e.getMessage());
+//        }
+
+        //Log.d("실행", "imageFileUri="+imageFileUri);
+
+        // 내부저장소 캐시 경로를 받아온다
+        File storage = context.getCacheDir();
+
+        // 저장할 파일 이름
+        String timeStamp
+                = new SimpleDateFormat("yyyyMMdd_HHmmss")
+                .format(new Date());
+        String fileName = "TEST_"+timeStamp+".jpg";
+        // storeae에 파일 인스턴스를 생성
+        File tempFile = new File(storage,fileName);
+
+        try {
+            // 자동으로 빈 파일을 생성
+            tempFile.createNewFile();
+
+            // 파일을 쓸 수 있는 스트림을 준비
+            FileOutputStream out = new FileOutputStream(tempFile);
+
+            // compress함수를 사용해 스틀미에 비트맵을 저장
+            image_Bitmap.compress(Bitmap.CompressFormat.JPEG,100,out);
+
+            // 스트림 사용후 닫아준자
+            out.close();
+
+            send_filepath = tempFile.getPath();
+            Log.d("실행", "send_filepath="+send_filepath);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            Log.d("실행","FileNotFoundException:"+e.getMessage());
+            Log.e("실행","FileNotFoundException : " + e.getMessage());
+        } catch (IOException e) {
+            Log.e("실행","IOException : " + e.getMessage());
         }
 
-        Log.d("실행", "imageFileUri="+imageFileUri);
 
-        return String.valueOf(imageFileUri);
+        return String.valueOf(send_filepath);
+    }
+
+    // 좋은 화질의 사진을 가져오기 위해 -> 임시파일을 생성한다
+    private File createImgageFile() throws IOException{
+        String timeStamp
+                = new SimpleDateFormat("yyyyMMdd_HHmmss")
+                .format(new Date());
+        m_filename = "TEST_"+timeStamp+"_";
+
+        /*
+        createTempFile에 들어갈 매개변수 중 directory부분(File)
+         */
+        File storageDir
+                = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            /*
+            File getExternalFilesDir(String type)
+            : 매개변수에 원하는 디렉토리 유형을 전달하여,
+            적절한 디렉토리를 얻을 수 있다.
+            (여기서  Environment.DIRECTORY_PICTURES는 그림 파일 저장)
+             */
+
+        /*
+        createTempFile = 임시 파일을 생성 할 수 있다
+        createTempFile(String prefix, String suffix, File directory)
+        : 지정된 접두사와 접미사 문자열을 사용하여
+        지정 된 디렉토리에 새 빈 파일을 작성하여 이름을 생성한다
+         */
+        File image = File.createTempFile(
+                m_filename,
+                ".jpg",
+                storageDir
+        );
+
+        send_filepath = image.getAbsolutePath();
+        Log.d("실행","send_filepath="+send_filepath);
+
+        return image;
     }
 }

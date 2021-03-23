@@ -1,4 +1,5 @@
 package com.remon.books;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -33,13 +35,24 @@ import android.widget.TextView;
 
 import com.remon.books.Adapter.Adapter_Img_Memo;
 import com.remon.books.Data.Data_Img_Memo;
+import com.remon.books.Function.Function_ImgClass;
 import com.remon.books.Function.Function_Set;
+import com.remon.books.Function.Function_SharedPreference;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Activity_Add_Memo extends AppCompatActivity {
 
@@ -49,7 +62,8 @@ public class Activity_Add_Memo extends AppCompatActivity {
     함수
      */
     Function_Set fs;
-
+    Function_ImgClass fi;
+    Function_SharedPreference fshared;
     /*
     뷰연결
      */
@@ -105,6 +119,8 @@ public class Activity_Add_Memo extends AppCompatActivity {
         fs = new Function_Set(context);
         fs.context = context;
         fs.activity = activity;
+        fi = new Function_ImgClass();
+        fshared = new Function_SharedPreference(context);
 
         // 제목셋팅
         txt_title.setText(getIntent().getStringExtra("title"));
@@ -195,8 +211,12 @@ public class Activity_Add_Memo extends AppCompatActivity {
             Log.d("실행", "(in onActivityResult)result="+data.getStringExtra("result"));
             Log.d("실행", "(in onActivityResult)result="+data.getStringExtra("position"));
 
+            // 절대경로로 변경해야 함
+            String url = data.getStringExtra("result");
+            Log.d("실행", "url="+url);
+
             // 해당 이미지 변경하기
-            arrayList.get(Integer.parseInt(data.getStringExtra("position"))).setImg(data.getStringExtra("result"));
+            arrayList.get(Integer.parseInt(data.getStringExtra("position"))).setImg(url);
             mainAdapter.notifyDataSetChanged();
         }
     }
@@ -209,4 +229,202 @@ public class Activity_Add_Memo extends AppCompatActivity {
     public void Pick_From_Gallery(View view) {
         fs.pick_from_gallery_imgs(PICK_FROM_GALLERY_VALUE);
     }
+
+    // 메모 내용 서버로 전송하기
+    public void send_to_SERVER(View view) {
+        // 선택된 스피너값
+        String select_spinner = spinner_select_open.getSelectedItem().toString();
+        String open;
+        if(select_spinner.equals("전체")){
+            open = "all";
+        }else if(select_spinner.equals("팔로잉")){
+            open = "follow";
+        }else{ // 전체
+            open = "no";
+        }
+
+        // 작성자
+        String login_value = fshared.getPreferenceString(getString(R.string.member),getString(R.string.login_value));
+
+        Save_Data_Book_Memo sdbm = new Save_Data_Book_Memo();
+        sdbm.execute(unique_book_value,edit_memo.getText().toString(),edit_page.getText().toString(),open,login_value);
+            // unique_book_value,메모내용(memo), 페이지(page), 공개여부(open:all,follow,no),작성자
+    } // end send_to_SERVER
+
+    class Save_Data_Book_Memo extends AsyncTask<String,Void,String>{
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            String urlString = getString(R.string.server_url)+"Add_Data_Book_Memo.php";
+            HttpURLConnection conn = null;
+            DataOutputStream dos = null;
+            String lineEnd = "\r\n";
+            String twoHyphens = "--";
+            String boundary = "*****";
+            int bytesRead, bytesAvailable, bufferSize;
+            byte[] buffer;
+            int maxBufferSize = 1 * 1024 * 1024;
+            try {
+                URL url = new URL(urlString);
+
+                try {
+                    conn = (HttpURLConnection) url.openConnection();
+                    conn.setDoInput(true); // Allow Inputs
+                    conn.setDoOutput(true); // Allow Outputs
+                    conn.setUseCaches(false); // Don't use a Cached Copy
+                    conn.setRequestMethod("POST");
+                    conn.setRequestProperty("Accept-Charset", "utf-8");
+                    conn.setRequestProperty("Connection", "Keep-Alive");
+                    conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+                    conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+
+                    DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+
+                    /*
+                    텍스트 데이터
+                    : unique_book_value,메모내용(memo), 페이지(page), 공개여부(open:all,follow,no)
+                     */
+                    // arraylist 크기(얼마나 for을 돌릴건지 알기 위해)
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+                    wr.writeBytes("Content-Disposition: form-data; name=\"size\"\r\n\r\n" + arrayList.size());
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+
+                    // unique_book_value
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+                    wr.writeBytes("Content-Disposition: form-data; name=\"unique_book_value\"\r\n\r\n");
+                    wr.write(strings[0].getBytes("utf-8"));
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+
+                    // 메모내용(memo)
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+                    wr.writeBytes("Content-Disposition: form-data; name=\"memo\"\r\n\r\n");
+                    wr.write(strings[1].getBytes("utf-8"));
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+
+                    // 페이지(page)
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+                    wr.writeBytes("Content-Disposition: form-data; name=\"page\"\r\n\r\n");
+                    wr.write(strings[2].getBytes("utf-8"));
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+
+                    // 공개여부(open)
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+                    wr.writeBytes("Content-Disposition: form-data; name=\"open\"\r\n\r\n");
+                    wr.write(strings[3].getBytes("utf-8"));
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+
+                    // 작성자
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+                    wr.writeBytes("Content-Disposition: form-data; name=\"login_value\"\r\n\r\n");
+                    wr.write(strings[4].getBytes("utf-8"));
+                    wr.writeBytes("\r\n--" + boundary + "\r\n");
+
+                    // 파일전송
+                    for(int i=0; i<arrayList.size(); i++){
+
+                        FileInputStream fileInputStream = null;
+                        
+                        try{
+                            fileInputStream
+                                    = new FileInputStream(arrayList.get(i).getImg());
+                            Log.d("실행", "FileInputStream성공->"+i);
+                        }catch (Exception e){
+                            Log.d("실행", "FileInputStream에러=>"+arrayList.get(i).getImg()+","+e.getMessage());
+                        }
+                        /*
+                        여러파일을 전송할 때 주의사항
+                        -> uploaded_file은 키값으로 들어갈 것이기 때문에,
+                        중복되면 마지막 데이터만 전송이 된다
+                            => i값을 string으로 변환하여 구분해준다(php단에서 구분지어 받는다)
+                         */
+                        dos = new DataOutputStream(conn.getOutputStream());
+                        dos.writeBytes(lineEnd);
+                        dos.writeBytes(twoHyphens + boundary + lineEnd);
+
+                        // 파일이름
+                        Random generator = new Random();
+                        int n = 1000000;
+                        n = generator.nextInt(n);
+                        String fileName = "Img_Book_Memo-"+n+".jpg";
+
+                        // 키값 전송
+                        String a= String.valueOf(i);
+                        dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file"+a+"\";filename=\""+ fileName + "\"" + lineEnd);
+                        dos.writeBytes(lineEnd);
+
+                        // create a buffer of maximum size
+                        bytesAvailable = fileInputStream.available();
+                        bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                        buffer = new byte[bufferSize];
+                        bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                        while (bytesRead > 0) {
+                            dos.write(buffer, 0, bufferSize);
+                            bytesAvailable = fileInputStream.available();
+                            bufferSize = Math.min(bytesAvailable, maxBufferSize);
+                            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                        }
+                        fileInputStream.close();
+                        dos.writeBytes(lineEnd);
+                        dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+                        dos.flush();
+                    } // end for
+
+
+                    /*
+                    서버에서 전송받기
+                     */
+                    int responseStatusCode
+                            = conn.getResponseCode();
+                    Log.d("실행", "POST response code - " + responseStatusCode);
+
+                    // inputStream을 통해 데이터를 받아온다
+                    InputStream inputStream;
+                    if(responseStatusCode==HttpURLConnection.HTTP_OK){
+                        // 정상적인 응답 데이터 인 경우
+                        inputStream = conn.getInputStream();
+                    }else{
+                        // 에러 발생
+                        inputStream = conn.getErrorStream();
+                    }
+
+                    /*
+                    StringBuilder를 사용하여 수신되는 데이터를 저장한다
+                     */
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                    StringBuilder sb = new StringBuilder();
+                    String line = null;
+                    while((line = bufferedReader.readLine()) != null){
+                        sb.append(line);
+                    }
+                    bufferedReader.close();
+
+                    // 저장 된 데이터를 스트링으로 변환하여 리턴한다
+                    return sb.toString();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d("실행", "conn=>"+e.getMessage());
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                Log.d("실행", "URL에러=>"+e.getMessage());
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            Log.d("실행", "POST response  - " + s);
+
+            if(s.equals("success")){ // 성공시
+                finish();
+            }else{ // 실패시
+                Toast.makeText(getApplicationContext(), "죄송합니다. 오류가 발생하였습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
+            }
+        }
+    } // end Save_Data_Book_Memo
 }
