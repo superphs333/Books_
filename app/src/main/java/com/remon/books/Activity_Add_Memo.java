@@ -189,6 +189,16 @@ public class Activity_Add_Memo extends AppCompatActivity {
             arrayList.add(dim);
             mainAdapter.notifyDataSetChanged();
         }
+
+        // 편집된 이미지 가져오기
+        if(requestCode==999 && resultCode==RESULT_OK){
+            Log.d("실행", "(in onActivityResult)result="+data.getStringExtra("result"));
+            Log.d("실행", "(in onActivityResult)result="+data.getStringExtra("position"));
+
+            // 해당 이미지 변경하기
+            arrayList.get(Integer.parseInt(data.getStringExtra("position"))).setImg(data.getStringExtra("result"));
+            mainAdapter.notifyDataSetChanged();
+        }
     }
 
     // 카메라(btn_camera) => 카메라에서 이미지 가져오기

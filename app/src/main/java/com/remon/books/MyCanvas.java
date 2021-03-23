@@ -1,6 +1,7 @@
 package com.remon.books;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +10,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -18,6 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import java.io.FileNotFoundException;
+import java.io.OutputStream;
 
 public class MyCanvas extends View {
 
@@ -175,5 +179,25 @@ public class MyCanvas extends View {
             startX = -1; startY = -1;
         }
         return true;
+    }
+
+    // 해당 이미지를 저장하고 이전엑티비티로 전송
+    public String Save_Send(){
+
+        ContentValues contentValues = new ContentValues(3);
+        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, "Draw On Me");
+        Uri imageFileUri = context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,contentValues);
+        try {
+            OutputStream imageFileOS = context.getContentResolver().openOutputStream(imageFileUri);
+            image_Bitmap.compress(Bitmap.CompressFormat.JPEG,90,imageFileOS);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Log.d("실행","FileNotFoundException:"+e.getMessage());
+        }
+
+        Log.d("실행", "imageFileUri="+imageFileUri);
+
+        return String.valueOf(imageFileUri);
     }
 }

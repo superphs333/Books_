@@ -71,6 +71,7 @@ public class Adapter_Img_Memo
 
     @Override
     public void onBindViewHolder(@NonNull final CustomViewHolder holder, final int position) {
+
         /*
         이미지 넣기
         - 이미지를 앨범에서 가져오는 경우
@@ -88,8 +89,10 @@ public class Adapter_Img_Memo
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("실행", "보낼 position="+position);
                 Intent intent = new Intent(context, Activity_Underline_Picture.class);
                 intent.putExtra("img_url",arrayList.get(position).getImg());
+                intent.putExtra("position", position+"");
                 activity.startActivityForResult(intent,999);
             }
         });
