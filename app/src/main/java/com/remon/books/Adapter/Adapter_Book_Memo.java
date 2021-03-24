@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -104,6 +106,13 @@ public class Adapter_Book_Memo
                 .into(holder.img_profile);
         // 닉네임
         holder.txt_nickname.setText(arrayList.get(holder.getAdapterPosition()).getNickname());
+        // txt_nickname 클릭 => 팔로잉
+        holder.txt_nickname.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
         // 페이지
         holder.txt_page.setText(arrayList.get(holder.getAdapterPosition()).getPage()+"p");
         // count_heart
@@ -112,6 +121,13 @@ public class Adapter_Book_Memo
         holder.txt_comment_count.setText(arrayList.get(holder.getAdapterPosition()).getCount_comment()+"");
         // 책이름
         holder.txt_book.setText(arrayList.get(holder.getAdapterPosition()).getTitle());
+//        holder.txt_book.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(context,Activity_)
+//            }
+//        });
+        // 내 메모만 보기 / 다른 사람 메모 보기 / 전체보 기
         // 날짜, 시간
         holder.txt_date_time.setText(arrayList.get(holder.getAdapterPosition()).getDate_time());
         // 메모
@@ -171,6 +187,39 @@ public class Adapter_Book_Memo
         }// end for
         // 슬라이더에 리스틑 반영
         adapter2.renewItems(sliderItemList);
+
+
+        /*
+        하트표시
+        - 이미 별 표시를 했을 경우(check_heart=true) = 채운하트 ===> 빈별, 데이터베이스(DELETE)
+        - 별표시를 하지 않았을 경우(check_heart=false) = 빈별 ===> 채운별, 데이터베이스(INSERT)
+
+        전달값) idx_memo, login_value
+         */
+        final boolean check_heart = arrayList.get(holder.getAdapterPosition()).getCheck_heart();
+        Drawable drawable;
+        if(check_heart==true){ // 체크 된 상태
+            drawable = context.getResources().getDrawable(R.drawable.fill_heart);
+        }else{  // 체크가 되지 않은 상태
+            drawable = context.getResources().getDrawable(R.drawable.empty_heart);
+        }
+        holder.img_heart.setImageDrawable(drawable); // 하트모양 셋팅
+        holder.img_heart.setOnClickListener(new View.OnClickListener() { // 클릭 -> 상태반대로 변경
+            @Override
+            public void onClick(View v) {
+                // 별모양 상태 변경
+                Drawable drawable = null;
+                if(check_heart==true){ // 체크 된 상태
+                    drawable = context.getResources().getDrawable(R.drawable.empty_heart); // 빈하트
+                    arrayList.get(holder.getAdapterPosition()).setCheck_heart(false);
+                    notifyDataSetChanged();
+                }else{ // 체크가 되지 않은 상태
+                    drawable = context.getResources().getDrawable(R.drawable.fill_heart); // 채운하트
+                }
+            }
+        });
+
+
     }
 
     @Override

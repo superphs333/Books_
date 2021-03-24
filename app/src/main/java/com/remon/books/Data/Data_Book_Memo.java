@@ -5,9 +5,10 @@ public class Data_Book_Memo {
     int idx,page,count_heart,count_comment;
     String login_value,nickname, profile_url, unique_book_value, title,date_time,
             img_urls,memo,open,thumbnail;
+    Boolean check_heart;
 
 
-    public Data_Book_Memo(int idx, int page, int count_heart, int count_comment, String login_value, String nickname, String profile_url, String unique_book_value, String title, String date_time, String img_urls, String memo, String open, String thumbnail) {
+    public Data_Book_Memo(int idx, int page, int count_heart, int count_comment, String login_value, String nickname, String profile_url, String unique_book_value, String title, String date_time, String img_urls, String memo, String open, String thumbnail, Boolean check_heart) {
         this.idx = idx;
         this.page = page;
         this.count_heart = count_heart;
@@ -22,6 +23,7 @@ public class Data_Book_Memo {
         this.memo = memo;
         this.open = open;
         this.thumbnail = thumbnail;
+        this.check_heart = check_heart;
     }
 
     public int getIdx() {
@@ -134,5 +136,13 @@ public class Data_Book_Memo {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public Boolean getCheck_heart() {
+        return check_heart;
+    }
+
+    public void setCheck_heart(Boolean check_heart) {
+        this.check_heart = check_heart;
     }
 }
