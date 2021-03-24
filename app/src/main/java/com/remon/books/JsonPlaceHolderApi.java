@@ -1,5 +1,6 @@
 package com.remon.books;
 
+import com.remon.books.Data.Data_Book_Memo;
 import com.remon.books.Data.Data_My_Book;
 import com.remon.books.Data.Member_Info;
 
@@ -32,4 +33,11 @@ public interface JsonPlaceHolderApi {
     @FormUrlEncoded
     @POST("Data/Get_My_Book.php")
     Call<ArrayList<Data_My_Book>> Get_My_Book(@Field("unique_book_value") String unique_book_value);
+
+    /*
+    Data_Book_Memo 가져오기
+     */
+    @FormUrlEncoded
+    @POST("Data/Get_Book_Memo.php")
+    Call<ArrayList<Data_Book_Memo>> Get_Book_Memo(@Field("login_value") String login_value, @Field("unique_book_value") String unique_book_value);
 }

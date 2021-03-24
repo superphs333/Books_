@@ -4,6 +4,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.arch.core.util.Function;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
@@ -23,6 +24,8 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
+import com.remon.books.Adapter.Adapter_Book_Memo;
+import com.remon.books.Data.Data_Book_Memo;
 import com.remon.books.Data.Data_My_Book;
 import com.remon.books.Function.Function_Set;
 import com.remon.books.Function.Function_SharedPreference;
@@ -58,6 +61,13 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
 
     // 함수
     Function_Set fs;
+    Function_SharedPreference fshared;
+
+    // 리싸이클러뷰
+    ArrayList<Data_Book_Memo> arrayList;
+    Adapter_Book_Memo mainAdapter;
+    LinearLayoutManager linearLayoutManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +94,7 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
         // 함수
         fs = new Function_Set(context);
         fs.context = context;
+        fshared = new Function_SharedPreference(context);
 
 
 
@@ -197,6 +208,8 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
                     Glide.with(context).load(dmb.getThumbnail()).into(img_book);
                     txt_review.setText(dmb.getReview());
 
+
+
                 }else{
                     Log.d("실행","서버에 연결은 되었으나 오류발생 ");
                 }
@@ -208,8 +221,51 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
 
             }
         });
+
+
+        /*
+        메모 데이터 불러오기
+         */
+        final String login_value = fshared.getPreferenceString(getString(R.string.member),getString(R.string.login_value));
+        Get_Memo_Data(login_value);
+
     } // end onResume
 
+    private void Get_Memo_Data(String login_value) {
+        Log.d("실행", "unique_book_value="+unique_book_value+", login_value="+fshared.getPreferenceString(getString(R.string.member),getString(R.string.login_value)));
+
+        RetrofitConnection retrofitConnection
+                = new RetrofitConnection();
+        Call<ArrayList<Data_Book_Memo>> call
+                = retrofitConnection.server
+                .Get_Book_Memo(login_value,unique_book_value);
+        call.enqueue(new Callback<ArrayList<Data_Book_Memo>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Data_Book_Memo>> call, Response<ArrayList<Data_Book_Memo>> response) {
+
+                if(response.isSuccessful()){
+                    Log.d("실행", "(Get_Memo_Data)resonse=>"+response.message());
+
+                    arrayList = response.body();
+                    mainAdapter = new Adapter_Book_Memo(arrayList,context,activity);
+                    rv_book_memos.setAdapter(mainAdapter);
+                    linearLayoutManager = new LinearLayoutManager(context);
+                    linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                    rv_book_memos.setLayoutManager(linearLayoutManager);
+                }else{
+                    Log.d("실행","(Get_Memo_Data)서버에 연결은 되었으나 오류발생");
+
+                }
+            }
+
+
+
+            @Override
+            public void onFailure(Call<ArrayList<Data_Book_Memo>> call, Throwable t) {
+                Log.d("실행", "onFailure: " + t.toString()); //서버와 연결 실패
+            }
+        });
+    }
 
 
     // 액티비티 Activity_Review_Write로 이동

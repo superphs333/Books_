@@ -3,12 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/border_layout"
+    android:layout_margin="10sp"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.5"
+        android:layout_weight="2.3"
         android:orientation="horizontal"
         android:padding="10sp">
 
@@ -25,8 +27,15 @@
             android:id="@+id/txt_nickname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:gravity="right"
             android:text="닉네임" />
+
+        <TextView
+            android:id="@+id/txt_function"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:text="⋮" />
     </LinearLayout>
 
     <LinearLayout
@@ -42,9 +51,9 @@
             android:layout_weight="5"
             android:layout_height="wrap_content">
             <com.smarteist.autoimageslider.SliderView
-                android:id="@+id/imageSlider"
+                android:id="@+id/sliderView"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="200dp"
                 app:sliderAnimationDuration="600"
                 app:sliderAutoCycleDirection="back_and_forth"
                 app:sliderAutoCycleEnabled="true"
@@ -68,13 +77,6 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/txt_function"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:text="⋮" />
-
-            <TextView
                 android:id="@+id/txt_memo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -82,7 +84,7 @@
                 android:text="메모" />
 
             <TextView
-                android:id="@+id/textView18"
+                android:id="@+id/txt_page"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="page" />
@@ -95,8 +97,11 @@
 
             <Spinner
                 android:id="@+id/spinner_select_open"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:scrollbarSize="3sp" />
+
         </LinearLayout>
 
     </LinearLayout>
@@ -104,7 +109,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_weight="1.5"
         android:orientation="horizontal">
 
         <ImageView
@@ -132,12 +137,30 @@
             app:srcCompat="@drawable/comment" />
 
         <TextView
-            android:id="@+id/txt_bookmark_count"
+            android:id="@+id/txt_comment_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:layout_margin="10sp"
             android:text="0" />
+
+        <TextView
+            android:id="@+id/txt_date_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:paddingRight="10sp"
+            android:text="날짜" />
+
+        <TextView
+            android:id="@+id/txt_open"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginRight="10sp"
+            android:text="open " />
     </LinearLayout>
 
 
