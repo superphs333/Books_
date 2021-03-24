@@ -3,6 +3,8 @@ package com.remon.books.Function;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.remon.books.R;
+
 import static android.content.Context.MODE_PRIVATE;
 
 public class Function_SharedPreference {
@@ -90,5 +92,14 @@ public class Function_SharedPreference {
         SharedPreferences.Editor editor = pref.edit();
         editor.clear();
         editor.commit();
+    }
+
+    /*
+    자주 불러오는 값
+     */
+    public String get_login_value(){
+        String login_value
+                = getPreferenceString(context.getString(R.string.member),context.getString(R.string.login_value));
+        return login_value;
     }
 }

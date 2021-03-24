@@ -1,4 +1,5 @@
 package com.remon.books.Adapter;
+import android.widget.Toast;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,10 +20,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.remon.books.Activity_Underline_Picture;
+import com.remon.books.AppHelper;
 import com.remon.books.Data.Data_Book_Memo;
 import com.remon.books.Data.Data_Img_Memo;
+import com.remon.books.Function.Function_SharedPreference;
 import com.remon.books.ItemTouchHelperListener;
 import com.remon.books.R;
 import com.remon.books.SliderAdapterExample;
@@ -33,7 +40,9 @@ import com.smarteist.autoimageslider.SliderView;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Adapter_Book_Memo
     extends RecyclerView.Adapter<Adapter_Book_Memo.CustomViewHolder>
@@ -194,7 +203,7 @@ public class Adapter_Book_Memo
         - 이미 별 표시를 했을 경우(check_heart=true) = 채운하트 ===> 빈별, 데이터베이스(DELETE)
         - 별표시를 하지 않았을 경우(check_heart=false) = 빈별 ===> 채운별, 데이터베이스(INSERT)
 
-        전달값) idx_memo, login_value
+        전달값) idx_memo, login_value, check_heart
          */
         final boolean check_heart = arrayList.get(holder.getAdapterPosition()).getCheck_heart();
         Drawable drawable;
@@ -207,15 +216,78 @@ public class Adapter_Book_Memo
         holder.img_heart.setOnClickListener(new View.OnClickListener() { // 클릭 -> 상태반대로 변경
             @Override
             public void onClick(View v) {
+                Log.d("실행", "  check_heart="+check_heart);
+                //Log.d("실행", "idx="+arrayList.get(holder.getAdapterPosition()).getIdx());
+                final int idx = arrayList.get(holder.getAdapterPosition()).getIdx();
+
                 // 별모양 상태 변경
                 Drawable drawable = null;
                 if(check_heart==true){ // 체크 된 상태
                     drawable = context.getResources().getDrawable(R.drawable.empty_heart); // 빈하트
                     arrayList.get(holder.getAdapterPosition()).setCheck_heart(false);
-                    notifyDataSetChanged();
                 }else{ // 체크가 되지 않은 상태
                     drawable = context.getResources().getDrawable(R.drawable.fill_heart); // 채운하트
+                    arrayList.get(holder.getAdapterPosition()).setCheck_heart(true);
                 }
+                notifyDataSetChanged();
+
+                // login_value
+                Function_SharedPreference fshared = new Function_SharedPreference(context);
+                final String login_value = fshared.get_login_value();
+                //Log.d("실행", "login_value="+login_value);
+
+
+                // 데이터베이스 상태반영
+                // 웹페이지 실행하기
+                String url = context.getString(R.string.server_url)+"Update_heart_check.php";
+
+                StringRequest request = new StringRequest(
+                        Request.Method.POST,
+                        url,
+                        new com.android.volley.Response.Listener<String>() { // 정상 응답
+                            @Override
+                            public void onResponse(String response) {
+                                Log.d("실행","response=>"+response);
+
+                                String[] temp = response.split(context.getString(R.string.seperator));
+                                if(temp[0].equals("success") && temp[1].equals("success")){
+                                    Log.d("실행", "Count_heart="+temp[2]);
+
+                                    // txt_heart_count 셋팅
+                                    holder.txt_heart_count.setText(temp[2]);
+                                    // 값셋팅
+                                    arrayList.get(holder.getAdapterPosition()).setCount_heart(Integer.parseInt(temp[2]));
+                                }else{
+                                    Toast.makeText(context, "",Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        },
+                        new com.android.volley.Response.ErrorListener() { // 에러 발생
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.d("실행","error=>"+error.getMessage());
+                            }
+                        }
+
+                ){ // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
+                    // 만약 헤더를 한 줄 추가하고 싶다면 getHeaders() override
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("idx_memo",idx+"");
+                        params.put("login_value", login_value);
+                        params.put("check_heart", String.valueOf(check_heart));
+                        return params;
+                    }
+                };
+
+                // 요청 객체를 만들었으니 이제 requestQueue 객체에 추가하면 됨.
+                // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
+                // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
+                request.setShouldCache(false);
+                AppHelper.requestQueue.add(request);
+
+                notifyDataSetChanged();
             }
         });
 
