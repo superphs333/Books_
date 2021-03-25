@@ -1,11 +1,22 @@
 package com.remon.books;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+
+import static java.lang.Thread.sleep;
 
 public class Activity_Underline_Picture extends AppCompatActivity {
 
@@ -22,15 +33,49 @@ public class Activity_Underline_Picture extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity__underline__picture);
 
+        Log.d("실행", "===(Activity_Underline_Picture)onCreate===");
+
         img_url = getIntent().getStringExtra("img_url");
         Log.d("실행", "(in Activity_Underline_Picture onCreate)img_url="+img_url);
         position = getIntent().getStringExtra("position");
         Log.d("실행", "(in Activity_Underline_Picture onCreate)position="+position);
 
-
+        // 뷰연결
         my_canvas = (MyCanvas) findViewById(R.id.my_canvas);
         my_canvas.m_filename = img_url;
-        my_canvas.context = getApplicationContext();
+
+        // 서버에서 온건지, 사용자의 기기에서 온 이미지인지 분기
+//        if(img_url.substring(0,4).equals("http")){
+//            Glide.with(getApplicationContext())
+//                    .asBitmap()
+//                    .load(img_url)
+//                    .into(new CustomTarget<Bitmap>(){
+//                        @Override
+//                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+//                            Log.d("실행", "width="+resource.getWidth());
+//                            Log.d("실행", "width="+resource.getHeight());
+//
+//                            // 뷰연결
+//                            my_canvas = (MyCanvas) findViewById(R.id.my_canvas);
+//                            my_canvas.bitmap = resource;
+//
+//                        }
+//
+//                        @Override
+//                        public void onLoadCleared(@Nullable Drawable placeholder) {
+//
+//                        }
+//                    });
+//        }else{
+//            // 뷰연결
+//            my_canvas = (MyCanvas) findViewById(R.id.my_canvas);
+//            my_canvas.m_filename = img_url;
+//
+//        }
+
+
+
+
 
 
     }

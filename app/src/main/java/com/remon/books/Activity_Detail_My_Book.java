@@ -78,6 +78,7 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
         뷰연결
          */
         context = getApplicationContext();
+        activity = Activity_Detail_My_Book.this;
         img_book = findViewById(R.id.img_book);
         txt_title = findViewById(R.id.txt_title);
         txt_authors = findViewById(R.id.txt_authors);

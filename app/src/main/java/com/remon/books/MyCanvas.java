@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -19,9 +20,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.remon.books.Function.Function_Set;
 
 import java.io.File;
@@ -32,6 +37,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static java.lang.Thread.sleep;
+
 public class MyCanvas extends View {
 
     int startX= -1;
@@ -40,6 +47,7 @@ public class MyCanvas extends View {
     int stopY= -1;
     boolean mode_eraser;
         // true -> 지우개 false -> 펜
+    Bitmap bitmap; // 서버에서 온 이미지 -> 비트맵화
     Canvas mcanvas;
     Paint mpaint = new Paint();
     Bitmap image_Bitmap;
@@ -56,6 +64,8 @@ public class MyCanvas extends View {
 
     public MyCanvas(Context context) {
         super(context);
+        Log.d("실행", "Context");
+        this.context = context;
         this.setLayerType(LAYER_TYPE_SOFTWARE,null);
         //this.m_filename = m_filename;
             // 이걸했더니 에러가 났다
@@ -63,11 +73,32 @@ public class MyCanvas extends View {
 
     public MyCanvas(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        this.context = context;
+        Log.d("실행", "Context context, @Nullable AttributeSet attrs");
         this.setLayerType(LAYER_TYPE_SOFTWARE,null);
         //this.m_filename = m_filename;
             // 이걸했더니 에러가 났다
-
     }
+
+//    public MyCanvas(Context context,Bitmap bitmap) {
+//        super(context);
+//        Log.d("실행", "Context context,Bitmap bitmap");
+//        this.setLayerType(LAYER_TYPE_SOFTWARE,null);
+//        this.bitmap = bitmap;
+//    }
+//
+//    public MyCanvas(Context context, @Nullable AttributeSet attrs,Bitmap bitmap) {
+//        super(context, attrs);
+//        Log.d("실행", "Context context, @Nullable AttributeSet attrs,Bitmap bitmap");
+//        this.setLayerType(LAYER_TYPE_SOFTWARE,null);
+//        //this.m_filename = m_filename;
+//        // 이걸했더니 에러가 났다
+//        this.bitmap = bitmap;
+//    }
+
+
+
+
 
     // 뷰의 크기가 변경되었을 때 호출한다
     @Override
@@ -77,52 +108,72 @@ public class MyCanvas extends View {
         Log.d("실행", "m_filename="+m_filename);
 
 
-        image_Bitmap = Bitmap.createBitmap(getWidth(),getHeight(), Bitmap.Config.ARGB_8888);
-        //paint_Bitmap = Bitmap.createBitmap(getWidth(),getHeight(), Bitmap.Config.ARGB_8888);
-
-
         // Paint 설정
         mpaint.setStrokeWidth(10f);
         mpaint.setAntiAlias(true);
-            // 선분을 매끄럽게 그리기 위해서
-        // 블러효과
-//        BlurMaskFilter blur = new BlurMaskFilter(10, BlurMaskFilter.Blur.INNER);
-//        mpaint.setColor(Color.BLUE);
-//        mpaint.setMaskFilter(blur);
-//        mpaint.setStrokeJoin(Paint.Join.ROUND);
-            // 선끝 모양
-        // 투명도
         mpaint.setAntiAlias(true);
-//        mpaint.setAlpha(150);
+
+        image_Bitmap = Bitmap.createBitmap(getWidth(),getHeight(), Bitmap.Config.ARGB_8888);
+        //paint_Bitmap = Bitmap.createBitmap(getWidth(),getHeight(), Bitmap.Config.ARGB_8888);
 
         // bitmap에 직접 그림을 그리거나 다른 이미지를 그릴려고 하면, 새로운 canvas를 만들어내야 한다
         mcanvas = new Canvas();
 
         // 비트맵과 캔버스 연결
         mcanvas.setBitmap(image_Bitmap);
-            // 앞으로 canvas에 그리는 모든 작업은 bitmap에 반영이 된다
+        // 앞으로 canvas에 그리는 모든 작업은 bitmap에 반영이 된다
         mcanvas.drawColor(Color.WHITE);
+        Log.d("실행","width="+getWidth()+", height="+getHeight());
 
         /*
         캔버스에 비트맵 셋팅
+        : 이미지를 로드할 때는, 필요한 만큼만 이미지를 sampling하여 로드할 필요가 있다
          */
-        // 이미지를 로드할 때는, 필요한 만큼만 이미지를 sampling하여 로드할 필요가 있다
-        Log.d("실행","width="+getWidth()+", height="+getHeight());
-        // 리사이즈할 이미지 크기
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.RGB_565;
-        options.inJustDecodeBounds = true;
-            // 이미지 크기를 구할 때는 이 속성을 true로 지정해 주고,
-            // 이 옵션을 이용해서 BitmapFactory의 decode메소드를 사용함
-        BitmapFactory.decodeFile(m_filename,options);
-        // 화면 크기에 가장 근접하는 이미지의 리스케일 사이즈
-        int w = getWidth(); // 뷰너비
-        int h = getHeight(); // 뷰높이
+        final int w = getWidth(); // 뷰너비
+        final int h = getHeight(); // 뷰높이
         Log.d("실행", "w="+getWidth());
         Log.d("실행", "h="+getHeight());
-        Log.d("실행", "options.outWidth="+options.outWidth);
-        Log.d("실행", "options.getHeight="+options.outHeight);
-        Bitmap bitmap = BitmapFactory.decodeFile(m_filename);
+
+        // 여기에서 서버에서 온 경우/아닌 경우 분기
+        if(m_filename.substring(0,4).equals("http")){ // 서버에서
+            Log.d("실행", "서버o");
+
+            Glide.with(context)
+                    .asBitmap()
+                    .load("https://my3my3my.tk/website/Img_Profile/Image_Profile-483962.jpg")
+                    .into(new CustomTarget<Bitmap>(){
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            bitmap = resource;
+
+                            // 비트맵 리사이즈
+                            Resize_Bitmap(bitmap,w,h);
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                        }
+                    });
+        }else{ // 이용자의 기기에서
+            Log.d("실행", "서버x");
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            options.inJustDecodeBounds = true;
+                // 이미지 크기를 구할 때는 이 속성을 true로 지정해 주고,
+                // 이 옵션을 이용해서 BitmapFactory의 decode메소드를 사용함
+            BitmapFactory.decodeFile(m_filename,options);
+
+            // 화면 크기에 가장 근접하는 이미지의 리스케일 사이즈
+            bitmap = BitmapFactory.decodeFile(m_filename);
+
+            Resize_Bitmap(bitmap, w, h);
+        }
+
+    }
+
+    private void Resize_Bitmap(Bitmap bitmap, int w, int h) {
         float bitmap_width = bitmap.getWidth();
         float bitmap_height = bitmap.getHeight();
         if(bitmap_height>h){
@@ -132,6 +183,7 @@ public class MyCanvas extends View {
             bitmap_height *= (scale/100);
         } // end if
         bitmap = Bitmap.createScaledBitmap(bitmap,(int)bitmap_width,(int)bitmap_height,true);
+
         // 비트맵 크기
         float left = (w-bitmap.getWidth())/2;
         float top = (h-bitmap.getHeight())/2;
@@ -143,12 +195,17 @@ public class MyCanvas extends View {
             : 왼쪽 모서리 좌표를 (x,y)로 가지는 bitmap을 그림
              */
         invalidate();
+    }
 
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
     }
 
     /* onDraw(Canvas canvas)
-    개별적인 뷰를 그릴때 호출된다
-     */
+        개별적인 뷰를 그릴때 호출된다
+         */
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);

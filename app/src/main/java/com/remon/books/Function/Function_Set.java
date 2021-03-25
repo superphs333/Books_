@@ -682,7 +682,7 @@ public class Function_Set {
         // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
         // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
         request.setShouldCache(false);
-        AppHelper.requestQueue.add(request);
+         AppHelper.requestQueue.add(request);
 
     } // end Update_My_Book_Data
 

@@ -40,4 +40,6 @@ public interface JsonPlaceHolderApi {
     @FormUrlEncoded
     @POST("Data/Get_Book_Memo.php")
     Call<ArrayList<Data_Book_Memo>> Get_Book_Memo(@Field("login_value") String login_value, @Field("unique_book_value") String unique_book_value);
+
+
 }
