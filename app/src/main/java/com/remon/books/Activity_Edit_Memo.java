@@ -525,11 +525,11 @@ public class Activity_Edit_Memo extends AppCompatActivity {
             super.onPostExecute(s);
             Log.d("실행", "POST response  - " + s);
 
-//            if(s.equals("success")){ // 성공시
-//                finish();
-//            }else{ // 실패시
-//                Toast.makeText(getApplicationContext(), "죄송합니다. 오류가 발생하였습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
-//            }
+            if(s.equals("success")){ // 성공시
+                finish();
+            }else{ // 실패시
+                Toast.makeText(getApplicationContext(), "죄송합니다. 오류가 발생하였습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
+            }
         }
     } // end Save_Data_Book_Memo
 

@@ -62,6 +62,7 @@ public class Set_nickname extends AppCompatActivity {
         // 함수 모음 객체
         function_set = new Function_Set(context);
         fs = new Function_SharedPreference(context);
+        fs.context = context;
 
 
         /*

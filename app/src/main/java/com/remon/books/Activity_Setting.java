@@ -274,4 +274,18 @@ public class Activity_Setting extends AppCompatActivity {
         ActivityCompat.finishAffinity(this);
         startActivity(intent);
     }
+
+    // Activity_Management_Comment로 이동
+    public void Go_To_Management_Comment(View view) {
+        Intent intent = new Intent(context,Activity_Management_Comment.class);
+        intent.putExtra(getString(R.string.login_value),fshared.get_login_value());
+        startActivity(intent);
+    }
+
+    // Activity_Management_Follow로 이동
+    public void Go_To_Management_Follow(View view) {
+        Intent intent = new Intent(context,Activity_Management_Follow.class);
+        intent.putExtra(getString(R.string.login_value),fshared.get_login_value());
+        startActivity(intent);
+    }
 }

@@ -2,6 +2,7 @@ package com.remon.books.Function;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.remon.books.R;
 
@@ -100,6 +101,7 @@ public class Function_SharedPreference {
     public String get_login_value(){
         String login_value
                 = getPreferenceString(context.getString(R.string.member),context.getString(R.string.login_value));
+        Log.d("실행", "(in Function_SharedPreference)login_value="+login_value);
         return login_value;
     }
 }

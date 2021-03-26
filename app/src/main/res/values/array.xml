@@ -18,4 +18,9 @@
         <item>팔로잉</item>
         <item>비공개</item>
     </string-array>
+
+    <string-array name="select_open2">
+        <item>전체</item>
+        <item>팔로우</item>
+    </string-array>
 </resources>
