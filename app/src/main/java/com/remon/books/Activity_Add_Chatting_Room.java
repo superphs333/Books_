@@ -1,4 +1,6 @@
 package com.remon.books;
+import android.content.Intent;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -64,6 +66,21 @@ public class Activity_Add_Chatting_Room extends AppCompatActivity {
                         public void onResponse(String response) {
                             Log.d("실행","response=>"+response);
 
+                            String[] string_array= response.split("§");
+                            Log.d("실행", "결과="+string_array[0]);
+                            Log.d("실행", "idx="+string_array[1]);
+
+                            if(string_array[0].equals("success")){
+                                Toast.makeText(getApplicationContext()
+                                        , "채팅방이 생성되었습니다!",Toast.LENGTH_LONG).show();
+
+                                Intent intent = new Intent(getApplicationContext(),Activity_Chatting_Room.class);
+                                intent.putExtra("idx",string_array[1]);
+                                startActivity(intent);
+                                finish();
+                            }else{
+                                Toast.makeText(getApplicationContext(), "문제가 발생하였습니다. 다시 시도해주세요",Toast.LENGTH_LONG).show();
+                            }
                         }
                     },
                     new com.android.volley.Response.ErrorListener() { // 에러 발생
