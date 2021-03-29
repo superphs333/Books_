@@ -56,6 +56,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
     // Also declare the dependency for the Google Play services library and specify its version
 
+    // firbase alarm
+    implementation 'com.google.firebase:firebase-messaging'
+
 
     //서버통신 관련 라이브러리 : volley, retrofit
     implementation 'com.android.volley:volley:1.1.1'

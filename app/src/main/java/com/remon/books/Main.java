@@ -51,6 +51,7 @@ public class Main extends AppCompatActivity {
     // 프래그먼트
     Fragment_Books fragment_books;
     Fragment_mypage fragment_mypage;
+    Fragment_Chatting_Room fragment_chatting_room;
 
     // 버튼
     Button btn_books, btn_gathering, btn_chatting, btn_record,btn_mypage;
@@ -90,6 +91,8 @@ public class Main extends AppCompatActivity {
         // 추가 시켜 줄 프래그먼트 객체 생성
         fragment_books = new Fragment_Books();
         fragment_mypage = new Fragment_mypage();
+        fragment_chatting_room = new Fragment_Chatting_Room();
+
 
         // 프래그먼트 트랜잭션 시작
             // 여기에서 프래그먼트 트랜잭션, 백스택, 애니메이션 등을 설정한다
@@ -141,11 +144,11 @@ public class Main extends AppCompatActivity {
             case R.id.btn_mypage:
                 fragmentTransaction.replace(R.id.frameLayout,fragment_mypage).commitAllowingStateLoss();
                 break;
-//
-//            case R.id.btn_gathering:
-//                fragmentTransaction.replace(R.id.frameLayout,Gathering).commitAllowingStateLoss();
-//                break;
-//
+
+            case R.id.btn_gathering:
+                fragmentTransaction.replace(R.id.frameLayout,fragment_chatting_room).commitAllowingStateLoss();
+                break;
+
 //            case R.id.btn_chatting:
 //                fragmentTransaction.replace(R.id.frameLayout,Chatting).commitAllowingStateLoss();
 //                break;

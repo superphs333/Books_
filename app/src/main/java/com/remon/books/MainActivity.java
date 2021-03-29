@@ -38,6 +38,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.remon.books.Function.Function_Set;
 import com.remon.books.Function.Function_SharedPreference;
 
@@ -98,6 +101,24 @@ public class MainActivity extends AppCompatActivity {
         function_set = new Function_Set(context);
         function_sharedPreference = new Function_SharedPreference(context);
 
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if(!task.isSuccessful()){
+                            Log.w("실행", "Fetching FCM registration token failed", task.getException());
+                            return;
+                        }// end if
+
+                        // Get new FCM registration token
+                        String token = task.getResult();
+
+
+                        Log.d("실행", token);
+
+                    }
+                });
 
 
 

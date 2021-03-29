@@ -19,7 +19,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Activity_Management_Follow"></activity>
+        <activity android:name=".Activity_Add_Chatting_Room"></activity>
+        <activity android:name=".Activity_Management_Follow" />
         <activity android:name=".Activity_Management_Comment" />
         <activity android:name=".Activity_Underline_Picture" />
         <activity android:name=".Activity_Add_Memo" />
@@ -60,7 +61,14 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
-        </provider>
+        </provider> <!-- Firebase 알림 -->
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
