@@ -2,15 +2,16 @@ package com.remon.books.Data;
 
 public class Data_Chatting_Room {
 
-    String title, room_explain;
+    String title, room_explain,leader;
     int total_count, join_count, idx;
 
-    public Data_Chatting_Room(String title, String room_explain, int total_count, int join_count, int idx) {
+    public Data_Chatting_Room(String title, String room_explain, int total_count, int join_count, int idx, String leader) {
         this.title = title;
         this.room_explain = room_explain;
         this.total_count = total_count;
         this.join_count = join_count;
         this.idx = idx;
+        this.leader = leader;
     }
 
 
@@ -52,5 +53,13 @@ public class Data_Chatting_Room {
 
     public void setIdx(int idx) {
         this.idx = idx;
+    }
+
+    public String getLeader() {
+        return leader;
+    }
+
+    public void setLeader(String leader) {
+        this.leader = leader;
     }
 }

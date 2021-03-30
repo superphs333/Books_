@@ -3,12 +3,15 @@ package com.remon.books.Data;
 public class Data_Join_People {
     boolean follow; // 내가 상대를 팔로우 하고 있는지 (팔로우 하고 있다면 : 1, 아니라면 : 0)
     String nickname, profile_url,login_value;
+    int room_idx;
 
-    public Data_Join_People(boolean follow, String nickname, String profile_url, String login_value) {
+    public Data_Join_People(boolean follow, String nickname, String profile_url, String login_value, int room_idx) {
         this.follow = follow;
         this.nickname = nickname;
         this.profile_url = profile_url;
         this.login_value = login_value;
+        this.room_idx = room_idx;
+
     }
 
     public boolean isFollow() {
@@ -42,4 +45,14 @@ public class Data_Join_People {
     public void setLogin_value(String login_value) {
         this.login_value = login_value;
     }
+
+    public int getRoom_idx() {
+        return room_idx;
+    }
+
+    public void setRoom_idx(int room_idx) {
+        this.room_idx = room_idx;
+    }
+
+
 }

@@ -1,7 +1,9 @@
 package com.remon.books.Adapter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
@@ -16,9 +18,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.remon.books.Activity_Chatting_Room;
+import com.remon.books.Activity_Edit_Chatting_Room;
 import com.remon.books.Activity_Underline_Picture;
 import com.remon.books.Data.Data_Chatting_Room;
 import com.remon.books.Data.Data_Img_Memo;
+import com.remon.books.Function.Function_Set;
+import com.remon.books.Function.Function_SharedPreference;
 import com.remon.books.ItemTouchHelperListener;
 import com.remon.books.R;
 
@@ -36,11 +41,16 @@ public class Adapter_Chatting_Room
     // 데이터 셋팅
     private ArrayList<Data_Chatting_Room> arrayList;
 
+    // 함수
+    Function_SharedPreference fshared;
+
 
     // 생성자
-    public Adapter_Chatting_Room(ArrayList<Data_Chatting_Room> arrayList, Context context){
+    public Adapter_Chatting_Room(ArrayList<Data_Chatting_Room> arrayList, Context context,Activity activity){
         this.arrayList = arrayList;
         this.context = context;
+        this.activity = activity;
+        fshared = new Function_SharedPreference(context);
     }
 
 
@@ -49,7 +59,7 @@ public class Adapter_Chatting_Room
     public class CustomViewHolder extends RecyclerView.ViewHolder{
 
         // 위젯정의
-        protected TextView txt_title, txt_explain,txt_count, txt_total;
+        protected TextView txt_title, txt_explain,txt_count, txt_total, txt_function;
 
         public CustomViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -57,7 +67,7 @@ public class Adapter_Chatting_Room
             this.txt_explain = itemView.findViewById(R.id.txt_explain);
             this.txt_count = itemView.findViewById(R.id.txt_count);
             this.txt_total = itemView.findViewById(R.id.txt_total);
-
+            this.txt_function = itemView.findViewById(R.id.txt_function);
         }
     }
 
@@ -92,6 +102,45 @@ public class Adapter_Chatting_Room
                 context.startActivity(intent);
             }
         });
+
+        // leader = login_value인 경우에만 txt_function보이도록
+        if(fshared.get_login_value().equals(arrayList.get(holder.getAdapterPosition()).getLeader())){
+            holder.txt_function.setVisibility(View.VISIBLE);
+        }else{
+            holder.txt_function.setVisibility(View.GONE);
+        }
+
+        // txt_function => 수정, 삭제
+        holder.txt_function.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder
+                        = new AlertDialog.Builder(activity);
+                final String str[] = {"수정","삭제"};
+                builder.setTitle("선택하세요")
+                        .setNegativeButton("취소",null)
+                        .setItems(str,// 리스트 목록에 사용할 배열
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Log.d("실행","선택된것="+str[which]);
+
+                                        if(str[which].equals("수정")){
+                                            Intent intent = new Intent(context,Activity_Edit_Chatting_Room.class);
+                                            intent.putExtra("idx",arrayList.get(holder.getAdapterPosition()).getIdx());
+                                            activity.startActivity(intent);
+                                        }else if(str[which].equals("삭제")){
+
+                                        }
+                                    }
+                                }
+                        );
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+            }
+        });
+
 
     }
 

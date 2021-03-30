@@ -1,5 +1,6 @@
 package com.remon.books;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ public class Fragment_Chatting_Room extends Fragment  {
      */
     View v;
     Context context;
+    Activity activity;
     Button btn_add_room;
     RecyclerView rv_chatting_rooms;
 
@@ -67,6 +69,7 @@ public class Fragment_Chatting_Room extends Fragment  {
         LayoutInflater inflater1 = inflater;
         v = inflater.inflate(R.layout.fragment__chattingroom,container,false);
         context = v.getContext();
+        activity = (Main)getActivity();
         btn_add_room = v.findViewById(R.id.btn_add_room);
         rv_chatting_rooms = v.findViewById(R.id.rv_chatting_rooms);
 
@@ -112,7 +115,7 @@ public class Fragment_Chatting_Room extends Fragment  {
                     Log.d("실행", "Get_Chatting_Room_Data_Whole 성공");
 
                     arrayList = response.body();
-                    mainAdapter = new Adapter_Chatting_Room(arrayList,context);
+                    mainAdapter = new Adapter_Chatting_Room(arrayList,context,activity);
                     rv_chatting_rooms.setAdapter(mainAdapter);
 
                 }else{

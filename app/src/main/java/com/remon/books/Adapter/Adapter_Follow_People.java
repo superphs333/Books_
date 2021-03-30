@@ -102,33 +102,16 @@ public class Adapter_Follow_People
             @Override
             public void onClick(View v) {
 
-                /*
-                mode_follow
-                - = 팔로잉
-                    From_login_value = 나
-                    To_login_value = 클릭한 대상
-                - = 팔로워
-                    From_login_value = 클릭한 대상
-                    To_login_value = 나
-                 */
-                String From_login_value = "";
-                String To_login_value = "";
+
                 AlertDialog.Builder builder
                         = new AlertDialog.Builder(activity);
                 String[] str = {"A","B"};
                 if(mode_follow.equals("follower")){
                     str = new String[]{"삭제", "팔로잉"};
-                    From_login_value = arrayList.get(holder.getAdapterPosition()).getLogin_value();
-                    To_login_value = fshared.get_login_value();
-
                 }else if(mode_follow.equals("following")){
                     str = new String[]{"팔로잉 취소"};
-                    From_login_value = fshared.get_login_value();
-                    To_login_value = arrayList.get(holder.getAdapterPosition()).getLogin_value();
                 }
                 final String[] finalStr = str;
-                final String finalFrom_login_value = From_login_value;
-                final String finalTo_login_value = To_login_value;
                 builder.setTitle("선택하세요")
                         .setNegativeButton("취소",null)
                         .setItems(str,// 리스트 목록에 사용할 배열
@@ -137,22 +120,40 @@ public class Adapter_Follow_People
                                     public void onClick(DialogInterface dialog, int which) {
                                         Log.d("실행","선택된것="+ finalStr[which]);
 
+                                        /*
+                                        mode_follow
+                                        - = 팔로잉
+                                            From_login_value = 나
+                                            To_login_value = 클릭한 대상
+                                        - = 팔로워
+                                            From_login_value = 클릭한 대상
+                                            To_login_value = 나
+                                         */
+                                        String From_login_value = "";
+                                        String To_login_value = "";
+
                                         String management = "";
                                         if(finalStr[which].equals("삭제")){
                                             management = "invisible";
+                                            From_login_value = arrayList.get(holder.getAdapterPosition()).getLogin_value();
+                                            To_login_value = fshared.get_login_value();
                                         }else if(finalStr[which].equals("팔로잉")){
                                             management = "following";
+                                            From_login_value =  fshared.get_login_value();
+                                            To_login_value = arrayList.get(holder.getAdapterPosition()).getLogin_value();
                                         }else if(finalStr[which].equals("팔로잉 취소")){
                                             management = "delete_following";
+                                            From_login_value = fshared.get_login_value();
+                                            To_login_value = arrayList.get(holder.getAdapterPosition()).getLogin_value();
                                         }
 
-                                        Log.d("실행", "From_login_value="+ finalFrom_login_value);
-                                        Log.d("실행", "To_login_value="+ finalTo_login_value);
+                                        Log.d("실행", "From_login_value="+ From_login_value);
+                                        Log.d("실행", "To_login_value="+ To_login_value);
                                         Log.d("실행", "management="+management);
 
 
                                         final String finalManagement = management;
-                                        fs.Management_Follow(finalFrom_login_value, finalTo_login_value, management, new Function_Set.VolleyCallback() {
+                                        fs.Management_Follow(From_login_value, To_login_value, management, new Function_Set.VolleyCallback() {
                                             @Override
                                             public void onSuccess(String result) {
                                                 Log.d("실행", "(in Adapter)result="+result);
