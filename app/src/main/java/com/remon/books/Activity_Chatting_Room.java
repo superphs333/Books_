@@ -162,6 +162,8 @@ public class Activity_Chatting_Room extends AppCompatActivity {
             public void onResponse(Call<ArrayList<Data_Join_People>> call, Response<ArrayList<Data_Join_People>> response) {
                 if(response.isSuccessful()){
                     Log.d("실행", "get_Join_Peoples SUCCESS!");
+                    Log.d("실행", "leader="+leader);
+
                     arrayList = response.body();
                     mainAdapter = new Adapter_Join_People(arrayList,getApplicationContext(),Activity_Chatting_Room.this,leader);
                     rv_peoples.setAdapter(mainAdapter);
@@ -241,7 +243,10 @@ public class Activity_Chatting_Room extends AppCompatActivity {
                         public void onClick(DialogInterface dialog, int which) {
                             Log.d("실행","예 누름");
 
-                            fs.Management_Join_Chatting_Room(idx, login_value, state, new Function_Set.VolleyCallback() {
+                            // 방장 변경
+                            leader = arrayList.get(1).getLogin_value();
+
+                            fs.Management_Join_Chatting_Room(idx, login_value, state,arrayList.get(1).getLogin_value() ,new Function_Set.VolleyCallback() {
                                 @Override
                                 public void onSuccess(String result) {
 
@@ -311,7 +316,9 @@ public class Activity_Chatting_Room extends AppCompatActivity {
                     public void onResponse(String response) {
                         Log.d("실행","response=>"+response);
 
-                        if(response.equals("success")){
+                        String[] string_array= response.split("§");
+
+                        if(string_array[0].equals("success") && string_array[1].equals("success")){
                             Toast.makeText(getApplicationContext(), "삭제되었습니다.",Toast.LENGTH_LONG).show();
                             finish();
                         }else{
