@@ -187,6 +187,9 @@ public class Activity_Chatting_Room extends AppCompatActivity {
                         }
                         state = false;
                     }
+
+                    // join_count 업데이트
+                    txt_count.setText(arrayList.size()+"");
                 }else{
                     Log.d("실행", "서버에 연결되었으나 문제가 생김");
                 }

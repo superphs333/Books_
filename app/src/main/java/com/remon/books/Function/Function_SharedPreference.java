@@ -21,6 +21,7 @@ public class Function_SharedPreference {
     public Function_SharedPreference(Context context){
         this.context = context;
     }
+    public Function_SharedPreference(){}
 
 
     // 데이터 저장 함수
@@ -99,9 +100,15 @@ public class Function_SharedPreference {
     자주 불러오는 값
      */
     public String get_login_value(){
-        String login_value
-                = getPreferenceString(context.getString(R.string.member),context.getString(R.string.login_value));
-        Log.d("실행", "(in Function_SharedPreference)login_value="+login_value);
+
+        String login_value;
+        if(context==null){
+            login_value = getPreferenceString("member","login_value");
+        }else{
+            login_value
+                    = getPreferenceString(context.getString(R.string.member),context.getString(R.string.login_value));
+        }
+        //Log.d("실행", "(in Function_SharedPreference)login_value="+login_value);
         return login_value;
     }
 }

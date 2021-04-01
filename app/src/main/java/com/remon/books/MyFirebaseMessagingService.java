@@ -1,15 +1,32 @@
 package com.remon.books;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.remon.books.Function.Function_Set;
+import com.remon.books.Function.Function_SharedPreference;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /*
@@ -29,12 +46,60 @@ import com.google.firebase.messaging.RemoteMessage;
 // 토큰이 확보되었다면, 앱서버로 전송하고 원하는 방법으로 저장 할 수 있다
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
+    // 이메일
+    Function_SharedPreference fshared;
+
+
+
     // 새 토큰이 생성될 때마다 onNewToken콜백이 호출된다
     @Override
-    public void onNewToken(@NonNull String s) {
+    public void onNewToken(@NonNull final String s) {
         super.onNewToken(s);
         Log.d("실행", "onNewToken함수 호출");
         Log.d("실행", "Refreshed token: " + s);
+
+        fshared = new Function_SharedPreference(getApplicationContext());
+
+        final String login_value = fshared.get_login_value();
+
+        // 웹페이지 실행하기
+        String url = getString(R.string.server_url)+"Update_sender_id.php";
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                url,
+                new com.android.volley.Response.Listener<String>() { // 정상 응답
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("실행","response=>"+response);
+
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() { // 에러 발생
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("실행","error=>"+error.getMessage());
+                    }
+                }
+
+        ){ // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
+            // 만약 헤더를 한 줄 추가하고 싶다면 getHeaders() override
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("login_value",login_value);
+                params.put("sender_id",s);
+                return params;
+            }
+        };
+
+        // 요청 객체를 만들었으니 이제 requestQueue 객체에 추가하면 됨.
+        // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
+        // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
+        request.setShouldCache(false);
+        AppHelper.requestQueue.add(request);
+
+
     }
 
     // 메세지를 받았을 때 동작하는 메서드
@@ -48,14 +113,113 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if(remoteMessage.getData().size()>0){
             Log.d("실행", "remoteMessage.getData().size()>0");
 
+            String sort = remoteMessage.getData().get("sort");
+            Log.d("실행", "sort="+sort);
 
-        }
+            String title = remoteMessage.getData().get("title");
+            String message = remoteMessage.getData().get("message");
+
+
+            if(sort.equals("For_chatting_room_waiting_list")){
+                showNotification_For_chatting_room_waiting_list(remoteMessage.getData().get("idx"),title,message);
+            }
+
+
+        } // end remoteMessage.getData().size()>0
 
         // 알림메세지를 받는다
             // 데이터 받을 때 => remoteMessage.getNotification().getBody()
         if(remoteMessage.getNotification() != null){
             Log.d("실행", "remoteMessage.getNotification() != null");
 
-        }
+
+
+
+        } // end remoteMessage.getNotification() != null
     }
+
+    public void showNotification_For_chatting_room_waiting_list(String idx, String title,String message){
+        Intent intent
+                = new Intent(this, Activity_Chatting_Room.class);
+        intent.putExtra("idx",idx);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            // 호출하려는 액티비티의 인스턴스가 이미 존재하는 경우 -> 새로운 인스턴스 생성x,존재하는 액티비티
+            // 를 포그라운드에 가져온다 + 액티비티 스택의 최상단 액티비티부터 포그라운드로 가져온 액티비티
+            // 까지의 모든 액티비티를 삭제한다
+
+        /*
+        PendingIntent(Context context, int requestCode, Intent intent, int flags)
+        - context = 어떤 PendingIntent에 의해 서비스르 시작하는 Context
+        - requestCode = 보낸 사람에 대한 비공개 요청 코드
+        - intent = 시작된 서비스를 나타내는 intent
+        - flags = 실제 전달될 때 제공되는 intent의 어떤 불특정 부분을 제어 할 수 있다
+         */
+        PendingIntent pendingIntent
+                = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_ONE_SHOT);
+            // FLAG_ONE_SHOT = 한번만 사용할 수 있는 PendingIntent
+
+        /*
+        알림 생성하기
+         */
+        NotificationCompat.Builder builder
+                /*
+                Compat사용 이유
+                - 하위 호환 가능
+                - 버전분기 없이 사용 가능하게 해줌(물론, 알람채널 등록은 버전분기를 해줘야 함)
+                 */
+                = new NotificationCompat.Builder(getApplicationContext(),getString(R.string.Channel_ID_Chatting_Room))
+                    // 채널 아이디를 제공해야 한다
+                .setSmallIcon(R.mipmap.ic_launcher)
+                    // 작은 아이콘(사용자가 볼 수 있는 유일한 필수 콘텐츠)
+                .setAutoCancel(true)
+                    // 알람 터치시 자동으로 삭제할 것인지 설정
+                .setVibrate(new long[] {1000, 1000, 1000, 1000, 1000})
+                .setOnlyAlertOnce(true)
+                    // 한번만 울리기(중복된 알림은 발생해도 알리지 않음
+                .setContentIntent(pendingIntent);
+
+        // 버전별로 분기
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+            builder = builder.setContent(getCustomDesign(title, message));
+        }else{
+            builder = builder.setContentTitle(title)
+                    .setContentText(message)
+                    .setSmallIcon(R.mipmap.ic_launcher);
+        }
+
+        // 알람채널을 시스템에 등록한다
+        NotificationManager notificationManager
+                = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+            // 채널생성
+                // Notification Channel = notification들을 groupping하는 데 사용됨
+                    // Notification을 여러가지 용도로 나누어서 관리할 수 있게 만들어 줌
+            NotificationChannel notificationChannel
+                    = new NotificationChannel(getString(R.string.Channel_ID_Chatting_Room),"채팅방 참여",NotificationManager.IMPORTANCE_HIGH);
+                /*
+                - channel id = 고유한 id값을 설정한다
+                - channel name = 채널의 이름을 설정한다
+                - channel importance - 중요도를 설정한다(DEFAULT, HIGH)
+                 */
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+        notificationManager.notify(0,builder.build());
+            // id = 고유한 알림 식별자
+            // 사용자에게 표시 할 내용을 설명하는 개체
+
+
+    }
+
+    /*
+    알람 커스텀
+     */
+    // 기본
+    private RemoteViews getCustomDesign(String title,String message){
+        RemoteViews remoteViews
+                = new RemoteViews(getApplicationContext().getPackageName(),R.layout.notification);
+        remoteViews.setTextViewText(R.id.noti_title,title);
+        remoteViews.setTextViewText(R.id.noti_message,message);
+        remoteViews.setImageViewResource(R.id.noti_icon,R.mipmap.ic_launcher);
+        return remoteViews;
+    } // end getCustomDesign
 }

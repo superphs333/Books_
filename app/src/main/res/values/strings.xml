@@ -53,4 +53,10 @@
     <string name="choose_true">#afe3ff</string>
     <string name="choose_false">#a0a0a0</string>
 
+    <!--
+    Notification Channel ID
+    -->
+    <string name="Channel_ID_Chatting_Room">Chatting_Room</string>
+    <string name="Channel_ID_Chatting">Chatting</string>
+
 </resources>

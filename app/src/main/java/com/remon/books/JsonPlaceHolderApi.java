@@ -65,6 +65,13 @@ public interface JsonPlaceHolderApi {
     Call<ArrayList<Data_Chatting_Room>> Get_Chatting_Room_Data_Whole();
 
     /*
+    Data_Chatting_Room 가져오기1 - 참여중 or 대기중
+     */
+    @FormUrlEncoded
+    @POST("Data/Get_Chatting_Room_Data.php")
+    Call<ArrayList<Data_Chatting_Room>> Get_Chatting_Room_Data_By_Sort(@Field("login_value") String login_value, @Field("state") int state);
+
+    /*
     Data_Join_People 가져오기
      */
     @FormUrlEncoded
