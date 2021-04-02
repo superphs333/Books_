@@ -52,9 +52,11 @@ public class Main extends AppCompatActivity {
     Fragment_Books fragment_books;
     Fragment_mypage fragment_mypage;
     Fragment_Chatting_Room fragment_chatting_room;
+    Fragment_Sns fragment_sns;
+
 
     // 버튼
-    Button btn_books, btn_gathering, btn_chatting, btn_record,btn_mypage;
+    Button btn_books, btn_gathering, btn_feed, btn_record,btn_mypage;
 
 
     @Override
@@ -68,7 +70,7 @@ public class Main extends AppCompatActivity {
         context = getApplicationContext();
         btn_books = findViewById(R.id.btn_books);
         btn_gathering = findViewById(R.id.btn_gathering);
-        btn_chatting = findViewById(R.id.btn_chatting);
+        btn_feed = findViewById(R.id.btn_feed);
         btn_record = findViewById(R.id.btn_record);
         btn_mypage = findViewById(R.id.btn_mypage);
 
@@ -92,6 +94,7 @@ public class Main extends AppCompatActivity {
         fragment_books = new Fragment_Books();
         fragment_mypage = new Fragment_mypage();
         fragment_chatting_room = new Fragment_Chatting_Room();
+        fragment_sns = new Fragment_Sns();
 
 
         // 프래그먼트 트랜잭션 시작
@@ -153,9 +156,9 @@ public class Main extends AppCompatActivity {
 //                fragmentTransaction.replace(R.id.frameLayout,Chatting).commitAllowingStateLoss();
 //                break;
 //
-//            case R.id.btn_community:
-//                fragmentTransaction.replace(R.id.frameLayout,COMMUNITY).commitAllowingStateLoss();
-//                break;
+            case R.id.btn_feed:
+                fragmentTransaction.replace(R.id.frameLayout,fragment_sns).commitAllowingStateLoss();
+                break;
         }
 
     } // end clickHandler

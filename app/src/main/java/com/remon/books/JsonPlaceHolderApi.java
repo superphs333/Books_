@@ -49,7 +49,7 @@ public interface JsonPlaceHolderApi {
      */
     @FormUrlEncoded
     @POST("Data/Get_Book_Memo_in_SNS.php")
-    Call<ArrayList<Data_Book_Memo>> Get_Book_Memo_in_SNS(@Field("requester") String requester, @Field("unique_book_value") String unique_book_value,@Field("view") String view);
+    Call<ArrayList<Data_Book_Memo>> Get_Book_Memo_in_SNS(@Field("requester") String requester, @Field("unique_book_value") String unique_book_value,@Field("view") String view,@Field("chk_heart") boolean chk_heart);
 
     /*
     Data_Follow_People 가져오기

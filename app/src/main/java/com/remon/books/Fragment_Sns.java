@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -31,7 +32,11 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.ArrayList;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -50,12 +55,16 @@ public class Fragment_Sns extends Fragment {
 
     // 리사이클러뷰
     Adapter_Book_Memo mainAdapter;
-    Data_Book_Memo arraylist;
+    ArrayList<Data_Book_Memo> arraylist;
     LinearLayoutManager linearLayoutManager;
 
     // 함수
     Function_SharedPreference fshared;
     Function_Set fs;
+
+    // 필요변수
+    String login_value;
+    boolean chk_like;
 
 
 
@@ -92,8 +101,24 @@ public class Fragment_Sns extends Fragment {
         fshared = new Function_SharedPreference(context);
         fs = new Function_Set(context,activity);
 
+        // 변수셋팅
+        login_value = fshared.get_login_value();
 
 
+        // spinner변경 -> 해당 데이터
+        spinner_open.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Bring_Memo_Datas();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        // 체크박스 변경경
 
 
 
@@ -116,8 +141,46 @@ public class Fragment_Sns extends Fragment {
     }
 
     private void Bring_Memo_Datas(){
-//        Activity_Detail_My_Book.RetrofitConnection
+
+        String view = spinner_open.getSelectedItem().toString();
+        Log.d("실행", "chk_like_post->"+chk_like_post);
+
+
+        RetrofitConnection retrofitConnection
+                = new RetrofitConnection();
+        Call<ArrayList<Data_Book_Memo>> call
+                = retrofitConnection.server.Get_Book_Memo_in_SNS(login_value,"",view,chk_like_post.isChecked());
+        call.enqueue(new Callback<ArrayList<Data_Book_Memo>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Data_Book_Memo>> call, Response<ArrayList<Data_Book_Memo>> response) {
+                if(response.isSuccessful()){
+                    arraylist = response.body();
+                    mainAdapter = new Adapter_Book_Memo(arraylist,context,activity);
+                    rv_book_memos.setAdapter(mainAdapter);
+                    linearLayoutManager = new LinearLayoutManager(context);
+                    linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                    rv_book_memos.setLayoutManager(linearLayoutManager);
+                }else{
+                    Log.d("실행", "서버에 연결은 되었으나. 오류 발생");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Data_Book_Memo>> call, Throwable t) {
+                Log.d("실행", "에러=>"+t.getMessage());
+            }
+        });
     } // end Bring_Memo_Datas
+
+    public class RetrofitConnection{
+        String URL = getString(R.string.server_url);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        JsonPlaceHolderApi server = retrofit.create(JsonPlaceHolderApi.class);
+    }
+
 
 
 }

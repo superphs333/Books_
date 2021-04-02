@@ -113,7 +113,7 @@ public class Activity_Book_Memos extends AppCompatActivity {
         RetrofitConnection retrofitConnection
                 = new RetrofitConnection();
         Call<ArrayList<Data_Book_Memo>> call
-                = retrofitConnection.server.Get_Book_Memo_in_SNS(login_value,unique_book_value,selected);
+                = retrofitConnection.server.Get_Book_Memo_in_SNS(login_value,unique_book_value,selected,false);
         call.enqueue(new Callback<ArrayList<Data_Book_Memo>>() {
             @Override
             public void onResponse(Call<ArrayList<Data_Book_Memo>> call, Response<ArrayList<Data_Book_Memo>> response) {
