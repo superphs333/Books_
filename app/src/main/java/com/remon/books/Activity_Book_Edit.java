@@ -125,7 +125,7 @@ public class Activity_Book_Edit extends AppCompatActivity {
                 = new RetrofitConnection();
         Call<ArrayList<Data_My_Book>> call
                 = retrofitConnection.server
-                .Get_My_Book(unique_book_value);
+                .Get_My_Book(unique_book_value,fshared.get_login_value());
         call.enqueue(new Callback<ArrayList<Data_My_Book>>() {
             @Override
             public void onResponse(Call<ArrayList<Data_My_Book>> call, Response<ArrayList<Data_My_Book>> response) {

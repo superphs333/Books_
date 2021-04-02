@@ -180,6 +180,8 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+
+
         /*
         unique_book_value에 해당하는 데이터 불러오기
          */
@@ -187,7 +189,7 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
                 = new RetrofitConnection();
         Call<ArrayList<Data_My_Book>> call
                 = retrofitConnection.server
-                .Get_My_Book(unique_book_value);
+                .Get_My_Book(unique_book_value,fshared.get_login_value());
         call.enqueue(new Callback<ArrayList<Data_My_Book>>() {
             @Override
             public void onResponse(Call<ArrayList<Data_My_Book>> call, Response<ArrayList<Data_My_Book>> response) {
@@ -280,6 +282,14 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
     // Activity_Add_Memo로 이동
     public void go_to_Activity_Add_Memo(View view) {
         Intent intent = new Intent(context,Activity_Add_Memo.class);
+        intent.putExtra(getString(R.string.unique_book_value),unique_book_value);
+        intent.putExtra("title",dmb.getTitle());
+        startActivity(intent);
+    }
+
+    // Activity_Book_Memos로 이동(더 많은 메모를 볼 수 있는 액티비티)
+    public void more_memos(View view) {
+        Intent intent = new Intent(context,Activity_Book_Memos.class);
         intent.putExtra(getString(R.string.unique_book_value),unique_book_value);
         intent.putExtra("title",dmb.getTitle());
         startActivity(intent);

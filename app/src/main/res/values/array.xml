@@ -30,4 +30,11 @@
         <item>참여중</item>
         <item>대기중</item>
     </string-array>
+
+    <!--  메모 선택  -->
+    <string-array name="select_memo_view">
+        <item>전체</item>
+        <item>팔로우</item>
+        <item>내메모</item>
+    </string-array>
 </resources>

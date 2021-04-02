@@ -135,7 +135,7 @@ public class Adater_Search_Book
                                                 public void onSuccess(String result) {
 
                                                     // result = duplicate_no인 경우에만 책 추가
-                                                    if(result.equals("duplicate_no")){
+                                                    if(result.trim().equals("duplicate_no")){
                                                         Intent intent = new Intent(activity, PopUp_in_Search_Book.class);
                                                         intent.putExtra("title",arrayList.get(holder.getAdapterPosition()).getTitle());
                                                         intent.putExtra("book", (Serializable) arrayList.get(holder.getAdapterPosition()));

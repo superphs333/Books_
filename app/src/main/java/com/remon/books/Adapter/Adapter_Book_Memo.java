@@ -252,7 +252,7 @@ public class Adapter_Book_Memo
                             public void onResponse(String response) {
                                 Log.d("실행","response=>"+response);
 
-                                String[] temp = response.split(context.getString(R.string.seperator));
+                                String[] temp = response.trim().split(context.getString(R.string.seperator));
                                 if(temp[0].equals("success") && temp[1].equals("success")){
                                     Log.d("실행", "Count_heart="+temp[2]);
 

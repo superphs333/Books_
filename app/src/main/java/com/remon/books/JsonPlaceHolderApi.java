@@ -35,7 +35,7 @@ public interface JsonPlaceHolderApi {
      */
     @FormUrlEncoded
     @POST("Data/Get_My_Book.php")
-    Call<ArrayList<Data_My_Book>> Get_My_Book(@Field("unique_book_value") String unique_book_value);
+    Call<ArrayList<Data_My_Book>> Get_My_Book(@Field("unique_book_value") String unique_book_value, @Field("login_value") String login_value);
 
     /*
     Data_Book_Memo 가져오기
@@ -49,7 +49,7 @@ public interface JsonPlaceHolderApi {
      */
     @FormUrlEncoded
     @POST("Data/Get_Book_Memo_in_SNS.php")
-    Call<ArrayList<Data_Book_Memo>> Get_Book_Memo_in_SNS(@Field("reqester") String reqester, @Field("unique_book_value") String unique_book_value,@Field("open") String open);
+    Call<ArrayList<Data_Book_Memo>> Get_Book_Memo_in_SNS(@Field("requester") String requester, @Field("unique_book_value") String unique_book_value,@Field("view") String view);
 
     /*
     Data_Follow_People 가져오기

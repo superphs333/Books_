@@ -19,7 +19,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Activity_Chatting_Room"></activity>
+        <activity android:name=".Activity_Book_Memos"></activity>
+        <activity android:name=".Activity_Chatting_Room" />
         <activity android:name=".Activity_Add_Chatting_Room" />
         <activity android:name=".Activity_Edit_Chatting_Room" />
         <activity android:name=".Activity_Management_Follow" />
