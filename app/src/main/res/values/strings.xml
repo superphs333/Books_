@@ -58,5 +58,7 @@
     -->
     <string name="Channel_ID_Chatting_Room">Chatting_Room</string>
     <string name="Channel_ID_Chatting">Chatting</string>
+    <string name="Channel_ID_SNS">SNS</string>
+
 
 </resources>

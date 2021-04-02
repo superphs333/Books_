@@ -500,7 +500,8 @@ public class Function_Set {
                     public void onResponse(String response) {
                         Log.d("실행","response=>"+response);
 
-                        fshared.setPreference("member",sort,response);
+
+                        fshared.setPreference("member",sort,response.trim());
 
                     }
                 },

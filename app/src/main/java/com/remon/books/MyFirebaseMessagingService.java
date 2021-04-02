@@ -108,6 +108,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         super.onMessageReceived(remoteMessage);
         Log.d("실행", "onMessageReceived함수 호출");
 
+        fshared = new Function_SharedPreference(getApplicationContext());
+
+        final String login_value = fshared.get_login_value();
+
         // 데이터 메세지를 받는다
             // 데이터 받을 때 => remoteMessage.getData().get("key")
         if(remoteMessage.getData().size()>0){
@@ -121,11 +125,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
 
             if(sort.equals("For_chatting_room_waiting_list")){
-                showNotification_For_chatting_room_waiting_list(remoteMessage.getData().get("idx"),title,message);
+                showNotification("For_chatting_room_waiting_list",remoteMessage.getData().get("idx"),title,message);
+            }else if(sort.equals("For_Follow")){
+                showNotification("For_Follow","login_value",title,message);
             }
 
 
         } // end remoteMessage.getData().size()>0
+
+
 
         // 알림메세지를 받는다
             // 데이터 받을 때 => remoteMessage.getNotification().getBody()
@@ -138,14 +146,23 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         } // end remoteMessage.getNotification() != null
     }
 
-    public void showNotification_For_chatting_room_waiting_list(String idx, String title,String message){
-        Intent intent
-                = new Intent(this, Activity_Chatting_Room.class);
-        intent.putExtra("idx",idx);
+
+    public void showNotification(String sort,String putextra, String title,String message){
+        Intent intent = null;
+
+        // putExtra에 보낼 내용 분기
+        if(sort.equals("For_chatting_room_waiting_list")){
+            intent = new Intent(this, Activity_Chatting_Room.class);
+            intent.putExtra("idx",putextra);
+        }else if(sort.equals("For_Follow")){
+            intent = new Intent(this, Activity_Management_Follow.class);
+            intent.putExtra("login_value",putextra);
+        }
+
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            // 호출하려는 액티비티의 인스턴스가 이미 존재하는 경우 -> 새로운 인스턴스 생성x,존재하는 액티비티
-            // 를 포그라운드에 가져온다 + 액티비티 스택의 최상단 액티비티부터 포그라운드로 가져온 액티비티
-            // 까지의 모든 액티비티를 삭제한다
+        // 호출하려는 액티비티의 인스턴스가 이미 존재하는 경우 -> 새로운 인스턴스 생성x,존재하는 액티비티
+        // 를 포그라운드에 가져온다 + 액티비티 스택의 최상단 액티비티부터 포그라운드로 가져온 액티비티
+        // 까지의 모든 액티비티를 삭제한다
 
         /*
         PendingIntent(Context context, int requestCode, Intent intent, int flags)
@@ -156,7 +173,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
          */
         PendingIntent pendingIntent
                 = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_ONE_SHOT);
-            // FLAG_ONE_SHOT = 한번만 사용할 수 있는 PendingIntent
+        // FLAG_ONE_SHOT = 한번만 사용할 수 있는 PendingIntent
 
         /*
         알림 생성하기
@@ -168,14 +185,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 - 버전분기 없이 사용 가능하게 해줌(물론, 알람채널 등록은 버전분기를 해줘야 함)
                  */
                 = new NotificationCompat.Builder(getApplicationContext(),getString(R.string.Channel_ID_Chatting_Room))
-                    // 채널 아이디를 제공해야 한다
+                // 채널 아이디를 제공해야 한다
                 .setSmallIcon(R.mipmap.ic_launcher)
-                    // 작은 아이콘(사용자가 볼 수 있는 유일한 필수 콘텐츠)
+                // 작은 아이콘(사용자가 볼 수 있는 유일한 필수 콘텐츠)
                 .setAutoCancel(true)
-                    // 알람 터치시 자동으로 삭제할 것인지 설정
+                // 알람 터치시 자동으로 삭제할 것인지 설정
                 .setVibrate(new long[] {1000, 1000, 1000, 1000, 1000})
                 .setOnlyAlertOnce(true)
-                    // 한번만 울리기(중복된 알림은 발생해도 알리지 않음
+                // 한번만 울리기(중복된 알림은 발생해도 알리지 않음
                 .setContentIntent(pendingIntent);
 
         // 버전별로 분기
@@ -192,8 +209,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
             // 채널생성
-                // Notification Channel = notification들을 groupping하는 데 사용됨
-                    // Notification을 여러가지 용도로 나누어서 관리할 수 있게 만들어 줌
+            // Notification Channel = notification들을 groupping하는 데 사용됨
+            // Notification을 여러가지 용도로 나누어서 관리할 수 있게 만들어 줌
             NotificationChannel notificationChannel
                     = new NotificationChannel(getString(R.string.Channel_ID_Chatting_Room),"채팅방 참여",NotificationManager.IMPORTANCE_HIGH);
                 /*
@@ -204,11 +221,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(notificationChannel);
         }
         notificationManager.notify(0,builder.build());
-            // id = 고유한 알림 식별자
-            // 사용자에게 표시 할 내용을 설명하는 개체
-
-
+        // id = 고유한 알림 식별자
+        // 사용자에게 표시 할 내용을 설명하는 개체
     }
+
+
+
 
     /*
     알람 커스텀

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.remon.books.Adapter.Adapter_Book_Memo;
 import com.remon.books.Adapter.Adapter_Follow_People;
 import com.remon.books.Data.Data_Follow_People;
+import com.remon.books.Function.Function_SharedPreference;
 
 import java.util.ArrayList;
 
@@ -44,6 +45,9 @@ public class Activity_Management_Follow extends AppCompatActivity {
     // 데이터
     ArrayList<Data_Follow_People> arrayList;
 
+    // 함수
+    Function_SharedPreference fshared;
+
 
 
     @Override
@@ -51,8 +55,7 @@ public class Activity_Management_Follow extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity__management__follow);
 
-        login_value = getIntent().getStringExtra(getString(R.string.login_value));
-        Log.d("실행", "login_value="+login_value);
+
 
         /*
         뷰연결
@@ -61,6 +64,10 @@ public class Activity_Management_Follow extends AppCompatActivity {
         rv_follows = findViewById(R.id.rv_follows);
         btn_follower = findViewById(R.id.btn_follower);
         btn_following = findViewById(R.id.btn_following);
+
+        fshared = new Function_SharedPreference(getApplicationContext());
+        login_value = fshared.get_login_value();
+        Log.d("실행", "login_value="+login_value);
 
         // 버튼 초기색
         btn_follower.setBackgroundColor(Color.parseColor(getString(R.string.choose_true)));

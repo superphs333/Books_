@@ -119,7 +119,6 @@ public class Adapter_Follow_People
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         Log.d("실행","선택된것="+ finalStr[which]);
-
                                         /*
                                         mode_follow
                                         - = 팔로잉
@@ -156,9 +155,11 @@ public class Adapter_Follow_People
                                         fs.Management_Follow(From_login_value, To_login_value, management, new Function_Set.VolleyCallback() {
                                             @Override
                                             public void onSuccess(String result) {
-                                                Log.d("실행", "(in Adapter)result="+result);
+                                                Log.d("실행", "(in Adapter)result="+result.trim());
 
-                                                if(result.equals("success")){
+                                                String[] string_array= result.trim().split("§");
+
+                                                if(string_array[0].equals("success")){
                                                     // 해당 position에 있는 아이템 삭제
                                                         // 팔로잉 삭제, 삭제인 경우
                                                     if(!finalManagement.equals("following")){

@@ -127,14 +127,17 @@ public class Adapter_Join_People
                             @Override
                             public void onSuccess(String result) {
 
-                                Log.d("실행", "result="+result);
+                                Log.d("실행", "result="+result.trim());
 
-                                if(result.equals("success")){
+                                String[] string_array= result.trim().split("§");
+
+                                if(string_array[0].equals("success")){
                                     holder.txt_follow.setVisibility(View.GONE);
                                     arrayList.get(holder.getAdapterPosition()).setFollow(true);
                                     notifyDataSetChanged();
 
                                     Toast.makeText(context, "팔로우 하였습니다!",Toast.LENGTH_LONG).show();
+
                                 }else{
                                     Toast.makeText(context, "죄송합니다. 문제가 발생하였습니다.",Toast.LENGTH_LONG).show();
                                 }
