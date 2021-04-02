@@ -129,7 +129,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }else if(sort.equals("For_Follow")){
                 showNotification("For_Follow","login_value",title,message);
             }else if(sort.equals("For_memo_like")){
-                showNotification("For_memo_like",remoteMessage.getData().get("idx"),title,message);
+                showNotification("For_memo_like","3",title,message);
             }
 
 
@@ -156,11 +156,13 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if(sort.equals("For_chatting_room_waiting_list")){
             intent = new Intent(this, Activity_Chatting_Room.class);
             intent.putExtra("idx",putextra);
+
         }else if(sort.equals("For_Follow")){
             intent = new Intent(this, Activity_Management_Follow.class);
             intent.putExtra("login_value",putextra);
         }else if(sort.equals("For_memo_like")){
-            //intent = new Intent(this,Acivity_)
+            intent = new Intent(this,Activity_Management_Follow.class);
+            intent.putExtra("login_value",putextra);
         }
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

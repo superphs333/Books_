@@ -329,6 +329,14 @@ public class Adapter_Book_Memo
             }
         });
 
+        // 메모 자세히 보기
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
+
 
     }
 
