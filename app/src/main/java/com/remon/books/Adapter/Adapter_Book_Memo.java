@@ -8,13 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -28,12 +25,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.remon.books.Activity_Edit_Memo;
-import com.remon.books.Activity_Underline_Picture;
+import com.remon.books.Activity_Feed;
 import com.remon.books.AppHelper;
 import com.remon.books.Data.Data_Book_Memo;
-import com.remon.books.Data.Data_Img_Memo;
+import com.remon.books.Function.Function_Set;
 import com.remon.books.Function.Function_SharedPreference;
-import com.remon.books.ItemTouchHelperListener;
 import com.remon.books.R;
 import com.remon.books.SliderAdapterExample;
 import com.remon.books.SliderItem;
@@ -41,7 +37,6 @@ import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnima
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,12 +52,18 @@ public class Adapter_Book_Memo
     // 데이터 셋팅
     private ArrayList<Data_Book_Memo> arrayList;
 
+    // 함수
+    Function_Set fs;
+    Function_SharedPreference fshared;
+
 
     // 생성자
     public Adapter_Book_Memo(ArrayList<Data_Book_Memo> arrayList, Context context, Activity activity){
         this.arrayList = arrayList;
         this.context = context;
         this.activity = activity;
+        fs = new Function_Set(context);
+        fshared = new Function_SharedPreference(context);
     }
 
 
@@ -73,7 +74,7 @@ public class Adapter_Book_Memo
         // 위젯정의
         protected ImageView img_profile, img_heart, img_comment;
         protected TextView txt_nickname, txt_memo, txt_page, txt_book, txt_heart_count
-                , txt_comment_count, txt_date_time, txt_function,txt_open;
+                , txt_comment_count, txt_date_time, txt_function,txt_open,txt_follow;
         Spinner spinner_select_open;
         protected SliderView sliderView;
 
@@ -93,6 +94,7 @@ public class Adapter_Book_Memo
             this.spinner_select_open = (Spinner)itemView.findViewById(R.id.spinner_select_open);
             this.sliderView =itemView.findViewById(R.id.sliderView);
             this.txt_open = itemView.findViewById(R.id.txt_open);
+            this.txt_follow = itemView.findViewById(R.id.txt_follow);
         }
     }
 
@@ -112,17 +114,52 @@ public class Adapter_Book_Memo
     @Override
     public void onBindViewHolder(@NonNull final CustomViewHolder holder, final int position) {
 
+
+
         // 프로필 이미지 셋팅
         Glide.with(holder.itemView.getContext())
                 .load(arrayList.get(position).getProfile_url())
                 .into(holder.img_profile);
         // 닉네임
         holder.txt_nickname.setText(arrayList.get(holder.getAdapterPosition()).getNickname());
-        // txt_nickname 클릭 => 팔로잉
-        holder.txt_nickname.setOnClickListener(new View.OnClickListener() {
+        // 팔로잉 체크 : false인 경우에만 팔로우 표시
+        if(!arrayList.get(holder.getAdapterPosition()).isFollow()){
+            holder.txt_follow.setVisibility(View.VISIBLE);
+        }else{
+            holder.txt_follow.setVisibility(View.GONE);
+        }
+        // txt_follow => 팔로우
+        holder.txt_follow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String From = fshared.get_login_value();
+                final String To = arrayList.get(holder.getAdapterPosition()).getLogin_value();
+                fs.Management_Follow(From, To, "following", new Function_Set.VolleyCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        Log.d("실행", "result="+result);
 
+                        String[] string_array= result.split("§");
+                        if(string_array[0].trim().equals("success")){
+
+                            int index = 0;
+                            for(Data_Book_Memo i : arrayList){
+                                if(i.getLogin_value().equals(To)){
+                                    arrayList.get(index).setFollow(true);
+                                    holder.txt_follow.setVisibility(View.GONE);
+                                }
+                                index++;
+                            }
+
+                            notifyDataSetChanged();
+
+                            Toast.makeText(context, "팔로우 하였습니다!",Toast.LENGTH_LONG).show();
+
+                        }else{
+                            Toast.makeText(context, "죄송합니다. 문제가 발생하였습니다.",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
             }
         });
         // 페이지
@@ -161,6 +198,21 @@ public class Adapter_Book_Memo
             //holder.spinner_select_open.setSelection(2);
             holder.txt_open.setText("비공개");
         }
+
+        // 프로필 이미지 클릭 -> 해당 피드
+        holder.img_profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("실행", "arrayList.get(holder.getAdapterPosition()).isFollow()="+arrayList.get(holder.getAdapterPosition()).isFollow());
+
+                Intent intent = new Intent(context, Activity_Feed.class);
+                intent.putExtra("login_value",arrayList.get(holder.getAdapterPosition()).getLogin_value());
+                intent.putExtra("nickname",arrayList.get(holder.getAdapterPosition()).getNickname());
+                intent.putExtra("profile_url",arrayList.get(holder.getAdapterPosition()).getProfile_url());
+                intent.putExtra("follow",arrayList.get(holder.getAdapterPosition()).isFollow());
+                activity.startActivity(intent);
+            }
+        });
 
         /*
         이미지 가져오기

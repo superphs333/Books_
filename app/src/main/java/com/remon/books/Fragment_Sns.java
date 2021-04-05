@@ -134,7 +134,7 @@ public class Fragment_Sns extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
+        Bring_Memo_Datas();
 
     }
 

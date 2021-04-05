@@ -6,6 +6,7 @@ public class Data_Book_Memo {
     String login_value,nickname, profile_url, unique_book_value, title,date_time,
             img_urls,memo,open,thumbnail;
     Boolean check_heart;
+    public boolean follow; // 내가 상대를 팔로우 하고 있는지 (팔로우 하고 있다면 : 1, 아니라면 : 0)
 
 
     public Data_Book_Memo(int idx, int page, int count_heart, int count_comment, String login_value, String nickname, String profile_url, String unique_book_value, String title, String date_time, String img_urls, String memo, String open, String thumbnail, Boolean check_heart) {
@@ -24,6 +25,28 @@ public class Data_Book_Memo {
         this.open = open;
         this.thumbnail = thumbnail;
         this.check_heart = check_heart;
+    }
+
+    public Data_Book_Memo(int idx, int page, int count_heart, int count_comment, String login_value,
+                          String nickname, String profile_url, String unique_book_value,
+                          String title, String date_time, String img_urls, String memo, String open,
+                          String thumbnail, Boolean check_heart, boolean follow) {
+        this.idx = idx;
+        this.page = page;
+        this.count_heart = count_heart;
+        this.count_comment = count_comment;
+        this.login_value = login_value;
+        this.nickname = nickname;
+        this.profile_url = profile_url;
+        this.unique_book_value = unique_book_value;
+        this.title = title;
+        this.date_time = date_time;
+        this.img_urls = img_urls;
+        this.memo = memo;
+        this.open = open;
+        this.thumbnail = thumbnail;
+        this.check_heart = check_heart;
+        this.follow = follow;
     }
 
     public int getIdx() {
@@ -144,5 +167,13 @@ public class Data_Book_Memo {
 
     public void setCheck_heart(Boolean check_heart) {
         this.check_heart = check_heart;
+    }
+
+    public boolean isFollow() {
+        return follow;
+    }
+
+    public void setFollow(boolean follow) {
+        this.follow = follow;
     }
 }

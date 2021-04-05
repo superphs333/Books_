@@ -12,6 +12,8 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.databinding.adapters.ImageViewBindingAdapter;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,12 +25,20 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
+import com.remon.books.Adapter.Adapter_Book_Memo;
+import com.remon.books.Data.Data_Book_Memo;
 import com.remon.books.Function.Function_Set;
 import com.remon.books.Function.Function_SharedPreference;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -43,6 +53,12 @@ public class Fragment_mypage extends Fragment {
     Context context;
     ImageView img_profile,img_setting;
     TextView txt_nickname;
+    RecyclerView rv_memos;
+
+    // 리사이클러뷰용
+    Adapter_Book_Memo mainAdapter;
+    ArrayList<Data_Book_Memo> arraylist;
+    LinearLayoutManager linearLayoutManager;
 
     // 함수
     Function_SharedPreference fshared;
@@ -105,6 +121,8 @@ public class Fragment_mypage extends Fragment {
         img_profile = v.findViewById(R.id.img_profile);
         img_setting = v.findViewById(R.id.img_setting);
         txt_nickname = v.findViewById(R.id.txt_nickname);
+        rv_memos = v.findViewById(R.id.rv_memos);
+
 
         // 함수셋팅
         fshared = new Function_SharedPreference(context);
@@ -195,6 +213,9 @@ public class Fragment_mypage extends Fragment {
         Log.d("실행", "profile_url="+fshared.getPreferenceString("member","profile_url"));
         Glide.with(context).load(fshared.getPreferenceString("member","profile_url")).into(img_profile);
         txt_nickname.setText(fshared.getPreferenceString("member","nickname"));
+
+        // 데이터 불러오기
+        Bring_Memo_Datas();
     }
 
     @Override
@@ -243,4 +264,43 @@ public class Fragment_mypage extends Fragment {
             Log.d("실행", "이미지 크롭 에러=>"+error);
         }
     } // end onActivityResult
+
+    private void Bring_Memo_Datas(){
+
+        String login_value = fshared.get_login_value();
+
+        RetrofitConnection retrofitConnection
+                = new RetrofitConnection();
+        Call<ArrayList<Data_Book_Memo>> call
+                = retrofitConnection.server.Get_Book_Memo_in_SNS(login_value,"","내메모",false);
+        call.enqueue(new Callback<ArrayList<Data_Book_Memo>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Data_Book_Memo>> call, Response<ArrayList<Data_Book_Memo>> response) {
+                if(response.isSuccessful()){
+                    arraylist = response.body();
+                    mainAdapter = new Adapter_Book_Memo(arraylist,context,activity);
+                    rv_memos.setAdapter(mainAdapter);
+                    linearLayoutManager = new LinearLayoutManager(context);
+                    linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                    rv_memos.setLayoutManager(linearLayoutManager);
+                }else{
+                    Log.d("실행", "서버에 연결은 되었으나. 오류 발생");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Data_Book_Memo>> call, Throwable t) {
+                Log.d("실행", "에러=>"+t.getMessage());
+            }
+        });
+    } // end Bring_Memo_Datas
+
+    public class RetrofitConnection{
+        String URL = getString(R.string.server_url);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        JsonPlaceHolderApi server = retrofit.create(JsonPlaceHolderApi.class);
+    }
 }
