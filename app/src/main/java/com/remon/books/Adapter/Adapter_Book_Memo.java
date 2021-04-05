@@ -24,6 +24,7 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
+import com.remon.books.Activity_Add_Comment;
 import com.remon.books.Activity_Edit_Memo;
 import com.remon.books.Activity_Feed;
 import com.remon.books.AppHelper;
@@ -126,6 +127,11 @@ public class Adapter_Book_Memo
         if(!arrayList.get(holder.getAdapterPosition()).isFollow()){
             holder.txt_follow.setVisibility(View.VISIBLE);
         }else{
+            holder.txt_follow.setVisibility(View.GONE);
+        }
+        // 자기 자신인 경우 -> 안보이게
+        if(arrayList.get(holder.getAdapterPosition()).getLogin_value().equals(fshared.get_login_value())){
+            Log.d("실행", "here");
             holder.txt_follow.setVisibility(View.GONE);
         }
         // txt_follow => 팔로우
@@ -386,6 +392,16 @@ public class Adapter_Book_Memo
             @Override
             public void onClick(View v) {
                 
+            }
+        });
+
+        // 댓글이미지 클릭 -> 해당 메모에 대한 댓글다는 액티비티로 이동
+        holder.img_comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, Activity_Add_Comment.class);
+                intent.putExtra("idx_memo",arrayList.get(holder.getAdapterPosition()).getIdx());
+                activity.startActivity(intent);
             }
         });
 
