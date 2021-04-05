@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -119,15 +120,12 @@ public class Fragment_Sns extends Fragment {
         });
 
         // 체크박스 변경경
-
-
-
-
-
-
-
-
-
+        chk_like_post.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Bring_Memo_Datas();
+            }
+        });
 
         // Inflate the layout for this fragment
         return v;
@@ -143,7 +141,7 @@ public class Fragment_Sns extends Fragment {
     private void Bring_Memo_Datas(){
 
         String view = spinner_open.getSelectedItem().toString();
-        Log.d("실행", "chk_like_post->"+chk_like_post);
+        Log.d("실행", "chk_like_post->"+chk_like_post.isChecked());
 
 
         RetrofitConnection retrofitConnection
