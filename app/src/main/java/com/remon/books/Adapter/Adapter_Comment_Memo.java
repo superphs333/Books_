@@ -6,12 +6,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -55,6 +58,7 @@ public class Adapter_Comment_Memo
     /*
     커스텀 리스너
      */
+    // 1. txt_function 용
     // 어댑터 내에서 커스텀 리스너 인터페이스 정의
     public interface OnItemClickListener{
         void onItemClick(View v, int position);
@@ -66,6 +70,19 @@ public class Adapter_Comment_Memo
     public void setOnItemClickListener(OnItemClickListener listener){
         this.mListener = listener;
     }
+
+    // 2. txt_reply용
+    public interface OnItemClickListener2{
+        void onItemClick(View v, int position);
+    }
+    private OnItemClickListener2 mListener2 = null ;
+    public void setOnItemClickListener2(OnItemClickListener2 listener){
+        this.mListener2 = listener;
+    }
+
+
+
+
 
 
 
@@ -91,6 +108,16 @@ public class Adapter_Comment_Memo
                     int pos = getAdapterPosition();
                     if(pos != RecyclerView.NO_POSITION){
                        mListener.onItemClick(v,pos);
+                    }
+                }
+            });
+
+            this.txt_reply.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = getAdapterPosition();
+                    if(pos != RecyclerView.NO_POSITION){
+                        mListener2.onItemClick(v,pos);
                     }
                 }
             });
@@ -129,10 +156,23 @@ public class Adapter_Comment_Memo
             // 본인이 아닌 경우
             holder.txt_function.setVisibility(View.GONE);
         }
+
+        // depth = 1인경우 -> 왼쪽으로부터 간격 띄우기
+        if(arrayList.get(holder.getAdapterPosition()).getDepth()==1){
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(80,0,0,0);  // 왼쪽, 위, 오른쪽, 아래 순서입니다.
+            holder.itemView.setLayoutParams(params);
+        }else{
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.setMargins(0,0,0,0);  // 왼쪽, 위, 오른쪽, 아래 순서입니다.
+            holder.itemView.setLayoutParams(params);
+        }
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("실행", "idx="+arrayList.get(holder.getAdapterPosition()).getIdx());
+                Log.d("실행", "depth="+arrayList.get(holder.getAdapterPosition()).getDepth()+", group_idx="+arrayList.get(holder.getAdapterPosition()).getGroup_idx());
+
             }
         });
 

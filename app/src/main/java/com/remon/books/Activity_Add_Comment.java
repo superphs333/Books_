@@ -24,6 +24,7 @@ import com.remon.books.Function.Function_SharedPreference;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
     // 메모 idx
     int idx_memo;
 
-    // mode -> add, edit
+    // mode -> add, edit, add_comment(대댓글추가), edit2(대댓글 수정)
     String mode = "add";
 
     // 선택한 댓글 position
@@ -102,6 +103,8 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
                 Management_Comment("add",0,0);
             }else if(mode.equals("edit")){
                 Management_Comment("edit",arrayList.get(temp_position).getIdx(),temp_position);
+            }else if(mode.equals("add_comment")){
+                Management_Comment("add_comment",arrayList.get(temp_position).getIdx(),temp_position);
             }
         } // end id==R.id.btn_comment
     }
@@ -124,12 +127,29 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
                     mainAdapter = new Adapter_Comment_Memo(arrayList,getApplicationContext(),Activity_Add_Comment.this);
                     rv_comments.setAdapter(mainAdapter);
 
+                    // txt_reply 클릭
+                    mainAdapter.setOnItemClickListener2(new Adapter_Comment_Memo.OnItemClickListener2() {
+                        @Override
+                        public void onItemClick(View v, int position) {
+                            Log.d("실행", "(txt_reply)position="+position);
+
+                            // edit_comment에 포커스, mode= add2
+                            mode = "add_comment";
+                            edit_comment.requestFocus();
+                            // 키보드 올리기
+                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
+                            temp_position = position;
+                        }
+                    });
+
                     // txt_function 클릭
                     mainAdapter.setOnItemClickListener(new Adapter_Comment_Memo.OnItemClickListener() {
                         @Override
                         public void onItemClick(View v, final int position) {
 
-                            Log.d("실행", "position="+position);
+                            Log.d("실행", "(txt_function)position="+position);
+
 
                             AlertDialog.Builder builder
                                     = new AlertDialog.Builder(Activity_Add_Comment.this);
@@ -224,12 +244,11 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
 
 
                             if(sort.equals("add")){
-
                                 Data_Comment_Memo cdm
                                         = new Data_Comment_Memo(idx_memo
                                         ,Integer.parseInt(string_array[1]),fshared.get_login_value()
                                         ,fshared.get_nickname(),fshared.profile_url()
-                                        ,comment,date_time);
+                                        ,comment,date_time,Integer.parseInt(string_array[1]),0);
                                 arrayList.add(cdm);
                                 mainAdapter.notifyDataSetChanged();
                             }else if(sort.equals("delete")){
@@ -242,6 +261,21 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
                                 // mode 변경 및 btn_comment 텍스트 셋팅
                                 btn_comment.setText("전송");
                                 mode = "add";
+                            }else if(sort.equals("add_comment")){
+
+                                // 값추가
+//                                Data_Comment_Memo cdm
+//                                        = new Data_Comment_Memo(idx_memo
+//                                        ,Integer.parseInt(string_array[1]),fshared.get_login_value()
+//                                        ,fshared.get_nickname(),fshared.profile_url()
+//                                        ,comment,date_time,Integer.parseInt(string_array[1]),1);
+//                                arrayList.add(cdm);
+//                                mainAdapter.notifyDataSetChanged();
+                                Get_Comment_Memos();
+                                rv_comments.scrollToPosition(arrayList.get(temp_position).getGroup_idx());
+
+
+                                mode = "add"; // mode변경
                             }
 
                             // edit_comment 빈값값
@@ -270,12 +304,16 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
                     params.put("login_value", fshared.get_login_value());
                     params.put("comment",comment);
                     params.put("date_time",date_time);
-                }else if(sort.equals("add_comment")){
+                }else if(sort.equals("add_comment")){ // 대댓글
+                    params.put("login_value", fshared.get_login_value());
+                    params.put("group_idx", arrayList.get(position).getIdx()+"");
+                    params.put("comment",comment);
+                    params.put("date_time",date_time);
 
-                }else if(sort.equals("edit")){
+                }else if(sort.equals("edit")){ // 수정
                     params.put("idx",idx+"");
                     params.put("comment",comment);
-                }else if(sort.equals("delete")){
+                }else if(sort.equals("delete")){ // 댓글삭제
                     params.put("idx",idx+"");
                 }
                 return params;

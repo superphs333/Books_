@@ -8,10 +8,11 @@ public class Data_Comment_Memo {
     String profile_url; // 프로필 사진
     String comment; // 댓글 내용
     String date_time; // 날짜
-    String parent; // 부모 댓글
+    int group_idx; // 부모 댓글
+    int depth; // 깊이 (부모: 0, 자식 :1)
 
     // 대댓글
-    public Data_Comment_Memo(int idx_memo, int idx, String login_value, String nickname, String profile_url, String comment, String date_time, String parent) {
+    public Data_Comment_Memo(int idx_memo, int idx, String login_value, String nickname, String profile_url, String comment, String date_time, int group_idx,int depth) {
         this.idx_memo = idx_memo;
         this.idx = idx;
         this.login_value = login_value;
@@ -19,7 +20,8 @@ public class Data_Comment_Memo {
         this.profile_url = profile_url;
         this.comment = comment;
         this.date_time = date_time;
-        this.parent = parent;
+        this.group_idx = group_idx;
+        this.depth = depth;
     }
 
     // 댓글
@@ -89,11 +91,19 @@ public class Data_Comment_Memo {
         this.date_time = date_time;
     }
 
-    public String getParent() {
-        return parent;
+    public int getGroup_idx() {
+        return group_idx;
     }
 
-    public void setParent(String parent) {
-        this.parent = parent;
+    public void setGroup_idx(int group_idx) {
+        this.group_idx = group_idx;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
     }
 }
