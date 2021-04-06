@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -51,6 +53,8 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
     EditText edit_comment;
     RecyclerView rv_comments;
     Button btn_comment;
+    LinearLayout linear_to; // txt_target_nickname, txt_cancel을 덮고 있는
+    TextView txt_target_nickname, txt_cancel;
 
     // 함수
     Function_SharedPreference fshared;
@@ -69,6 +73,9 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
         edit_comment = findViewById(R.id.edit_comment);
         rv_comments = findViewById(R.id.rv_comments);
         btn_comment = findViewById(R.id.btn_comment);
+        txt_target_nickname = findViewById(R.id.txt_target_nickname);
+        txt_cancel = findViewById(R.id.txt_cancel);
+        linear_to = findViewById(R.id.linear_to);
 
 
 
@@ -83,6 +90,10 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rv_comments.setLayoutManager(linearLayoutManager);
+
+        // 대댓글을 달지 않는 상태에서는 linear_to가 보이지 않아야 한다
+        linear_to.setVisibility(View.GONE);
+
 
         Get_Comment_Memos();
 
@@ -107,6 +118,17 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
                 Management_Comment("add_comment",arrayList.get(temp_position).getIdx(),temp_position);
             }
         } // end id==R.id.btn_comment
+
+        // 대댓글 보내기 취소
+        if(id==R.id.txt_cancel){
+            // 모드변경
+            mode = "add";
+            // 대댓글을 달지 않는 상태에서는 linear_to가 보이지 않아야 한다
+            linear_to.setVisibility(View.GONE);
+            // 키보드 내리기
+            InputMethodManager manager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+            manager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
 
@@ -140,6 +162,10 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
                             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                             imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
                             temp_position = position;
+                            // linear_to View.Visibility
+                            linear_to.setVisibility(View.VISIBLE);
+                            // txt_target_nickname 셋팅
+                            txt_target_nickname.setText(arrayList.get(position).getNickname());
                         }
                     });
 
@@ -276,10 +302,15 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
 
 
                                 mode = "add"; // mode변경
+                                linear_to.setVisibility(View.GONE);
                             }
 
                             // edit_comment 빈값값
                             edit_comment.setText("");
+
+                            // 키보드 내리기
+                            InputMethodManager manager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                            manager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
                         } // end string_array[0].equals("success")
 
@@ -309,6 +340,8 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
                     params.put("group_idx", arrayList.get(position).getIdx()+"");
                     params.put("comment",comment);
                     params.put("date_time",date_time);
+                    params.put("target",arrayList.get(position).getLogin_value());
+
 
                 }else if(sort.equals("edit")){ // 수정
                     params.put("idx",idx+"");

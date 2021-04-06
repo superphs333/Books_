@@ -91,7 +91,7 @@ public class Adapter_Comment_Memo
 
         // 위젯정의
         protected ImageView img_profile;
-        TextView txt_nickname, txt_date_time, txt_function, txt_comment, txt_reply;
+        TextView txt_nickname, txt_date_time, txt_function, txt_comment, txt_reply,txt_target_nickname;
 
         public CustomViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -101,6 +101,8 @@ public class Adapter_Comment_Memo
             this.txt_function = itemView.findViewById(R.id.txt_function);
             this.txt_comment = itemView.findViewById(R.id.txt_comment);
             this.txt_reply = itemView.findViewById(R.id.txt_reply);
+            this.txt_target_nickname = itemView.findViewById(R.id.txt_target_nickname);
+
 
             this.txt_function.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -157,15 +159,21 @@ public class Adapter_Comment_Memo
             holder.txt_function.setVisibility(View.GONE);
         }
 
-        // depth = 1인경우 -> 왼쪽으로부터 간격 띄우기
+        // depth = 1인경우 -> 왼쪽으로부터 간격 띄우기, txt_target_nickname 보이게 하기
         if(arrayList.get(holder.getAdapterPosition()).getDepth()==1){
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.setMargins(80,0,0,0);  // 왼쪽, 위, 오른쪽, 아래 순서입니다.
             holder.itemView.setLayoutParams(params);
+
+            holder.txt_target_nickname.setVisibility(View.VISIBLE);
+            holder.txt_target_nickname.setText(arrayList.get(holder.getAdapterPosition()).getTarget());
+
         }else{
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.setMargins(0,0,0,0);  // 왼쪽, 위, 오른쪽, 아래 순서입니다.
             holder.itemView.setLayoutParams(params);
+
+            holder.txt_target_nickname.setVisibility(View.GONE);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
