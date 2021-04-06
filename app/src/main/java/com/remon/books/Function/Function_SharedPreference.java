@@ -99,6 +99,7 @@ public class Function_SharedPreference {
     /*
     자주 불러오는 값
      */
+    // login_value
     public String get_login_value(){
 
         String login_value;
@@ -110,5 +111,30 @@ public class Function_SharedPreference {
         }
         //Log.d("실행", "(in Function_SharedPreference)login_value="+login_value);
         return login_value;
+    }
+    // nickname
+    public String get_nickname(){
+
+        String nickname;
+        if(context==null){
+            nickname = getPreferenceString("member","nickname");
+        }else{
+            nickname
+                    = getPreferenceString(context.getString(R.string.member),"nickname");
+        }
+        //Log.d("실행", "(in Function_SharedPreference)login_value="+login_value);
+        return nickname;
+    }
+    // profile_url
+    public String profile_url(){
+        String profile_url;
+        if(context==null){
+            profile_url = getPreferenceString("member","profile_url");
+        }else{
+            profile_url
+                    = getPreferenceString(context.getString(R.string.member),"profile_url");
+        }
+        //Log.d("실행", "(in Function_SharedPreference)login_value="+login_value);
+        return profile_url;
     }
 }
