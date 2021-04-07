@@ -148,8 +148,6 @@ public class Adapter_Comment_Memo
         holder.txt_nickname.setText(arrayList.get(holder.getAdapterPosition()).getNickname());
         // 날짜
         holder.txt_date_time.setText(arrayList.get(holder.getAdapterPosition()).getDate_time());
-        // 댓글 내용
-        holder.txt_comment.setText(arrayList.get(holder.getAdapterPosition()).getComment());
         // 본인인 경우에만 -> txt_function 보임
         if(arrayList.get(holder.getAdapterPosition()).getLogin_value().equals(fshared.get_login_value())){
             // 본인인 경우
@@ -158,6 +156,18 @@ public class Adapter_Comment_Memo
             // 본인이 아닌 경우
             holder.txt_function.setVisibility(View.GONE);
         }
+        // 댓글 내용
+            // -> depth=0 and visibility=false인 경우 => txt_comment.setText("[삭제된 댓글입니다]")
+        if(arrayList.get(holder.getAdapterPosition()).getVisibility()==0)
+        {
+            //Log.d("실행", "visibility="+arrayList.get(holder.getAdapterPosition()).getVisibility());
+            holder.txt_comment.setText("[삭제된 댓글입니다]");
+            holder.txt_function.setVisibility(View.GONE);
+            holder.txt_reply.setVisibility(View.GONE);
+        }else{
+            holder.txt_comment.setText(arrayList.get(holder.getAdapterPosition()).getComment());
+        }
+
 
         // depth = 1인경우 -> 왼쪽으로부터 간격 띄우기, txt_target_nickname 보이게 하기
         if(arrayList.get(holder.getAdapterPosition()).getDepth()==1){

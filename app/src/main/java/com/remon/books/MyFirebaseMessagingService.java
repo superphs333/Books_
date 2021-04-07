@@ -117,6 +117,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if(remoteMessage.getData().size()>0){
             Log.d("실행", "remoteMessage.getData().size()>0");
 
+            String input = remoteMessage.getData().toString();
+            Log.d("실행", "input="+input);
+
             String sort = remoteMessage.getData().get("sort");
             Log.d("실행", "sort="+sort);
 
@@ -130,6 +133,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 showNotification("For_Follow","login_value",title,message);
             }else if(sort.equals("For_memo_like")){
                 showNotification("For_memo_like","3",title,message);
+            }else if(sort.equals("For_Comment")){
+                Log.d("실행", "idx_memo="+remoteMessage.getData().get("idx_memo"));
+                showNotification("For_Comment",remoteMessage.getData().get("idx_memo"),title,message);
             }
 
 
@@ -163,6 +169,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }else if(sort.equals("For_memo_like")){
             intent = new Intent(this,Activity_Management_Follow.class);
             intent.putExtra("login_value",putextra);
+        }else if(sort.equals("For_Comment")){
+            intent = new Intent(this,Activity_Add_Comment.class);
+            intent.putExtra("idx_memo",Integer.parseInt(putextra));
         }
 
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

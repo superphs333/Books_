@@ -77,14 +77,13 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
         txt_cancel = findViewById(R.id.txt_cancel);
         linear_to = findViewById(R.id.linear_to);
 
-
+        // 값 전달받기
+        idx_memo = getIntent().getIntExtra("idx_memo",0);
+        Log.d("실행", "(in Activity_Add_Comment)idx_memo="+idx_memo);
 
         // 함숫셋팅
         fshared = new Function_SharedPreference(getApplicationContext());
 
-        // 값 전달받기
-        idx_memo = getIntent().getIntExtra("idx_memo",0);
-        Log.d("실행", "idx_memo="+idx_memo);
 
         // 리사이클러뷰
         linearLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -115,7 +114,7 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
             }else if(mode.equals("edit")){
                 Management_Comment("edit",arrayList.get(temp_position).getIdx(),temp_position);
             }else if(mode.equals("add_comment")){
-                Management_Comment("add_comment",arrayList.get(temp_position).getIdx(),temp_position);
+                Management_Comment("add_comment",arrayList.get(temp_position).getGroup_idx(),temp_position);
             }
         } // end id==R.id.btn_comment
 
@@ -274,12 +273,12 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
                                         = new Data_Comment_Memo(idx_memo
                                         ,Integer.parseInt(string_array[1]),fshared.get_login_value()
                                         ,fshared.get_nickname(),fshared.profile_url()
-                                        ,comment,date_time,Integer.parseInt(string_array[1]),0);
+                                        ,comment,date_time,Integer.parseInt(string_array[1]),0,1);
                                 arrayList.add(cdm);
                                 mainAdapter.notifyDataSetChanged();
                             }else if(sort.equals("delete")){
-                                arrayList.remove(position);
-                                mainAdapter.notifyItemRemoved(position);
+                                arrayList.get(position).setVisibility(0);
+                                mainAdapter.notifyDataSetChanged();
                             }else if(sort.equals("edit")){
                                 arrayList.get(position).setComment(comment);
                                 mainAdapter.notifyDataSetChanged();
@@ -309,8 +308,8 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
                             edit_comment.setText("");
 
                             // 키보드 내리기
-                            InputMethodManager manager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-                            manager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                           // InputMethodManager manager = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                            //manager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
                         } // end string_array[0].equals("success")
 
@@ -337,7 +336,7 @@ public class Activity_Add_Comment extends AppCompatActivity implements View.OnCl
                     params.put("date_time",date_time);
                 }else if(sort.equals("add_comment")){ // 대댓글
                     params.put("login_value", fshared.get_login_value());
-                    params.put("group_idx", arrayList.get(position).getIdx()+"");
+                    params.put("group_idx", arrayList.get(position).getGroup_idx()+"");
                     params.put("comment",comment);
                     params.put("date_time",date_time);
                     params.put("target",arrayList.get(position).getLogin_value());

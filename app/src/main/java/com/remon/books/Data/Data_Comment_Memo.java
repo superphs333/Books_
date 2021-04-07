@@ -11,9 +11,10 @@ public class Data_Comment_Memo {
     int group_idx; // 부모 댓글
     int depth; // 깊이 (부모: 0, 자식 :1)
     String target; // 타겟 닉네임
+    int visibility;
 
     // 대댓글
-    public Data_Comment_Memo(int idx_memo, int idx, String login_value, String nickname, String profile_url, String comment, String date_time, int group_idx,int depth, String target) {
+    public Data_Comment_Memo(int idx_memo, int idx, String login_value, String nickname, String profile_url, String comment, String date_time, int group_idx,int depth, String target, int visibility) {
         this.idx_memo = idx_memo;
         this.idx = idx;
         this.login_value = login_value;
@@ -24,10 +25,11 @@ public class Data_Comment_Memo {
         this.group_idx = group_idx;
         this.depth = depth;
         this.target = target;
+        this.visibility = visibility;
     }
 
     // 댓글
-    public Data_Comment_Memo(int idx_memo, int idx, String login_value, String nickname, String profile_url, String comment, String date_time, int group_idx,int depth) {
+    public Data_Comment_Memo(int idx_memo, int idx, String login_value, String nickname, String profile_url, String comment, String date_time, int group_idx,int depth, int visibility) {
         this.idx_memo = idx_memo;
         this.idx = idx;
         this.login_value = login_value;
@@ -37,6 +39,8 @@ public class Data_Comment_Memo {
         this.date_time = date_time;
         this.group_idx = group_idx;
         this.depth = depth;
+        this.visibility = visibility;
+
     }
 
     public int getIdx_memo() {
@@ -117,5 +121,13 @@ public class Data_Comment_Memo {
 
     public void setTarget(String target) {
         this.target = target;
+    }
+
+    public int getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(int visibility) {
+        this.visibility = visibility;
     }
 }
