@@ -1,6 +1,7 @@
 package com.remon.books;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -302,7 +303,9 @@ public class Activity_Chatting_Room extends AppCompatActivity {
             }
 
         }else if(id==R.id.btn_enter){ // 채팅방 입장하기
-
+            Intent intent = new Intent(getApplicationContext(),Activity_Chatting.class);
+            intent.putExtra("room_idx",idx);
+            startActivity(intent);
         }
     } // end Onclick
 
