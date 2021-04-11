@@ -18,6 +18,7 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.remon.books.Adapter.Adapter_Follow_People;
 import com.remon.books.Adapter.Adapter_Join_People;
 import com.remon.books.Data.Data_Join_People;
@@ -148,7 +149,11 @@ public class Activity_Chatting_Room extends AppCompatActivity {
         // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
         // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
         request.setShouldCache(false);
+        if(AppHelper.requestQueue==null){
+            AppHelper.requestQueue = Volley.newRequestQueue(Activity_Chatting_Room.this);
+        }
         AppHelper.requestQueue.add(request);
+
     }
 
     public void get_Join_Peoples(){

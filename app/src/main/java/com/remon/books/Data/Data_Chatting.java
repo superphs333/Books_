@@ -22,6 +22,12 @@ public class Data_Chatting {
         this.order_tag = order_tag;
     }
 
+    // notice
+    public Data_Chatting(String sort, String content){
+        this.sort = sort;
+        this.content = content;
+    }
+
 
     public int getIdx() {
         return idx;

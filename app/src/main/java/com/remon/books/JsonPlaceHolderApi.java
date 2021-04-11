@@ -1,6 +1,7 @@
 package com.remon.books;
 
 import com.remon.books.Data.Data_Book_Memo;
+import com.remon.books.Data.Data_Chatting;
 import com.remon.books.Data.Data_Chatting_Room;
 import com.remon.books.Data.Data_Comment_Memo;
 import com.remon.books.Data.Data_Follow_People;
@@ -103,5 +104,13 @@ public interface JsonPlaceHolderApi {
     @FormUrlEncoded
     @POST("Data/Get_Comments.php")
     Call<ArrayList<Data_Comment_Memo>> Get_Comment_Memos_I(@Field("login_value") String login_value);
+
+
+    /*
+    채팅 데이터 불러오기
+     */
+    @FormUrlEncoded
+    @POST("Data/Get_Chatting.php")
+    Call<ArrayList<Data_Chatting>> Get_Chatting(@Field("room_idx") int room_idx);
 
 }

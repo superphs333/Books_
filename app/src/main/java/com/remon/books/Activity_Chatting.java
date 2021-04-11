@@ -1,15 +1,19 @@
 package com.remon.books;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.icu.util.Output;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.remon.books.Adapter.Adapter_Chatting;
 import com.remon.books.Data.Data_Chatting;
 import com.remon.books.Function.Function_SharedPreference;
 
@@ -20,6 +24,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Activity_Chatting extends AppCompatActivity implements View.OnClickListener{
 
@@ -48,6 +58,8 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
     리사이클러뷰
      */
     ArrayList<Data_Chatting> arrayList;
+    Adapter_Chatting mainAdapter;
+    LinearLayoutManager linearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +71,8 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
 
         // 뷰연결
         edit_chat = findViewById(R.id.edit_chat);
+        rv_chatting = findViewById(R.id.rv_chatting);
+
 
         // 함수연결
         fshared = new Function_SharedPreference(getApplicationContext());
@@ -66,13 +80,53 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
         // 변수셋팅
         login_value = fshared.get_login_value();
 
+
+
         // 서버와 연결(접속 스레드 가동)
         ConnectionThread thread = new ConnectionThread();
         thread.start();
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        // 채팅 데이터 불러오기
+        RetrofitConnection retrofitConnection
+                = new RetrofitConnection();
+        Call<ArrayList<Data_Chatting>> call
+                = retrofitConnection.server.Get_Chatting(room_idx);
+        call.enqueue(new Callback<ArrayList<Data_Chatting>>() {
+            @Override
+            public void onResponse(Call<ArrayList<Data_Chatting>> call, Response<ArrayList<Data_Chatting>> response) {
+                if(response.isSuccessful()){
+                    Log.d("실행", String.valueOf(response.code()));
+
+                    arrayList = response.body();
+
+                    /*
+                    리사이클러뷰 셋팅
+                    */
+                    mainAdapter = new Adapter_Chatting(arrayList,getApplicationContext(),login_value); // 어댑터
+                    rv_chatting.setAdapter(mainAdapter);
+                    linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+                    linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                    rv_chatting.setLayoutManager(linearLayoutManager);
+                    rv_chatting.scrollToPosition(mainAdapter.getItemCount()-1);
+
+
+                }else{
+                    Log.d("실행","서버에 연결은 되었으나 오류발생");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<Data_Chatting>> call, Throwable t) {
+                Log.d("실행", "onFailure: " + t.toString()); //서버와 연결 실패
+            }
+        });
+    }
 
     @Override
     public void onClick(View v) {
@@ -189,19 +243,51 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
                     메세지 분기
                      */
                     String[] string_array= msg.split("§");
+                    //Log.d("실행", "string_array.size="+string_array.length);
+
                     String sort = string_array[0]; // 분류
-                    int idx = Integer.parseInt(string_array[1]); // idx
+                    int idx = 0; // 값이 없는 경우 (분기 -> 값이 없을 때 parseInt시 오류
+                    if(!string_array[1].equals("")){
+                        idx = Integer.parseInt(string_array[1]); // idx
+                    }
                     String login_value = string_array[2]; // login_value
                     String nickname = string_array[3]; // nickname
                     String profile_url = string_array[4]; // profile_url
                     String content = string_array[5]; // content
                     String time = string_array[6]; // time
 
-                    Input_Chatting_Data(sort, idx, login_value,nickname,profile_url,content, time);
+                    Data_Chatting dc = null;
+                    if(sort.equals("notice")){ // notice(날짜)
+                        Log.d("실행", "notice");
+                        dc = new Data_Chatting(sort, content);
+                    }else if(sort.equals("message")){
+                        dc = new Data_Chatting(idx,room_idx,login_value,nickname,profile_url,sort,content,time,null);
+                    }
+
+                    arrayList.add(dc);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mainAdapter.notifyDataSetChanged();
+                                    rv_chatting.getLayoutManager().scrollToPosition(arrayList.size()-1);
+                                    //rv_chatting.scrollToPosition(mainAdapter.getItemCount()-1);
+                                }
+                            });
+                        }
+                    });
+                    Log.d("실행", "arraylist_size="+arrayList.size());
+
+
 
                 } // end while
             }catch (Exception e){
                 e.printStackTrace();
+                Log.d("실행", "에러=>"+e.toString());
+
             }
         }// end run()
     } // end MessageThread
@@ -283,4 +369,13 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
             e.printStackTrace();
         }
     } // end onDestroy
+
+    public class RetrofitConnection{
+        String URL = getString(R.string.server_url);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        JsonPlaceHolderApi server = retrofit.create(JsonPlaceHolderApi.class);
+    }
 }
