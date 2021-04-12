@@ -154,6 +154,15 @@ public class Adapter_Chatting extends RecyclerView.Adapter<RecyclerView.ViewHold
         }else if(viewType==2){ // 다른사람 - 파일
             ViewHolder_others_file viewholder = (ViewHolder_others_file)holder;
 
+            /*
+            분류, ordertag => 이거에 따라 시간이 보이거나/안보이거나
+            - file => 날짜, 프사, 닉네임 모두 보임
+            - files
+                - first -> 날짜 x, 프사 o, 닉네임 o
+                - center -> 날짜 x, 프사 x, 닉네임 x
+                - end -> 날짜 o, 프사 x, 닉네임 x
+             */
+
             // 채팅내용
             Glide.with(holder.itemView.getContext()).load(arrayList.get(holder.getAdapterPosition()).getContent()).into(viewholder.img_chat);
 
@@ -169,7 +178,31 @@ public class Adapter_Chatting extends RecyclerView.Adapter<RecyclerView.ViewHold
                 viewholder.txt_time.setText(arrayList.get(holder.getAdapterPosition()).getDate()); // 시간
                 Glide.with(holder.itemView.getContext()).load(arrayList.get(holder.getAdapterPosition()).getProfile_url()).into(viewholder.chat_thumbnail); // 썸네일
                 viewholder.txt_nickname.setText(arrayList.get(holder.getAdapterPosition()).getNickname()); // 닉네임
-            }else{
+            }else{ // 다중파일 -> 분기필요
+
+                if(order_tag.equals("first")){ // 날짜 x, 프사 o, 닉네임 o
+                    viewholder.txt_time.setVisibility(View.INVISIBLE); // 시간
+                    viewholder.chat_thumbnail.setVisibility(View.VISIBLE); // 썸네일
+                    viewholder.txt_nickname.setVisibility(View.VISIBLE); // 닉네임
+
+                    // 셋팅
+                    Glide.with(holder.itemView.getContext()).load(arrayList.get(holder.getAdapterPosition()).getProfile_url()).into(viewholder.chat_thumbnail); // 썸네일
+                    viewholder.txt_nickname.setText(arrayList.get(holder.getAdapterPosition()).getNickname()); // 닉네임
+
+                }else if(order_tag.equals("center")){ // 날짜 x, 프사 x, 닉네임 x
+                    viewholder.txt_time.setVisibility(View.INVISIBLE); // 시간
+                    viewholder.chat_thumbnail.setVisibility(View.INVISIBLE); // 썸네일
+                    viewholder.txt_nickname.setVisibility(View.INVISIBLE); // 닉네임
+
+                }else if(order_tag.equals("end")){ // 날짜 o, 프사 x, 닉네임 x
+                    viewholder.txt_time.setVisibility(View.VISIBLE); // 시간
+                    viewholder.chat_thumbnail.setVisibility(View.INVISIBLE); // 썸네일
+                    viewholder.txt_nickname.setVisibility(View.INVISIBLE); // 닉네임
+
+                    // 셋팅
+                    viewholder.txt_time.setText(arrayList.get(holder.getAdapterPosition()).getDate()); // 시간
+
+                }
 
             }
 
@@ -186,14 +219,24 @@ public class Adapter_Chatting extends RecyclerView.Adapter<RecyclerView.ViewHold
             // 채팅내용
             Glide.with(holder.itemView.getContext()).load(arrayList.get(holder.getAdapterPosition()).getContent()).into(viewholder.img_chat);
 
+            /*
+            분류, ordertag => 이거에 따라 시간이 보이거나/안보이거나
+            - file, files && order_tag=end => 시간보임
+            - files && order_tag=first ||  files && order_tag=center => 시간 안 보임
+             */
             String order_tag = arrayList.get(holder.getAdapterPosition()).getOrder_tag();
             String sort = arrayList.get(holder.getAdapterPosition()).getSort();
 
-            if(sort.equals("file")){
+            if(sort.equals("file")){ // 보임
                 viewholder.txt_time.setVisibility(View.VISIBLE);
                 viewholder.txt_time.setText(arrayList.get(holder.getAdapterPosition()).getDate());
-            }else{
-
+            }else{  // category=files인 경우에는 분기
+                if(order_tag.equals("end")){ // end인 경우에만 시간이 보인다
+                    viewholder.txt_time.setVisibility(View.VISIBLE);
+                    viewholder.txt_time.setText(arrayList.get(holder.getAdapterPosition()).getDate());
+                }else{ // 그 외에는 시간이 보이지 않음
+                    viewholder.txt_time.setVisibility(View.INVISIBLE);
+                }
             }
         }
     }

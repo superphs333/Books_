@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.icu.util.Output;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import retrofit2.Call;
@@ -290,6 +292,8 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
                         dc = new Data_Chatting(idx,room_idx,login_value,nickname,profile_url,sort,content,time,null);
                     }else if(sort.equals("file")){
                         dc = new Data_Chatting(idx,room_idx,login_value,nickname,profile_url,sort,content,time,null);
+                    }else if(sort.equals("files")){
+                        dc = new Data_Chatting(idx,room_idx,login_value,nickname,profile_url,sort,content,time,string_array[7]);
                     }
 
                     arrayList.add(dc);
@@ -340,6 +344,19 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
 
                 }else{ // 이미지 여러장
                     Log.d("실행", "이미지 여러장");
+
+                    ClipData clipData = data.getClipData();
+
+                    // 이미지 경로 저장 list
+                    List<String> img_list = new ArrayList<>();
+
+                    for(int i=0; i<clipData.getItemCount(); i++){
+                        img_list.add(getUri.getPath(getApplicationContext(),clipData.getItemAt(i).getUri()));
+                    } // end for
+
+                    // 이미지들을 서버에 전송하기
+                    Files_Sender sender = new Files_Sender(img_list);
+                    sender.start();
                 }
             }
         }
@@ -439,12 +456,20 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
                 e.printStackTrace();
             }
         }
-
+//
         // 파일을 전송하는 함수
         private String fileRead(){
             String result="";
 
             try {
+
+                // 파일명
+                Random generator = new Random();
+                int n = 1000000;
+                n = generator.nextInt(n);
+                String file_Nm = "Image-"+n+".jpg";
+
+
                 dos.writeUTF(file_Nm);
                 Log.d("실행","파일 이름(" + file_Nm + ")을 전송하였습니다.");
 
@@ -484,6 +509,179 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
             return result;
         } // end fileRead()
     } // end File_Sender
+
+
+    // 여러 파일 전송
+    class Files_Sender extends Thread{
+
+        List<String> imgs_list;
+        DataOutputStream dos;
+        FileInputStream fis;
+        BufferedInputStream bis;
+
+        // 생성자
+        public Files_Sender(List<String> imgs_list){
+            this.imgs_list = imgs_list;
+
+            try {
+                // 데이터 전송용 스트림 생성
+                dos = new DataOutputStream(member_socket.getOutputStream());
+            } catch (IOException e) {
+                Log.d("실행","DataOutputStream에러-"+e.getMessage());
+                e.printStackTrace();
+            }
+        }// end 생성자
+
+        // 실행코드
+        @Override
+        public void run() {
+            for(int i=0; i<imgs_list.size(); i++){
+                try {
+                    sleep(300);
+                } catch (InterruptedException e) {e.printStackTrace();}
+
+                Log.d("실행", "=====i="+i+"시작=====");
+
+                try{
+                  // 파일 전송을 할 것이라는 것을 서버에 알린다
+                    dos.writeUTF("files");
+                    dos.flush();
+
+                    /*
+                    order_tag를 보낸다
+                    - 맨 첫번째 => first
+                    - 중간 => center
+                    - 맨 마지막 => end
+                     */
+                    if(i==0){ // 맨 처음
+                        dos.writeUTF("first");
+                    }else if(i==imgs_list.size()-1){  // 맨 마지막
+                        dos.writeUTF("end");
+                    }else{  // 나머지 = 센터
+                        dos.writeUTF("center");
+                    }
+                    dos.flush();
+
+                    // 전송할 파일을 읽어서 Server에 전송
+                    String result = fileRead(dos,imgs_list.get(i));
+                }catch(Exception e){
+                  e.printStackTrace();
+                  Log.d("실행","dos.writeUTF에러-"+e.getMessage());
+                }finally {
+                    //  리소스 초기화
+                    try {
+                        fis.close();
+                    } catch (IOException e) {
+                        Log.d("실행","bis.close()에러-"+e.getMessage());
+                        e.printStackTrace();
+                    }
+                }
+
+            } // end for
+        } // end run
+
+        private String fileRead(DataOutputStream dos,String file_path){
+            String result="";
+
+            try {
+                // 파일명
+                Random generator = new Random();
+                int n = 1000000;
+                n = generator.nextInt(n);
+                String file_Nm = "Image-"+n+".jpg";
+
+                dos.writeUTF(file_Nm);
+                Log.d("실행","파일 이름(" + file_Nm + ")을 전송하였습니다.");
+
+                /*
+                파일을 읽어서 서버에 전송
+                 */
+                File file = new File(file_path);
+
+                // 파일 사이즈 보내기(얼만큼 보낼 것인지 알려주기)
+                dos.writeUTF(file.length()+"");
+                dos.flush();
+
+                fis = new FileInputStream(file); // 파일에서 데이터를 읽기
+                bis = new BufferedInputStream(fis); //FileInputStream보다 더 효율적으로 입출력 위해
+
+                int len;
+                int size = 4096;
+                byte[] data = new byte[size];
+                while((len=bis.read(data)) != -1){
+                    dos.write(data,0,len);
+                    dos.flush();
+                }
+
+                // 서버에 전송(서버로 보내기 위해서 flush를 사용)
+                dos.flush();
+                result = "SUCCESS";
+
+            } catch (IOException e) {
+                Log.d("실행","dos.writeUTF에러-"+e.getMessage());
+                e.printStackTrace();
+                result = "ERROR";
+            }finally {
+                Log.d("실행", "bis, fis close");
+                try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    Log.d("실행","bis.close()에러-"+e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+
+            return result;
+        } // end fileRead()
+    } // end Files_Sender
+
+    private String fileRead(DataOutputStream dos,FileInputStream fis, BufferedInputStream bis){
+        String result="";
+
+        try {
+
+            // 파일명
+            Random generator = new Random();
+            int n = 1000000;
+            n = generator.nextInt(n);
+            String file_Nm = "Image-"+n+".jpg";
+
+            dos.writeUTF(file_Nm);
+            Log.d("실행","파일 이름(" + file_Nm + ")을 전송하였습니다.");
+
+            /*
+            파일을 읽어서 서버에 전송
+             */
+            File file = new File(image_Uri_String);
+
+            // 파일 사이즈 보내기(얼만큼 보낼 것인지 알려주기)
+            dos.writeUTF(file.length()+"");
+            dos.flush();
+
+            fis = new FileInputStream(file); // 파일에서 데이터를 읽기
+            bis = new BufferedInputStream(fis); //FileInputStream보다 더 효율적으로 입출력 위해
+
+            int len;
+            int size = 4096;
+            byte[] data = new byte[size];
+            while((len=bis.read(data)) != -1){
+                dos.write(data,0,len);
+                dos.flush();
+            }
+
+            // 서버에 전송(서버로 보내기 위해서 flush를 사용)
+            dos.flush();
+            result = "SUCCESS";
+
+        } catch (IOException e) {
+            Log.d("실행","dos.writeUTF에러-"+e.getMessage());
+            e.printStackTrace();
+            result = "ERROR";
+        }
+
+        return result;
+    } // end fileRead()
 
 
     // 화면에 꺼지면 -> 채팅방 나가기(socket.close)
