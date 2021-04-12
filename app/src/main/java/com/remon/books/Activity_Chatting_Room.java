@@ -184,10 +184,14 @@ public class Activity_Chatting_Room extends AppCompatActivity {
                     }// end for
                     if(check>0){
                         btn_join.setText("나가기");
+                        btn_enter.setVisibility(View.VISIBLE);
                         state = true;
                     }else{
+                        btn_enter.setVisibility(View.GONE);
+
                         if(count==total){
                             btn_join.setText("대기하기");
+
                         }else{
                             btn_join.setText("참여하기");
                         }
