@@ -94,6 +94,8 @@ public class Activity_Underline_Picture extends AppCompatActivity {
                 setResult(RESULT_OK, intent);
                 finish();
                 break;
+            case R.id.btn_reset: // 펜 모두 지우기
+                my_canvas.Eraser();
         }
     } // end onClick
 }

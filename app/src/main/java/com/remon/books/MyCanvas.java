@@ -140,7 +140,7 @@ public class MyCanvas extends View {
 
             Glide.with(context)
                     .asBitmap()
-                    .load("https://my3my3my.tk/website/Img_Profile/Image_Profile-483962.jpg")
+                    .load(m_filename)
                     .into(new CustomTarget<Bitmap>(){
                         @Override
                         public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
@@ -378,4 +378,56 @@ public class MyCanvas extends View {
 
         return image;
     }
+
+    public void Eraser(){
+        image_Bitmap.eraseColor(Color.WHITE);
+        invalidate();
+
+        /*
+        캔버스에 비트맵 셋팅
+        : 이미지를 로드할 때는, 필요한 만큼만 이미지를 sampling하여 로드할 필요가 있다
+         */
+        final int w = getWidth(); // 뷰너비
+        final int h = getHeight(); // 뷰높이
+        Log.d("실행", "w="+getWidth());
+        Log.d("실행", "h="+getHeight());
+
+        // 여기에서 서버에서 온 경우/아닌 경우 분기
+        if(m_filename.substring(0,4).equals("http")){ // 서버에서
+            Log.d("실행", "서버o");
+
+            Glide.with(context)
+                    .asBitmap()
+                    .load(m_filename)
+                    .into(new CustomTarget<Bitmap>(){
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            bitmap = resource;
+
+                            // 비트맵 리사이즈
+                            Resize_Bitmap(bitmap,w,h);
+                        }
+
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                        }
+                    });
+        }else{ // 이용자의 기기에서
+            Log.d("실행", "서버x");
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.RGB_565;
+            options.inJustDecodeBounds = true;
+            // 이미지 크기를 구할 때는 이 속성을 true로 지정해 주고,
+            // 이 옵션을 이용해서 BitmapFactory의 decode메소드를 사용함
+            BitmapFactory.decodeFile(m_filename,options);
+
+            // 화면 크기에 가장 근접하는 이미지의 리스케일 사이즈
+            bitmap = BitmapFactory.decodeFile(m_filename);
+
+            Resize_Bitmap(bitmap, w, h);
+        }
+
+    } // end Eraser()
 }
