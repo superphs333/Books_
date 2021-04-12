@@ -1,12 +1,15 @@
 package com.remon.books;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.icu.util.Output;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -18,13 +21,18 @@ import com.remon.books.Adapter.Adapter_Chatting;
 import com.remon.books.Data.Data_Chatting;
 import com.remon.books.Function.Function_SharedPreference;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -42,6 +50,12 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
 
     // 함수
     Function_SharedPreference fshared;
+    GetUri getUri;
+        // 절대경로 받아오기
+
+    // 이미지 주소
+    String image_Uri_String;
+
 
     /*
     소켓관련
@@ -62,6 +76,8 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
     Adapter_Chatting mainAdapter;
     LinearLayoutManager linearLayoutManager;
 
+    int PICK_FROM_GALLERY_MULTI = 124;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +93,7 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
 
         // 함수연결
         fshared = new Function_SharedPreference(getApplicationContext());
+        getUri = new GetUri();
 
         // 변수셋팅
         login_value = fshared.get_login_value();
@@ -147,7 +164,13 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
                 thread.start();
                 break;
             case R.id.btn_plus : // 이미지 전송
-                //gallery_imgs_send();
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
+                intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
+                intent.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                //startActivityForResult(intent.createChooser(intent,""), PICK_FROM_GALLERY_MULTI);
+                startActivityForResult(intent,PICK_FROM_GALLERY_MULTI);
         }
     } // end onClick
 
@@ -265,6 +288,8 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
                         dc = new Data_Chatting(sort, content);
                     }else if(sort.equals("message")){
                         dc = new Data_Chatting(idx,room_idx,login_value,nickname,profile_url,sort,content,time,null);
+                    }else if(sort.equals("file")){
+                        dc = new Data_Chatting(idx,room_idx,login_value,nickname,profile_url,sort,content,time,null);
                     }
 
                     arrayList.add(dc);
@@ -293,7 +318,32 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
     } // end MessageThread
 
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
+        if(resultCode == RESULT_OK && requestCode==PICK_FROM_GALLERY_MULTI){
+            if(data==null){
+                // data가 null일 때는 앨범에서 뒤로가기 눌렀을 때
+                // data가 없기 때문에 생기는 오류를 잡아주기 위함
+            }else{
+                if(data.getClipData()==null){ // 이미지 한 장
+                    Log.d("실행", "이미지 한장");
+
+                    image_Uri_String = getUri.getPath(getApplicationContext(),data.getData());
+                    Log.d("실행", "image_Uri_String="+image_Uri_String);
+
+
+                    // 이미지를 서버에 전송하기
+                    File_Sender fileSender = new File_Sender(image_Uri_String);
+                    fileSender.start();
+
+                }else{ // 이미지 여러장
+                    Log.d("실행", "이미지 여러장");
+                }
+            }
+        }
+    } // end onActivityResult
 
     /*
     서버에 데이터를 전송하는 스레드
@@ -343,6 +393,97 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
             }
         } // end run
     }// end Send_To_Server_Thread
+
+    /*
+    서버에 파일을 전송하는 스레드
+     */
+    class File_Sender extends Thread{
+
+        String file_Path; // 파일경로
+        String file_Nm; // 파일 이름
+        DataOutputStream dos;
+        FileInputStream fis;
+        BufferedInputStream bis;
+
+        // 생성자
+        public File_Sender(String file_Path){
+            this.file_Path = file_Path;
+
+            // 파일명
+            Random generator = new Random();
+            int n = 1000000;
+            n = generator.nextInt(n);
+            file_Nm = "Chat_image-"+n+".jpg";
+
+            try{
+                // 데이터 전송용 스트림 생성
+                dos = new DataOutputStream(member_socket.getOutputStream());
+            }catch (IOException e) {
+                Log.d("실행","DataOutputStream에러-"+e.getMessage());
+                e.printStackTrace();
+            }
+        } // end 생성자
+
+        @Override
+        public void run() {
+            try {
+                // 파일 전송을 할 것이라는 것을 서버에 알린다
+                dos.writeUTF("file");
+                dos.flush();
+
+                // 전송 할 파일을 읽어서 Socket Server에 전송
+                String result  = fileRead();
+                Log.d("실행","result:"+result);
+            } catch (IOException e) {
+                Log.d("실행","dos.writeUTF에러-"+e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+        // 파일을 전송하는 함수
+        private String fileRead(){
+            String result="";
+
+            try {
+                dos.writeUTF(file_Nm);
+                Log.d("실행","파일 이름(" + file_Nm + ")을 전송하였습니다.");
+
+                /*
+                파일을 읽어서 서버에 전송
+                 */
+                File file = new File(image_Uri_String);
+
+                // 파일 사이즈 보내기(얼만큼 보낼 것인지 알려주기)
+                dos.writeUTF(file.length()+"");
+                dos.flush();
+
+                fis = new FileInputStream(file); // 파일에서 데이터를 읽기
+                bis = new BufferedInputStream(fis); //FileInputStream보다 더 효율적으로 입출력 위해
+
+                int len;
+                int size = 4096;
+                byte[] data = new byte[size];
+                while((len=bis.read(data)) != -1){
+                    dos.write(data,0,len);
+                    dos.flush();
+                }
+
+                // 서버에 전송(서버로 보내기 위해서 flush를 사용)
+                dos.flush();
+                result = "SUCCESS";
+
+            } catch (IOException e) {
+                Log.d("실행","dos.writeUTF에러-"+e.getMessage());
+                e.printStackTrace();
+                result = "ERROR";
+            }finally {
+                try { bis.close(); } catch (IOException e) { e.printStackTrace(); }
+            }
+
+
+            return result;
+        } // end fileRead()
+    } // end File_Sender
 
 
     // 화면에 꺼지면 -> 채팅방 나가기(socket.close)
