@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -79,6 +80,8 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
 
         // 변수셋팅
         login_value = fshared.get_login_value();
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
 
 
@@ -266,19 +269,16 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
 
                     arrayList.add(dc);
 
-                    new Thread(new Runnable() {
+                    runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mainAdapter.notifyDataSetChanged();
-                                    rv_chatting.getLayoutManager().scrollToPosition(arrayList.size()-1);
-                                    //rv_chatting.scrollToPosition(mainAdapter.getItemCount()-1);
-                                }
-                            });
+                            Log.d("실행", "어댑터 반영");
+
+                            rv_chatting.scrollToPosition(mainAdapter.getItemCount()-1);
+                            mainAdapter.notifyDataSetChanged();
                         }
-                    });
+                    }); // end runOnUiThread
+
                     Log.d("실행", "arraylist_size="+arrayList.size());
 
 
@@ -293,20 +293,7 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
     } // end MessageThread
 
 
-    /*
-    서버에서 받아온 정보를 토대로 데이터를 생성하여
-    arraylist에 넣어준다
-     */
-    private void Input_Chatting_Data(String sort, int idx, String login_value
-            ,String nickname, String profile_url ,String content, String date)
-    {
-        Data_Chatting dc
-                = new Data_Chatting(idx,room_idx,login_value,nickname,profile_url,sort,content
-                ,date,null);
-        arrayList.add(dc);
 
-
-    }
 
     /*
     서버에 데이터를 전송하는 스레드
@@ -344,6 +331,8 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Log.d("실행", "setText 비움");
+
                         edit_chat.setText("");
                     }
                 }); // end runOnUiThread
