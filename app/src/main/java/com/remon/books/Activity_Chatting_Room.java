@@ -314,6 +314,7 @@ public class Activity_Chatting_Room extends AppCompatActivity {
         }else if(id==R.id.btn_enter){ // 채팅방 입장하기
             Intent intent = new Intent(getApplicationContext(),Activity_Chatting.class);
             intent.putExtra("room_idx",idx);
+            intent.putExtra("title",txt_title.getText().toString());
             startActivity(intent);
         }
     } // end Onclick

@@ -17,7 +17,12 @@ import android.view.WindowManager;
 import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.remon.books.Adapter.Adapter_Chatting;
 import com.remon.books.Data.Data_Chatting;
 import com.remon.books.Function.Function_SharedPreference;
@@ -33,7 +38,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import retrofit2.Call;
@@ -46,6 +53,9 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
 
     // 방 idx
     int room_idx;
+
+    // 방 타이틀
+    String title;
 
     // 회원정보
     String login_value;
@@ -70,6 +80,7 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
     // 뷰변수
     RecyclerView rv_chatting;
     EditText edit_chat;
+    TextView txt_title;
 
     /*
     리사이클러뷰
@@ -87,10 +98,15 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
 
         room_idx = getIntent().getIntExtra("room_idx",0);
         Log.d("실행", "room_idx="+room_idx);
+        title = getIntent().getStringExtra("title");
 
         // 뷰연결
+        txt_title = findViewById(R.id.txt_title);
         edit_chat = findViewById(R.id.edit_chat);
         rv_chatting = findViewById(R.id.rv_chatting);
+
+        // 뷰셋팅
+        txt_title.setText(title);
 
 
         // 함수연결
@@ -309,6 +325,17 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
                     }); // end runOnUiThread
 
                     Log.d("실행", "arraylist_size="+arrayList.size());
+
+
+                    // 알람보내기
+                    if(string_array.length==7){
+                        alarm_for_joiner(sort,nickname,content,login_value);
+                    }else if(string_array.length==8){
+                        if(string_array[7].equals("end")){
+                            alarm_for_joiner(sort,nickname,content,login_value);
+                        }
+                    }
+
 
 
 
@@ -682,6 +709,52 @@ public class Activity_Chatting extends AppCompatActivity implements View.OnClick
 
         return result;
     } // end fileRead()
+
+    // 알람전송
+        // sort, login_value,nickname,content
+    private void alarm_for_joiner(final String sort, final String nickname, final String content, final String writer){
+        // 실행할 웹페이지
+        String url = getString(R.string.server_url)+"alarm_for_chatting.php";
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                url,
+                new com.android.volley.Response.Listener<String>() { // 정상 응답
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("실행","response=>"+response);
+
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() { // 에러 발생
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("실행","error=>"+error.getMessage());
+                    }
+                }
+
+        ){ // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
+            // 만약 헤더를 한 줄 추가하고 싶다면 getHeaders() override
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("room_idx",room_idx+""); // 모임 idx
+                params.put("nickname", nickname); // 닉네임
+                params.put("sort", sort); // 분류
+                params.put("content", content); // 내용
+                params.put("title",title);
+                params.put("writer",writer); // 메세지 작성자
+                return params;
+            }
+        };
+
+        // 요청 객체를 만들었으니 이제 requestQueue 객체에 추가하면 됨.
+        // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
+        // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
+        request.setShouldCache(false);
+        AppHelper.requestQueue.add(request);
+
+    }
 
 
     // 화면에 꺼지면 -> 채팅방 나가기(socket.close)

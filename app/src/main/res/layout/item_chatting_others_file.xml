@@ -45,6 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="읽음표시"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/img_chat"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

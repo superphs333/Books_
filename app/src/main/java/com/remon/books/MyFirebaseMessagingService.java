@@ -7,9 +7,12 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.annotation.NonNull;
@@ -25,6 +28,11 @@ import com.google.firebase.messaging.RemoteMessage;
 import com.remon.books.Function.Function_Set;
 import com.remon.books.Function.Function_SharedPreference;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -136,6 +144,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }else if(sort.equals("For_Comment")){
                 Log.d("실행", "idx_memo="+remoteMessage.getData().get("idx_memo"));
                 showNotification("For_Comment",remoteMessage.getData().get("idx_memo"),title,message);
+            }else if(sort.equals("For_Chatting")){
+                // 만약 자기 자신이면 아무반응 x
+                if(!remoteMessage.getData().get("my").equals(fshared.get_login_value())){ // 자기자신
+                    showNotification_for_Chatting("For_Chattinge",remoteMessage.getData().get("room_idx"),title,message,remoteMessage.getData().get("content"),remoteMessage.getData().get("category"),remoteMessage.getData().get("room_title"), remoteMessage.getData().get("nickname"));
+                }
             }
 
 
@@ -240,6 +253,76 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         // 사용자에게 표시 할 내용을 설명하는 개체
     }
 
+    private void showNotification_for_Chatting(String sort, String room_idx, String title,String message ,String content, String category, String room_title, String nickname){
+
+        // 알림 클릭 시 이동 할 액티비티
+        Intent intent = new Intent(this, Activity_Chatting.class);
+        String channel_id = sort;
+        int put = Integer.parseInt(room_idx);
+        intent.putExtra("room_idx",put);
+        intent.putExtra("title",room_title);
+        PendingIntent pendingIntent
+                = PendingIntent.getActivity(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_ONE_SHOT
+                // FLAG_ONE_SHOT = 한번만 사용 할 수 있는 PendingIntent
+        );
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                /*
+        알림 생성하기
+         */
+        NotificationCompat.Builder builder
+                /*
+                Compat사용 이유
+                - 하위 호환 가능
+                - 버전분기 없이 사용 가능하게 해줌(물론, 알람채널 등록은 버전분기를 해줘야 함)
+                 */
+                = new NotificationCompat.Builder(getApplicationContext(),getString(R.string.Channel_ID_Chatting_Room))
+                // 채널 아이디를 제공해야 한다
+                .setSmallIcon(R.mipmap.ic_launcher)
+                // 작은 아이콘(사용자가 볼 수 있는 유일한 필수 콘텐츠)
+                .setAutoCancel(true)
+                // 알람 터치시 자동으로 삭제할 것인지 설정
+                .setVibrate(new long[] {1000, 1000, 1000, 1000, 1000})
+                .setOnlyAlertOnce(true)
+                // 한번만 울리기(중복된 알림은 발생해도 알리지 않음
+                .setContentIntent(pendingIntent);
+
+        // 버전별로 분기
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN){
+            builder = builder.setContent(getCustomDesign_for_Chatting(category,title, message,content, nickname));
+        }else{
+            builder = builder.setContentTitle(title)
+                    .setContentText(message)
+                    .setSmallIcon(R.mipmap.ic_launcher);
+        }
+
+        // 알람채널을 시스템에 등록한다
+        NotificationManager notificationManager
+                = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+            // 채널생성
+            // Notification Channel = notification들을 groupping하는 데 사용됨
+            // Notification을 여러가지 용도로 나누어서 관리할 수 있게 만들어 줌
+            NotificationChannel notificationChannel
+                    = new NotificationChannel(getString(R.string.Channel_ID_Chatting_Room),"채팅방 참여",NotificationManager.IMPORTANCE_HIGH);
+                /*
+                - channel id = 고유한 id값을 설정한다
+                - channel name = 채널의 이름을 설정한다
+                - channel importance - 중요도를 설정한다(DEFAULT, HIGH)
+                 */
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+        notificationManager.notify(0,builder.build());
+        // id = 고유한 알림 식별자
+        // 사용자에게 표시 할 내용을 설명하는 개체
+
+
+    } // end showNotification_for_Chatting
+
 
 
 
@@ -255,4 +338,53 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         remoteViews.setImageViewResource(R.id.noti_icon,R.mipmap.ic_launcher);
         return remoteViews;
     } // end getCustomDesign
+    // 채팅용 : sort,title, message,content
+    private RemoteViews getCustomDesign_for_Chatting(String category,String title,String message, String content, String nickname){
+        // 제목(noti_title) =>
+        // 분류(sort)용도 => 내용을 보일 것인지 or 이미지를 보일 것인지
+        // 내용(noti_message) => message
+
+        /*
+        내용셋팅
+         */
+        final RemoteViews remoteViews
+                = new RemoteViews(getApplicationContext().getPackageName(),
+                R.layout.notification_for_chatting);
+        remoteViews.setTextViewText(R.id.noti_title,title);
+        if(category.equals("message")){
+            remoteViews.setViewVisibility(R.id.noti_message, View.VISIBLE); // 텍스트뷰 보이기
+            remoteViews.setViewVisibility(R.id.for_chatting_img, View.INVISIBLE); // 이미지뷰 안보이기
+            remoteViews.setTextViewText(R.id.noti_message,message); // 텍스트 셋팅
+        }else if(category.equals("file") || category.equals("files")){
+            remoteViews.setViewVisibility(R.id.for_chatting_img, View.VISIBLE); // 이미지뷰 보이기
+            //remoteViews.setViewVisibility(R.id.noti_message, View.INVISIBLE); // 텍스트뷰 안보이기
+            remoteViews.setTextViewText(R.id.noti_message,nickname+":"); // 텍스트 셋팅
+            // url로 부터 비트맵을 받아와서 셋팅한다
+            HttpURLConnection connection = null;
+            try {
+                URL url = new URL(content);
+                try {
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setDoInput(true);
+                    connection.connect();
+                    InputStream input = connection.getInputStream();
+                    Bitmap myBitmap = BitmapFactory.decodeStream(input);
+
+                    remoteViews.setImageViewBitmap(R.id.for_chatting_img,myBitmap);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }finally{
+                if(connection!=null)
+                    connection.disconnect();
+            }
+
+        }
+        return remoteViews;
+    } // end getCustomDesign
+
 }
