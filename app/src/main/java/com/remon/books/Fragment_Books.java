@@ -1,6 +1,8 @@
 package com.remon.books;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -157,7 +159,32 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
 
         switch (id){
             case R.id.floating:
-                anim();
+                //anim();
+
+                AlertDialog.Builder builder
+                        = new AlertDialog.Builder(context);
+                final String str[] = {"직접추가","도서검색"};
+                builder.setTitle("어떤 방식으로 도서를 추가하시겠습니까?")
+                        .setNegativeButton("취소",null)
+                        .setItems(str,// 리스트 목록에 사용할 배열
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Log.d("실행","선택된것="+str[which]);
+
+                                        if(str[which].equals("직접추가")){ // 직접추가
+                                            Intent intent2 = new Intent(context,Activity_Book_Add.class);
+                                            startActivity(intent2);
+                                        }else{ // 도서찾기
+                                            Intent intent = new Intent(context,Activity_Book_Search.class);
+                                            startActivity(intent);
+                                        }
+                                    }
+                                }
+                        );
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
                 break;
             case R.id.floating_search:
                 anim();
@@ -232,7 +259,9 @@ public class Fragment_Books extends Fragment implements View.OnClickListener {
                      */
                     //arrayList = new ArrayList<>();
                     arrayList = response.body();
-                    mainAdapter = new Adater_My_Book(arrayList,context);
+
+                    //
+                   mainAdapter = new Adater_My_Book(arrayList,context);
                     rv_my_books.setAdapter(mainAdapter);
                     linearLayoutManager = new LinearLayoutManager(context);
                     linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);

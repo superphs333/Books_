@@ -409,6 +409,7 @@ public class SignUp extends AppCompatActivity {
     // 입력받은 이메일로 인증문자를 전송한다
     public void send_email(View view) {
 
+        // 입력받은 이메일
         final String email = edit_email.getText().toString();
 
         // 이메일 형식인지 확인한다
@@ -456,6 +457,7 @@ public class SignUp extends AppCompatActivity {
                         = "다음의 인증문자를 입력하세요 :"+temp_email_string;
                 try {
                     gMailSender.sendMail(email_title, email_content, email);
+                    Toast.makeText(getApplicationContext(), "이메일이 전송되었습니다!",Toast.LENGTH_LONG).show();
                 } catch (SendFailedException e) {
                     Toast
                             .makeText(getApplicationContext(), "이메일 형식이 잘못되었습니다.", Toast.LENGTH_SHORT).show();

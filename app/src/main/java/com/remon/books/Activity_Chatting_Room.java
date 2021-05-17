@@ -38,6 +38,8 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import static java.lang.Thread.sleep;
+
 public class Activity_Chatting_Room extends AppCompatActivity {
 
     // 뷰변수
@@ -220,46 +222,106 @@ public class Activity_Chatting_Room extends AppCompatActivity {
 
         if(id==R.id.btn_join){ // 참여하기
 
-            // 만약, 참여인원이 1명이라면(+현재 회원이 참여중인 상태) => 방삭제 알림
-            if(txt_count.getText().toString().equals("1") && state==true ){
-                AlertDialog.Builder builder = new AlertDialog.Builder(Activity_Chatting_Room.this);
-                builder.setTitle("알림"); //AlertDialog의 제목 부분
-                builder.setMessage("방의 마지막 인원이 나가게 되면 방이 삭제됩니다. 방을 삭제하시겠습니까?"); //AlertDialog의 내용 부분
-                builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Log.d("실행","예 누름");
+            // 존재하는 방인지 확인
+            fs.check_room(idx, new Function_Set.VolleyCallback() {
+                @Override
+                public void onSuccess(String result) {
 
-                        // 방 삭제하기
-                        Delete_Chatting_Room();
+                    Log.d("실행", "(후)result="+result);
+
+
+
+                    // 방이 존재하지 않으면 -> 함수 빠져나감
+                    if(result.trim().equals("false")){
+                        Log.d("실행", "false");
+                        return;
                     }
-                });
-                builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Log.d("실행","아니요 누름");
+                    Log.d("실행", "true");
+
+                    // 참가자 다시 불러오기
+                    get_Join_Peoples();
+
+                    try{
+                        sleep(3000);
+                    }catch (InterruptedException e){
+                        e.printStackTrace();
                     }
-                });
-                builder.setNeutralButton("취소", null);
-                builder.create().show(); //보이기
-            }else{
-                // 방장이 나가는 경우
-                if(login_value.equals(leader)){
 
-                    Log.d("실행", "방장");
+                    Log.d("실행", "txt_count=>"+txt_count.getText().toString());
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(Activity_Chatting_Room.this);
-                    builder.setTitle("알림"); //AlertDialog의 제목 부분
-                    builder.setMessage("방장이 나가게 되는 경우 다음 사람이 방장을 위임받게 됩니다. 나가시겠습니까?"); //AlertDialog의 내용 부분
-                    builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Log.d("실행","예 누름");
 
-                            // 방장 변경
-                            leader = arrayList.get(1).getLogin_value();
 
-                            fs.Management_Join_Chatting_Room(idx, login_value, state,arrayList.get(1).getLogin_value() ,new Function_Set.VolleyCallback() {
+                    // 만약, 참여인원이 1명이라면(+현재 회원이 참여중인 상태) => 방삭제 알림
+                    if(txt_count.getText().toString().equals("1") && state==true ){
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(Activity_Chatting_Room.this);
+                        builder.setTitle("알림"); //AlertDialog의 제목 부분
+                        builder.setMessage("방의 마지막 인원이 나가게 되면 방이 삭제됩니다. 방을 삭제하시겠습니까?"); //AlertDialog의 내용 부분
+                        builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d("실행","예 누름");
+
+                                // 방 삭제하기
+                                Delete_Chatting_Room();
+                            }
+                        });
+                        builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.d("실행","아니요 누름");
+                            }
+                        });
+                        builder.setNeutralButton("취소", null);
+                        builder.create().show(); //보이기
+                    }else{
+                        // 방장이 나가는 경우
+                        if(login_value.equals(leader)){
+
+                            Log.d("실행", "방장");
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(Activity_Chatting_Room.this);
+                            builder.setTitle("알림"); //AlertDialog의 제목 부분
+                            builder.setMessage("방장이 나가게 되는 경우 다음 사람이 방장을 위임받게 됩니다. 나가시겠습니까?"); //AlertDialog의 내용 부분
+                            builder.setPositiveButton("예", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Log.d("실행","예 누름");
+
+                                    // 방장 변경
+                                    leader = arrayList.get(1).getLogin_value();
+
+                                    fs.Management_Join_Chatting_Room(idx, login_value, state,arrayList.get(1).getLogin_value() ,new Function_Set.VolleyCallback() {
+                                        @Override
+                                        public void onSuccess(String result) {
+
+                                            String[] string_array= result.split("§");
+
+                                            if(string_array[0].equals("success")){
+                                                get_Join_Peoples();
+                                                txt_count.setText(string_array[1]+"");
+                                                count = Integer.parseInt(string_array[1]);
+                                            }else if(string_array[0].equals("Duplicate")){
+                                                Toast.makeText(getApplicationContext(), "이미 대기중인 상태입니다",Toast.LENGTH_LONG).show();
+                                            }else{
+                                                Toast.makeText(getApplicationContext(), "죄송합니다.문제가 발생하였습니다.",Toast.LENGTH_LONG).show();
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                            builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Log.d("실행","아니요 누름");
+                                }
+                            });
+                            builder.setNeutralButton("취소", null);
+                            builder.create().show(); //보이기
+
+
+                        }else{
+                            fs.Management_Join_Chatting_Room(idx, login_value, state, new Function_Set.VolleyCallback() {
                                 @Override
                                 public void onSuccess(String result) {
 
@@ -277,39 +339,13 @@ public class Activity_Chatting_Room extends AppCompatActivity {
                                 }
                             });
                         }
-                    });
-                    builder.setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Log.d("실행","아니요 누름");
-                        }
-                    });
-                    builder.setNeutralButton("취소", null);
-                    builder.create().show(); //보이기
 
 
-                }else{
-                    fs.Management_Join_Chatting_Room(idx, login_value, state, new Function_Set.VolleyCallback() {
-                        @Override
-                        public void onSuccess(String result) {
-
-                            String[] string_array= result.split("§");
-
-                            if(string_array[0].equals("success")){
-                                get_Join_Peoples();
-                                txt_count.setText(string_array[1]+"");
-                                count = Integer.parseInt(string_array[1]);
-                            }else if(string_array[0].equals("Duplicate")){
-                                Toast.makeText(getApplicationContext(), "이미 대기중인 상태입니다",Toast.LENGTH_LONG).show();
-                            }else{
-                                Toast.makeText(getApplicationContext(), "죄송합니다.문제가 발생하였습니다.",Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
+                    }
                 }
+            }); // end volley
 
 
-            }
 
         }else if(id==R.id.btn_enter){ // 채팅방 입장하기
             Intent intent = new Intent(getApplicationContext(),Activity_Chatting.class);

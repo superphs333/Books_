@@ -187,6 +187,7 @@ public class Fragment_mypage extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context,Change_nickname.class);
+                intent.putExtra("sort","from_mypage");
                 startActivity(intent);
             }
         });

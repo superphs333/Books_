@@ -142,8 +142,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             }else if(sort.equals("For_memo_like")){
                 showNotification("For_memo_like","3",title,message);
             }else if(sort.equals("For_Comment")){
-                Log.d("실행", "idx_memo="+remoteMessage.getData().get("idx_memo"));
-                showNotification("For_Comment",remoteMessage.getData().get("idx_memo"),title,message);
+                // 만약 자기 자신이면 아무반응 x
+                if(!remoteMessage.getData().get("writer").equals(fshared.get_login_value())){
+                    Log.d("실행", "idx_memo="+remoteMessage.getData().get("idx_memo"));
+                    showNotification("For_Comment",remoteMessage.getData().get("idx_memo"),title,message);
+                }
             }else if(sort.equals("For_Chatting")){
                 // 만약 자기 자신이면 아무반응 x
                 if(!remoteMessage.getData().get("my").equals(fshared.get_login_value())){ // 자기자신
@@ -175,7 +178,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if(sort.equals("For_chatting_room_waiting_list")){
             intent = new Intent(this, Activity_Chatting_Room.class);
             intent.putExtra("idx",putextra);
-
         }else if(sort.equals("For_Follow")){
             intent = new Intent(this, Activity_Management_Follow.class);
             intent.putExtra("login_value",putextra);

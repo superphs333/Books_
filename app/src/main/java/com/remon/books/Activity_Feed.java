@@ -74,9 +74,14 @@ public class Activity_Feed extends AppCompatActivity {
         follow = getIntent().getBooleanExtra("follow",false);
         if(follow==true){ // 이미 팔로우 상태 -> txt_follow="팔로우 취소"
             txt_follow.setText("팔로우 취소");
-        }else{ // 팔로우 상태x -> txt_follow Visible
+        }else if(follow==false){ // 팔로우 상태x -> txt_follow Visible
             txt_follow.setText("팔로우");
         }
+        // 만약 자기 자신이면 txt_follow 없앰
+        if(target_login_value.equals(fshared.get_login_value())){
+            txt_follow.setVisibility(View.GONE);
+        }
+
 
         Bring_Memo_Datas();
 

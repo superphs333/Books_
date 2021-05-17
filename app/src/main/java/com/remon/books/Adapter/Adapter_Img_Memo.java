@@ -48,11 +48,13 @@ public class Adapter_Img_Memo
     public class CustomViewHolder extends RecyclerView.ViewHolder{
 
         // 위젯정의
-        protected ImageView img_memo;
+        protected ImageView img_memo,img_delete;
 
         public CustomViewHolder(@NonNull View itemView) {
             super(itemView);
             this.img_memo = (ImageView)itemView.findViewById(R.id.img_memo);
+            this.img_delete = (ImageView)itemView.findViewById(R.id.img_delete);
+
         }
     }
 
@@ -86,16 +88,39 @@ public class Adapter_Img_Memo
         }
 
         // 이미지 클릭 -> 밑줄을 그을 수 있는 액티비티로 이동
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//        holder.itemView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Log.d("실행", "보낼 position="+position);
+//                Intent intent = new Intent(context, Activity_Underline_Picture.class);
+//                intent.putExtra("img_url",arrayList.get(position).getImg());
+//                intent.putExtra("position", position+"");
+//                activity.startActivityForResult(intent,999);
+//            }
+//        });
+
+        // 이미지 부분 클릭 ->  밑줄을 그을 수 있는 액티비티로 이동
+        holder.img_memo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("실행", "보낼 position="+position);
+                Log.d("실행", "보낼 position="+holder.getAdapterPosition());
                 Intent intent = new Intent(context, Activity_Underline_Picture.class);
-                intent.putExtra("img_url",arrayList.get(position).getImg());
-                intent.putExtra("position", position+"");
+                intent.putExtra("img_url",arrayList.get(holder.getAdapterPosition()).getImg());
+                intent.putExtra("position", holder.getAdapterPosition()+"");
                 activity.startActivityForResult(intent,999);
             }
         });
+
+        // img_delete클릭(x버튼) -> 이미지 삭제
+        holder.img_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("실행", "img_delete 클릭");
+                arrayList.remove(holder.getAdapterPosition());
+                notifyItemRemoved(holder.getAdapterPosition());
+            }
+        });
+
     }
 
     @Override

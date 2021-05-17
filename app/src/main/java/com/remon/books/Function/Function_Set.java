@@ -48,6 +48,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.firebase.ui.auth.AuthUI.getApplicationContext;
+import static com.remon.books.AppHelper.requestQueue;
 
 public class Function_Set {
 
@@ -137,8 +138,15 @@ public class Function_Set {
                             result[0] = "able";
 
                         }else if(response.equals("unable")){ // 중복 이메일 존재
-                            Toast
-                                    .makeText(context, "중복된 이메일이 존재합니다",Toast.LENGTH_LONG).show();
+
+                            if(sort.equals("email")){
+                                Toast
+                                        .makeText(context, "중복된 이메일이 존재합니다",Toast.LENGTH_LONG).show();
+                            }else if(sort.equals("nickname")){
+                                Toast
+                                        .makeText(context, "중복된 닉네임이 존재합니다",Toast.LENGTH_LONG).show();
+                            }
+
 
                            result[0] = "unable";
 
@@ -418,7 +426,10 @@ public class Function_Set {
         - 서버(member_info_change.php)로 이동
         - 값여부/sort에 따라 페이지 이동
      */
-    public void Change_Member_Info(final String sort, final String change, final String login_value){
+    public void Change_Member_Info(final String sort, final String change, final String login_value, final boolean only_pw_change){
+
+
+
         // 웹페이지 실행하기
         String url = context.getString(R.string.server_url)+"member_info_change.php";
 
@@ -443,9 +454,15 @@ public class Function_Set {
 
                         // pw인 경우 nickname인 경우 분기
                         if(sort.equals("pw")){ // pw인 경우 -> MainActivity이동
-                            Intent intent = new Intent(context, MainActivity.class);
-                            context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-                            activity.finish();
+
+                            // 페이지 이동 분기 -> 비밀번호 찾기 or 비밀번호 변경
+                            if(only_pw_change==true){
+                                activity.finish();
+                            }else{
+                                Intent intent = new Intent(context, MainActivity.class);
+                                context.startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                                activity.finish();
+                            }
                         }else if(sort.equals("nickname")){ // nickname인 경우
 
                         }
@@ -640,6 +657,8 @@ public class Function_Set {
         // sort = 데이터베이스(My_Books)중에서 어떤 속성을 변경할것인지
         // value =  해당 속성의 값을 무엇으로 할 것인지
 
+        Log.d("실행", "Update_My_Book_Data 함수");
+
         // login_value
         fshared = new Function_SharedPreference(context);
         final String login_value = fshared.getPreferenceString("member","login_value");
@@ -684,7 +703,9 @@ public class Function_Set {
         // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
         // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
         request.setShouldCache(false);
-         AppHelper.requestQueue.add(request);
+        //AppHelper.requestQueue.add(request);
+        requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(request);
 
     } // end Update_My_Book_Data
 
@@ -741,6 +762,88 @@ public class Function_Set {
 
     } // end Update_My_Book_Data
 
+    // 채팅방 존재하는지 확인
+    public void check_room(final int idx, final VolleyCallback callback){
+        // 웹페이지 실행하기
+        String url = context.getString(R.string.server_url)+"check_room.php";
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                url,
+                new com.android.volley.Response.Listener<String>() { // 정상 응답
+                    @Override
+                    public void onResponse(String response) {
+                        //Log.d("실행","response=>"+response);
+
+                        callback.onSuccess(response);
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() { // 에러 발생
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("실행","error=>"+error.getMessage());
+                    }
+                }
+
+        ){ // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
+            // 만약 헤더를 한 줄 추가하고 싶다면 getHeaders() override
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("idx", String.valueOf(idx));
+                return params;
+            }
+        };
+
+        // 요청 객체를 만들었으니 이제 requestQueue 객체에 추가하면 됨.
+        // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
+        // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
+        request.setShouldCache(false);
+        AppHelper.requestQueue.add(request);
+
+    }
+
+    // 채팅룸 참여 OR 나가기 가능한지 확인
+    public void check_management_join_chatting_room(final int idx, final boolean state, final VolleyCallback callback){
+        String url = context.getString(R.string.server_url)+"Chk_Join_Room.php";
+
+        StringRequest request = new StringRequest(
+                Request.Method.POST,
+                url,
+                new com.android.volley.Response.Listener<String>() { // 정상 응답
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("실행","response=>"+response);
+
+                        callback.onSuccess(response);
+                    }
+                },
+                new com.android.volley.Response.ErrorListener() { // 에러 발생
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("실행","error=>"+error.getMessage());
+                    }
+                }
+
+        ){ // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
+            // 만약 헤더를 한 줄 추가하고 싶다면 getHeaders() override
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("idx", String.valueOf(idx));
+                params.put("state", String.valueOf(state));
+                return params;
+            }
+        };
+
+        // 요청 객체를 만들었으니 이제 requestQueue 객체에 추가하면 됨.
+        // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
+        // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
+        request.setShouldCache(false);
+        AppHelper.requestQueue.add(request);
+
+    }
+
     // 채팅룸 참여/나가기 관리
     public void Management_Join_Chatting_Room(final int idx, final String login_value, final boolean state, final VolleyCallback callback){
         // 웹페이지 실행하기
@@ -755,7 +858,7 @@ public class Function_Set {
                         Log.d("실행","response=>"+response);
 
                         callback.onSuccess(response);
-                    }
+                }
                 },
                 new com.android.volley.Response.ErrorListener() { // 에러 발생
                     @Override

@@ -164,6 +164,9 @@ public class Activity_Setting extends AppCompatActivity {
     - 알림창 ->
      */
     public void withdrawal(View view) {
+
+        Log.d("실행", "가입형태=>"+fshared.getPreferenceString("member","platform_type"));
+
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("알림"); //AlertDialog의 제목 부분
         builder.setMessage("정말로 탈퇴하시겠습니까?"); //AlertDialog의 내용 부분
@@ -185,6 +188,8 @@ public class Activity_Setting extends AppCompatActivity {
 
     // 회원정보 삭제
     public void withdrawal(){
+
+
         // 현재 회원 login_value값
         final String login_value = fshared.getPreferenceString("member","login_value");
         Log.d("실행", "login_value="+login_value);
@@ -201,8 +206,12 @@ public class Activity_Setting extends AppCompatActivity {
                     public void onResponse(String response) {
                         Log.d("실행","response=>"+response);
 
+
+
+
                         if(response.equals("success")){
                             // 회원정보 삭제 성공
+
 
                             // 구글 or 일반 로그인 분기
                             if(fshared.getPreferenceString("member","platform_type").equals("google")){

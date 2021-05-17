@@ -49,6 +49,9 @@ public class Change_nickname extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_nickname);
 
+        Log.d("실행", "Change_nickname onCreate");
+
+
         /*
         뷰연결
          */
@@ -110,6 +113,14 @@ public class Change_nickname extends AppCompatActivity {
          }); // end edit_nick.addTextChangedListener
 
 
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        Log.d("실행", "Change_nickname onDestroy");
 
     }
 
@@ -181,18 +192,26 @@ public class Change_nickname extends AppCompatActivity {
 
                         // 성공인경우
                         if(response.equals("success")){
+
                             Toast.makeText(getApplicationContext()
                                     , "닉네임 변경이 완료되었습니다",Toast.LENGTH_LONG).show();
-
-                            // shared에 google로 로그인 했다는 것 저장
-                            fs.setPreference("member","platform_type","google");
 
                             // shared에 변경된 닉네임 저장
                             fs.setPreference("member","nickname",change_nickname);
 
-                            // 액티비티 종료
-                            finish();
+                            // 구분 : 구글 로그인 or 마이페이지
+                            if(getIntent().getStringExtra("sort").equals("from_mypage")){
 
+                                fs.setPreference("member","platform_type","normal");
+
+                                finish();
+                            }else{
+                                // shared에 google로 로그인 했다는 것 저장
+                                fs.setPreference("member","platform_type","google");
+
+                                // 액티비티 종료
+                                finish();
+                            }
 
                         }else{
                             Toast.makeText(getApplicationContext()

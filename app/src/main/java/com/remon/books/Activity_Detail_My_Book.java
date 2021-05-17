@@ -115,59 +115,59 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
 
 
         // 카테고리 변경시 -> 데이터베이스 반영
-//        category_read_status.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//
-//                // status -> 읽고싶은:0, 읽는중:1, 읽음:2
-//                int status;
-//                if(category_read_status.getSelectedItem().toString().equals(getString(R.string.read_bucket))){
-//                    // 읽고싶은
-//                    status = 0;
-//                }else if(category_read_status.getSelectedItem().toString().equals(getString(R.string.read_reading))){
-//                    // 읽는중
-//                    status = 1;
-//                }else{
-//                    // 읽음
-//                    status = 2;
-//                }
-//
-//                // 데이터베이스에 반영
-//                // 웹페이지 실행하기
-//                fs.Update_My_Book_Data(unique_book_value, "status", String.valueOf(status), new Function_Set.VolleyCallback() {
-//                    @Override
-//                    public void onSuccess(String result) {
-//                        Log.d("실행","(int Acitivty Detail My Books)result="+result);
-//
+        category_read_status.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                // status -> 읽고싶은:0, 읽는중:1, 읽음:2
+                int status;
+                if(category_read_status.getSelectedItem().toString().equals(getString(R.string.read_bucket))){
+                    // 읽고싶은
+                    status = 0;
+                }else if(category_read_status.getSelectedItem().toString().equals(getString(R.string.read_reading))){
+                    // 읽는중
+                    status = 1;
+                }else{
+                    // 읽음
+                    status = 2;
+                }
+
+                // 데이터베이스에 반영
+                // 웹페이지 실행하기
+                fs.Update_My_Book_Data(unique_book_value, "status", String.valueOf(status), new Function_Set.VolleyCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        Log.d("실행","(int Acitivty Detail My Books)result="+result);
+
 //                        if(result.equals("success")){
-//                            //Toast.makeText(getApplicationContext(), "성공적으로 반영되었습니다",Toast.LENGTH_LONG).show();
+//                            Toast.makeText(getApplicationContext(), "성공적으로 반영되었습니다",Toast.LENGTH_LONG).show();
 //                        }
-//                    }
-//                });
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
+                    }
+                });
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         // 별점 변경시 -> 데이터베이스에 반영
-//        rating_bar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-//            @Override
-//            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-//                fs.Update_My_Book_Data(unique_book_value, "rating", rating_bar.getRating() + "", new Function_Set.VolleyCallback() {
-//                    @Override
-//                    public void onSuccess(String result) {
-//                        Log.d("실행","(int Acitivty Detail My Books)result="+result);
-//
+        rating_bar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                fs.Update_My_Book_Data(unique_book_value, "rating", rating_bar.getRating() + "", new Function_Set.VolleyCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        Log.d("실행","(int Acitivty Detail My Books)result="+result);
+
 //                        if(result.equals("success")){
-//                            //Toast.makeText(getApplicationContext(), "성공적으로 반영되었습니다",Toast.LENGTH_LONG).show();
+//                            Toast.makeText(getApplicationContext(), "성공적으로 반영되었습니다",Toast.LENGTH_LONG).show();
 //                        }
-//                    }
-//                });
-//            }
-//        }); // end rating_bar.setOnRatingBarChangeListener
+                    }
+                });
+            }
+        }); // end rating_bar.setOnRatingBarChangeListener
 
 
 
@@ -179,8 +179,6 @@ public class Activity_Detail_My_Book extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-
 
         /*
         unique_book_value에 해당하는 데이터 불러오기

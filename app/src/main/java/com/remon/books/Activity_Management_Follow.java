@@ -64,6 +64,7 @@ public class Activity_Management_Follow extends AppCompatActivity {
         rv_follows = findViewById(R.id.rv_follows);
         btn_follower = findViewById(R.id.btn_follower);
         btn_following = findViewById(R.id.btn_following);
+        txt_count.setVisibility(View.GONE);
 
         fshared = new Function_SharedPreference(getApplicationContext());
         login_value = fshared.get_login_value();

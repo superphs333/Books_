@@ -22,13 +22,15 @@
         android:layout_height="wrap_content"
         android:text="앱설정"
         android:textSize="18sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/btn_alarm_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="알람설정" />
+        android:text="알람설정"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/textView18"
@@ -43,7 +45,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="Go_To_Management_Comment"
-        android:text="댓글관리" />
+        android:text="댓글관리"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/btn_follow"

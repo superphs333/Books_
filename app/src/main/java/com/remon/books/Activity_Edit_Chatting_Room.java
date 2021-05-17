@@ -23,7 +23,7 @@ import org.json.JSONException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Activity_Edit_Chatting_Room extends AppCompatActivity {
+public class  Activity_Edit_Chatting_Room extends AppCompatActivity {
 
     // 뷰변수
     EditText edit_title, edit_explain, edit_count;

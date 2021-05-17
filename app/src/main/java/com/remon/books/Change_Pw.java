@@ -57,7 +57,7 @@ public class Change_Pw extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change__pw);
-        Log.d("실행", "");
+        Log.d("실행", "===Change_Pw(onCreate)===");
 
 
 
@@ -201,7 +201,7 @@ public class Change_Pw extends AppCompatActivity {
         }
 
         // 모두 일치하므로, 비밀번호 변경
-        fs.Change_Member_Info("pw",edit_pw.getText().toString(),email);
+        fs.Change_Member_Info("pw",edit_pw.getText().toString(),email, true);
 
 
     } // end Pw_Change

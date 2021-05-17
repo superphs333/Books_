@@ -131,6 +131,8 @@ public class Find_Pw extends AppCompatActivity {
                                 = "다음의 인증문자를 입력하세요 :"+temp_string;
                         try {
                             gMailSender.sendMail(email_title, email_content, email);
+                            Toast.makeText(getApplicationContext(), "인증문자가 전송되었습니다!",Toast.LENGTH_LONG).show();
+
                         } catch (SendFailedException e) {
                             Toast
                                     .makeText(getApplicationContext(), "이메일 형식이 잘못되었습니다.", Toast.LENGTH_SHORT).show();

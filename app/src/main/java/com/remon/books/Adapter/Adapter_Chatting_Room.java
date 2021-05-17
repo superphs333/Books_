@@ -1,4 +1,5 @@
 package com.remon.books.Adapter;
+import android.widget.Toast;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -16,10 +17,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.bumptech.glide.Glide;
 import com.remon.books.Activity_Chatting_Room;
 import com.remon.books.Activity_Edit_Chatting_Room;
 import com.remon.books.Activity_Underline_Picture;
+import com.remon.books.AppHelper;
 import com.remon.books.Data.Data_Chatting_Room;
 import com.remon.books.Data.Data_Img_Memo;
 import com.remon.books.Function.Function_Set;
@@ -28,6 +34,8 @@ import com.remon.books.ItemTouchHelperListener;
 import com.remon.books.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Adapter_Chatting_Room
     extends RecyclerView.Adapter<Adapter_Chatting_Room.CustomViewHolder>
@@ -130,6 +138,48 @@ public class Adapter_Chatting_Room
                                             intent.putExtra("idx",arrayList.get(holder.getAdapterPosition()).getIdx());
                                             activity.startActivity(intent);
                                         }else if(str[which].equals("삭제")){
+                                            // 웹페이지 실행하기
+                                            String url = context.getString(R.string.server_url)+"Delete_Room.php";
+
+                                            StringRequest request = new StringRequest(
+                                                    Request.Method.POST,
+                                                    url,
+                                                    new com.android.volley.Response.Listener<String>() { // 정상 응답
+                                                        @Override
+                                                        public void onResponse(String response) {
+                                                            Log.d("실행","response=>"+response);
+
+                                                            if(response.trim().equals("success")){
+                                                                Toast.makeText(context, "성공적으로 삭제되었습니다",Toast.LENGTH_LONG).show();
+                                                                arrayList.remove(holder.getAdapterPosition());
+                                                                notifyItemRemoved(holder.getAdapterPosition());
+                                                            }else{
+                                                                Toast.makeText(context, "죄송합니다.문제가 생겼습니다.",Toast.LENGTH_LONG).show();
+                                                            }
+                                                        }
+                                                    },
+                                                    new com.android.volley.Response.ErrorListener() { // 에러 발생
+                                                        @Override
+                                                        public void onErrorResponse(VolleyError error) {
+                                                            Log.d("실행","error=>"+error.getMessage());
+                                                        }
+                                                    }
+
+                                            ){ // Post 방식으로 body에 요청 파라미터를 넣어 전달하고 싶을 경우
+                                                // 만약 헤더를 한 줄 추가하고 싶다면 getHeaders() override
+                                                @Override
+                                                protected Map<String, String> getParams() throws AuthFailureError {
+                                                    Map<String, String> params = new HashMap<String, String>();
+                                                    params.put("room_idx", arrayList.get(holder.getAdapterPosition()).getIdx()+"");
+                                                    return params;
+                                                }
+                                            };
+
+                                            // 요청 객체를 만들었으니 이제 requestQueue 객체에 추가하면 됨.
+                                            // Volley는 이전 결과를 캐싱하므로, 같은 결과가 있으면 그대로 보여줌
+                                            // 하지만 아래 메소드를 false로 set하면 이전 결과가 있더라도 새로 요청해서 응답을 보여줌.
+                                            request.setShouldCache(false);
+                                            AppHelper.requestQueue.add(request);
 
                                         }
                                     }

@@ -391,6 +391,8 @@ public class MainActivity extends AppCompatActivity {
      */
     public void login(View view) {
         final String email = edit_email.getText().toString();
+        Log.d("실행", "email="+email);
+
 
         // 이메일 유효성 확인
         if(!function_set.is_Email(email)){
@@ -498,8 +500,11 @@ public class MainActivity extends AppCompatActivity {
                         if(response.equals("1")){
                             // 존재하는 회원(구글-로그하웃 했다가, 다시 로그인하는 경우)
 
-                            // Shared - member 에 저장
+                            // Shared - member 에 저장,
                             function_sharedPreference.setPreference("member","login_value",login_value);
+
+                            // shared에 google로 로그인 했다는 것 저장
+                            function_sharedPreference.setPreference("member","platform_type","google");
 
                             // Main페이지로 이동
                             Intent intent = new Intent(context,Main.class);
